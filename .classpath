@@ -16,5 +16,7 @@
 	<classpathentry combineaccessrules="false" kind="src" path="/idemix_library"/>
 	<classpathentry combineaccessrules="false" kind="src" path="/idemix_terminal"/>
 	<classpathentry kind="lib" path="WebContent/WEB-INF/lib/gson-2.2.2.jar"/>
+	<classpathentry combineaccessrules="false" kind="src" path="/scuba_smartcards"/>
+	<classpathentry combineaccessrules="false" kind="src" path="/scuba_util"/>
 	<classpathentry kind="output" path="build/classes"/>
 </classpath>

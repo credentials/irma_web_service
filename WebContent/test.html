@@ -12,7 +12,7 @@
     <param name="type" value="application/x-java-applet;version=1.6" />
     <param name="scriptable" value="true" />
     <param name="mayscript" value="true" />
-    <embed type="application/x-java-applet;version=1.6" hidden="true" code="org.ovchip.scjs.SmartCardJS.class" archive="smartcardjs.jar" scriptable="true" mayscript="true" height="200" width="450" />
+    <embed type="application/x-java-applet;version=1.6" hidden="true" code="org.irmacard.scjs.SmartCardJS.class" archive="smartcardjs.jar" scriptable="true" mayscript="true" height="200" width="450" />
   </object>
   <button id="testbutton">Test</button>
   <script src="js/jquery.js" lang="JavaScript" type="text/javascript"></script>
@@ -24,7 +24,7 @@
 	  SmartCardHandler.init();
 	  $('#testbutton').bind('click', function() {
 		  $.ajax({
-			  url: '/IRMAweb/protocols/verification/4',
+			  url: '/irma_web_service/protocols/verification/4',
 			  contentType: 'application/json',
 			  data: JSON.stringify({crednr: 4}),
 			  type: 'POST',

@@ -1,0 +1,61 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="UTF-8">
+<title>Smartcard applet test</title>
+</head>
+<body>
+<h1>SmartCardJS - test</h1>
+  <object classid="clsid:8AD9C840-044E-11D1-B3E9-00805F499D93" height="200" width="450">
+    <param name="code" value="org.ovchip.SmartCardJS.class" />
+    <param name="archive" value="smartcardjs.jar" />
+    <param name="type" value="application/x-java-applet;version=1.6" />
+    <param name="scriptable" value="true" />
+    <param name="mayscript" value="true" />
+    <embed type="application/x-java-applet;version=1.6" hidden="true" code="org.irmacard.scjs.SmartCardJS.class" archive="smartcardjs.jar" scriptable="true" mayscript="true" height="200" width="450" />
+  </object>
+  <button id="testbutton">Test</button>
+  <button id="testpin">Test Pin</button>
+  <script src="js/jquery.js" lang="JavaScript" type="text/javascript"></script>
+  
+  <script src="js/smartcardjs.js" lang="JavaScript" type="text/javascript"></script>
+  <script type="text/javascript">
+
+  $(function() {
+	  SmartCardHandler.init();
+	  $('#testpin').bind('click', function() {
+		  // Select Applet
+		  SmartCardHandler.connectFirstCard();
+		  console.log(SmartCardHandler.transmit("00A40400066964656D697800"));
+		  
+		  // Send Pin
+		  console.log(SmartCardHandler.applet.verifyPin());
+	  })
+	  $('#testbutton').bind('click', function() {
+		  $.ajax({
+			  url: '/irma_web_service/protocols/verification/4',
+			  contentType: 'application/json',
+			  data: JSON.stringify({crednr: 4}),
+			  type: 'POST',
+			  success: function(data) {
+				  console.log(data);
+				  SmartCardHandler.connectFirstCard();
+				  var response = SmartCardHandler.transmitCommandSet(data.commands);
+				  console.log(response);
+				  $.ajax({
+					  url: data.responseurl,
+					  contentType: 'application/json',
+					  data: JSON.stringify(response),
+					  type: 'POST',
+					  success: function(data) {
+						  console.log('and back!');
+						  console.log(data);						  
+					  }
+				  });
+			  }
+		  });
+	  });
+  });
+  </script>
+</body>
+</html>

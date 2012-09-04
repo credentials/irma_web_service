@@ -22,6 +22,16 @@
 
   $(function() {
 	  SmartCardHandler.init();
+	  SmartCardHandler.bind("cardInserted", function() {
+		 console.log("Apparently, a card was inserted!"); 
+	  });
+	  SmartCardHandler.bind("cardRemoved", function() {
+		  console.log("Apparently, a card was removed!"); 
+	  });
+	  
+	  SmartCardHandler.bind("appletReady", function() {
+		  console.log("Applet was loaded and is ready for action!");
+	  })
 	  $('#testbutton').bind('click', function() {
 		  $.ajax({
 			  url: '/irma_web_service/protocols/verification/4',

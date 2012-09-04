@@ -3,6 +3,8 @@ package org.irmacard.web.restapi.resources;
 import java.lang.reflect.Type;
 import java.math.BigInteger;
 import java.util.List;
+import java.util.Map;
+import java.util.UUID;
 
 import net.sourceforge.scuba.smartcards.IResponseAPDU;
 import net.sourceforge.scuba.smartcards.ResponseAPDU;
@@ -47,12 +49,12 @@ public class VerificationProtocolResource extends ServerResource {
 	@Post("json")
 	public String handlePost (String value) {
 		Integer crednr = Integer.parseInt((String) getRequestAttributes().get("crednr"));
-		String nonce = (String) getRequestAttributes().get("nonce");
+		String id = (String) getRequestAttributes().get("id");
 		String round = (String) getRequestAttributes().get("round");
-		if (nonce == null) {
+		if (id == null) {
 			return step0(crednr,value);
 		} else if (round != null && round.equals("1")) {
-			return step1(crednr,value,nonce);
+			return step1(crednr,value,id);
 		}
 		return null;
 	}
@@ -68,7 +70,6 @@ public class VerificationProtocolResource extends ServerResource {
 				setPrettyPrinting().
 				registerTypeAdapter(ProtocolCommand.class, new ProtocolCommandSerializer()).
 				create();
-
 		IdemixCredentials ic = new IdemixCredentials();
 		
 		IdemixVerifySpecification vspec = IdemixVerifySpecification
@@ -77,9 +78,16 @@ public class VerificationProtocolResource extends ServerResource {
 			CommandSet cs = new CommandSet();
 			Nonce nonce = ic.generateNonce(vspec);
 			cs.commands = ic.requestProofCommands(vspec, nonce);
-			// OK, this is kind of dirty, but I need a representation of the nonce :)
-			String strnonce = Hex.bytesToHexString(((IdemixNonce)nonce).getNonce().toByteArray());
-			cs.responseurl = getReference().getPath() + "/" + strnonce + "/1";
+			
+			// Save the state, use random id as key
+			UUID id = UUID.randomUUID();
+			BigInteger intNonce = ((IdemixNonce)nonce).getNonce();
+			
+			@SuppressWarnings("unchecked")
+			Map<String ,BigInteger> noncemap = (Map<String,BigInteger>)getContext().getAttributes().get("noncemap");
+			noncemap.put(id.toString(), intNonce);
+
+			cs.responseurl = getReference().getPath() + "/" + id.toString() + "/1";
 			return gson.toJson(cs);
 		} catch (CredentialsException e) {
 			e.printStackTrace();
@@ -92,19 +100,26 @@ public class VerificationProtocolResource extends ServerResource {
 	 * Handle the next step of the verification protocol.
 	 * @param crednr credential number
 	 * @param value request body (with the card responses)
-	 * @param strNonce nonce, hex-encoded.
+	 * @param verificationId nonce, hex-encoded.
 	 * @return
 	 */
-	public String step1(int crednr, String value, String strNonce) {
+	public String step1(int crednr, String value, String verificationId) {
 		Gson gson = new GsonBuilder().
 				setPrettyPrinting().
 				registerTypeAdapter(IResponseAPDU.class, new ResponseAPDUDerializer()).
 				create();
+		
+		
+		// Get the nonce based on the id
+		@SuppressWarnings("unchecked")
+		Map<String ,BigInteger> noncemap = (Map<String,BigInteger>)getContext().getAttributes().get("noncemap");
+		BigInteger intNonce = noncemap.get(verificationId);
+		IdemixNonce nonce = new IdemixNonce(intNonce);
+		
 		ProtocolResponses responses = gson.fromJson(value, ProtocolResponses.class);		
 		IdemixCredentials ic = new IdemixCredentials();
 		IdemixVerifySpecification vspec = IdemixVerifySpecification
 				.fromIdemixProofSpec(IRMASetup.PROOF_SPEC_LOCATION, (short)crednr);
-		IdemixNonce nonce = new IdemixNonce(new BigInteger(Hex.hexStringToBytes(strNonce)));
 
 		try {
 			Attributes attr = ic.verifyProofResponses(vspec, nonce, responses);

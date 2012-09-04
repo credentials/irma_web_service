@@ -1,5 +1,9 @@
 package org.irmacard.web.restapi;
 
+import java.math.BigInteger;
+import java.util.HashMap;
+import java.util.Map;
+
 import org.irmacard.web.restapi.resources.VerificationProtocolResource;
 import org.restlet.Application;
 import org.restlet.Restlet;
@@ -15,9 +19,13 @@ public class IRMAProtocolApplication extends Application {
    @Override
    public synchronized Restlet createInboundRoot() {
        Router router = new Router(getContext());
-
+       
+       // This is a quick 'hack' to have some state, there is most probably
+       // a better way :)
+       Map<String,BigInteger> noncemap = new HashMap<String, BigInteger>();
+       getContext().getAttributes().put("noncemap", noncemap);
        router.attach("/verification/{crednr}", VerificationProtocolResource.class); 
-       router.attach("/verification/{crednr}/{nonce}/{round}", VerificationProtocolResource.class);
+       router.attach("/verification/{crednr}/{id}/{round}", VerificationProtocolResource.class);
        return router;
    }   
 }

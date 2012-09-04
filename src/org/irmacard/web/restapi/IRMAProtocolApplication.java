@@ -4,10 +4,13 @@ import java.math.BigInteger;
 import java.util.HashMap;
 import java.util.Map;
 
+import org.irmacard.web.restapi.resources.IssueStudentCredResource;
 import org.irmacard.web.restapi.resources.VerificationProtocolResource;
 import org.restlet.Application;
 import org.restlet.Restlet;
 import org.restlet.routing.Router;
+
+import credentials.Attributes;
 
 public class IRMAProtocolApplication extends Application {
     /**
@@ -24,8 +27,14 @@ public class IRMAProtocolApplication extends Application {
        // a better way :)
        Map<String,BigInteger> noncemap = new HashMap<String, BigInteger>();
        getContext().getAttributes().put("noncemap", noncemap);
+       Map<String,Attributes> attributemap = new HashMap<String, Attributes>();
+       getContext().getAttributes().put("attributemap", attributemap);
+
        router.attach("/verification/{crednr}", VerificationProtocolResource.class); 
        router.attach("/verification/{crednr}/{id}/{round}", VerificationProtocolResource.class);
+
+       router.attach("/issue/studentCred", IssueStudentCredResource.class);
+       router.attach("/issue/studentCred/{id}/{round}", IssueStudentCredResource.class);
        return router;
    }   
 }

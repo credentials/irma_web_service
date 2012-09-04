@@ -11,6 +11,9 @@ import net.sourceforge.scuba.smartcards.ResponseAPDU;
 import net.sourceforge.scuba.util.Hex;
 
 import org.irmacard.web.restapi.IRMASetup;
+import org.irmacard.web.restapi.util.CommandSet;
+import org.irmacard.web.restapi.util.ProtocolCommandSerializer;
+import org.irmacard.web.restapi.util.ResponseAPDUDeserializer;
 import org.restlet.resource.Post;
 import org.restlet.resource.ServerResource;
 
@@ -40,12 +43,6 @@ import credentials.idemix.spec.IdemixVerifySpecification;
  *
  */
 public class VerificationProtocolResource extends ServerResource {
-
-    private class CommandSet {
-    	public List<ProtocolCommand> commands;
-    	public String responseurl;
-    }
-    
 	@Post("json")
 	public String handlePost (String value) {
 		Integer crednr = Integer.parseInt((String) getRequestAttributes().get("crednr"));
@@ -100,13 +97,13 @@ public class VerificationProtocolResource extends ServerResource {
 	 * Handle the next step of the verification protocol.
 	 * @param crednr credential number
 	 * @param value request body (with the card responses)
-	 * @param verificationId nonce, hex-encoded.
+	 * @param verificationId 
 	 * @return
 	 */
 	public String step1(int crednr, String value, String verificationId) {
 		Gson gson = new GsonBuilder().
 				setPrettyPrinting().
-				registerTypeAdapter(IResponseAPDU.class, new ResponseAPDUDerializer()).
+				registerTypeAdapter(IResponseAPDU.class, new ResponseAPDUDeserializer()).
 				create();
 		
 		
@@ -135,30 +132,4 @@ public class VerificationProtocolResource extends ServerResource {
 		}
 	}
 
-	/**
-	 * Helper class to deserialize a ResponseAPDU from json
-	 *
-	 */
-	private class ResponseAPDUDerializer implements JsonDeserializer<ResponseAPDU> {
-		@Override
-		public ResponseAPDU deserialize(JsonElement json, Type typeOfT,
-				JsonDeserializationContext context) throws JsonParseException {
-			return new ResponseAPDU(Hex.hexStringToBytes(json.getAsString()));
-		}
-	}
-	
-	/**
-	 * Helper class to serialize ProtocolCommand to JSON.
-	 *
-	 */
-	private class ProtocolCommandSerializer implements JsonSerializer<ProtocolCommand> {
-		@Override
-		public JsonElement serialize(ProtocolCommand src, Type typeOfSrc,
-				JsonSerializationContext context) {
-			JsonObject obj = new JsonObject();
-			obj.addProperty("key", src.key);
-			obj.addProperty("command", Hex.bytesToHexString(src.command.getBytes()));
-			return obj;
-		}
-	}
 }

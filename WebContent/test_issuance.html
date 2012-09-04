@@ -33,11 +33,12 @@
 	  })
 	  $('#testbutton').bind('click', function() {
 		  $.ajax({
-			  url: '/irma_web_service/protocols/verification/4',
+			  url: '/irma_web_service/protocols/issue/studentCred',
 			  contentType: 'application/json',
 			  data: JSON.stringify({crednr: 4}),
 			  type: 'POST',
 			  success: function(data) {
+				  console.log('Got first batch of verification data');
 				  console.log(data);
 				  SmartCardHandler.connectFirstCard();
 				  var response = SmartCardHandler.transmitCommandSet(data.commands);
@@ -48,8 +49,24 @@
 					  data: JSON.stringify(response),
 					  type: 'POST',
 					  success: function(data) {
-						  console.log('and back!');
-						  console.log(data);						  
+						  console.log('and back! Got Verification result and issuance data');
+						  console.log(data);
+						// Send Pin
+						  console.log(SmartCardHandler.applet.verifyPin());
+						  var response = SmartCardHandler.transmitCommandSet(data.commands);
+						  console.log(response);
+						  $.ajax({
+							  url: data.responseurl,
+							  contentType: 'application/json',
+							  data: JSON.stringify(response),
+							  type: 'POST',
+							  success: function(data) {
+								  console.log('and back once more! Got final part of issuance data');
+								  console.log(data);
+								  var response = SmartCardHandler.transmitCommandSet(data.commands);
+								  console.log(response);
+							  }
+						  });
 					  }
 				  });
 			  }

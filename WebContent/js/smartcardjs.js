@@ -3,6 +3,7 @@
 		  init: function(applet) {
 			  this.waitTime = 100;
 			  this.applet = applet;
+			  this.callbacks = {};
 			  this.waitForApplet();	
 		  },
 		  waitForApplet: function() {
@@ -21,9 +22,11 @@
 		  setup: function() {
 			  this.applet.run();
 			  this.applet.enableSignals('SmartCardHandler');
+			  this.handleCallback('appletReady');
 		  },
-		  dispatch: function(event) {
-			  console.log(event);
+		  dispatch: function(signal) {
+			  console.log(signal);
+			  this.handleCallback(signal.getEvent());
 		  },
 		  showReaderList: function() {
 			  console.log(this.applet.getReaderList());
@@ -47,5 +50,13 @@
 				  }
 			  }
 			  return responses;
+		  },
+		  bind: function(eventName,callback) {
+			  this.callbacks[eventName] = callback;
+		  },
+		  handleCallback: function(eventName) {
+			  if (typeof this.callbacks[eventName] !== 'undefined') {
+				  this.callbacks[eventName]();
+			  }
 		  }
   };

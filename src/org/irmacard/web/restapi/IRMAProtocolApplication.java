@@ -1,6 +1,8 @@
 package org.irmacard.web.restapi;
 
 import java.math.BigInteger;
+import java.net.URI;
+import java.net.URISyntaxException;
 import java.util.HashMap;
 import java.util.Map;
 
@@ -11,6 +13,7 @@ import org.restlet.Restlet;
 import org.restlet.routing.Router;
 
 import credentials.Attributes;
+import credentials.idemix.util.CredentialInformation;
 
 public class IRMAProtocolApplication extends Application {
     /**
@@ -23,6 +26,17 @@ public class IRMAProtocolApplication extends Application {
    public synchronized Restlet createInboundRoot() {
        Router router = new Router(getContext());
        
+		URI CORE_LOCATION;
+		try {
+			CORE_LOCATION = VerificationProtocolResource.class.getClassLoader()
+					.getResource("/resources/").toURI();
+		} catch (URISyntaxException e) {
+			e.printStackTrace();
+			throw new RuntimeException(e.toString());
+		}
+		CredentialInformation.setCoreLocation(CORE_LOCATION);
+
+
        // This is a quick 'hack' to have some state, there is most probably
        // a better way :)
        Map<String,BigInteger> noncemap = new HashMap<String, BigInteger>();

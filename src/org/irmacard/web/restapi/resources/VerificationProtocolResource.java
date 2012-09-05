@@ -37,12 +37,19 @@ import credentials.idemix.IdemixCredentials;
 import credentials.idemix.IdemixNonce;
 import credentials.idemix.spec.IdemixVerifySpecification;
 
+import credentials.idemix.util.VerifyCredentialInformation;
+
 /**
  * Resource for the verification protocol.
  * @author Maarten Everts
  *
  */
 public class VerificationProtocolResource extends ServerResource {
+	private final String ISSUER = "MijnOverheid";
+	private final String CRED_NAME = "ageLower";
+	private final String VERIFIER = "UitzendingGemist";
+	private final String SPEC_NAME = "ageLowerOver16";
+
 	@Post("json")
 	public String handlePost (String value) {
 		Integer crednr = Integer.parseInt((String) getRequestAttributes().get("crednr"));
@@ -67,10 +74,12 @@ public class VerificationProtocolResource extends ServerResource {
 				setPrettyPrinting().
 				registerTypeAdapter(ProtocolCommand.class, new ProtocolCommandSerializer()).
 				create();
-		IdemixCredentials ic = new IdemixCredentials();
 		
-		IdemixVerifySpecification vspec = IdemixVerifySpecification
-				.fromIdemixProofSpec(IRMASetup.PROOF_SPEC_LOCATION, (short)crednr);
+		VerifyCredentialInformation vci = new VerifyCredentialInformation(
+				ISSUER, CRED_NAME, VERIFIER, SPEC_NAME);
+		IdemixCredentials ic = new IdemixCredentials();
+		IdemixVerifySpecification vspec = vci.getIdemixVerifySpecification();
+
 		try {
 			CommandSet cs = new CommandSet();
 			Nonce nonce = ic.generateNonce(vspec);
@@ -106,7 +115,6 @@ public class VerificationProtocolResource extends ServerResource {
 				registerTypeAdapter(IResponseAPDU.class, new ResponseAPDUDeserializer()).
 				create();
 		
-		
 		// Get the nonce based on the id
 		@SuppressWarnings("unchecked")
 		Map<String ,BigInteger> noncemap = (Map<String,BigInteger>)getContext().getAttributes().get("noncemap");
@@ -114,16 +122,20 @@ public class VerificationProtocolResource extends ServerResource {
 		IdemixNonce nonce = new IdemixNonce(intNonce);
 		
 		ProtocolResponses responses = gson.fromJson(value, ProtocolResponses.class);		
+
+		VerifyCredentialInformation vci = new VerifyCredentialInformation(
+				ISSUER, CRED_NAME, VERIFIER, SPEC_NAME);
 		IdemixCredentials ic = new IdemixCredentials();
-		IdemixVerifySpecification vspec = IdemixVerifySpecification
-				.fromIdemixProofSpec(IRMASetup.PROOF_SPEC_LOCATION, (short)crednr);
+		IdemixVerifySpecification vspec = vci.getIdemixVerifySpecification();
 
 		try {
 			Attributes attr = ic.verifyProofResponses(vspec, nonce, responses);
+
 			// TODO: do something with the results!
 			if (attr == null) {
 				return "{\"response\": \"invalid\"}";
 			} else {
+				attr.print();
 				return "{\"response\": \"valid\"}";
 			}
 		} catch (CredentialsException e) {

@@ -56,6 +56,22 @@
 			  }
 			  return responses;
 		  },
+		  // Merge above two at one time
+		  transmitCommandSetWithCB: function(commands, callback) {
+			  var responses = {};
+			  responses['result'] = 'succes';
+			  for(var i=0, len=commands.length; i < len; i++) {
+				  response = this.transmit(commands[i].command);
+				  responses[commands[i].key] = response;
+				  if (response.slice(-4) !== "9000") {
+					  // Don't bother continuing when the response is not ok
+					  responses['result'] = 'failed';
+					  break;
+				  }
+				  callback((i+1)/commands.length);
+			  }
+			  return responses;
+		  },
 		  bind: function(eventName,callback) {
 			  this.callbacks[eventName] = callback;
 		  },

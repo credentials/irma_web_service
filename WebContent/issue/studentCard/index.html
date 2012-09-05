@@ -1,0 +1,269 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+	<meta charset="utf-8">
+	<title>Radboud University IRMA Student Card</title>
+	<!-- Bootstrap -->
+	<link href="../../css/bootstrap.min.css" rel="stylesheet">
+	<style type="text/css">
+		div.huge {font-size: 300px; line-height: 1em;}
+	</style>
+</head>
+<body>
+	<div class="container">
+		<div class="page-header"><div class="row">
+			<div class="span6">
+				<img alt="Radboud University Nijmegen" src="../../img/ru_toplogo.jpg" />
+			</div>
+			<div class="span6">
+				<h1>Issueing of student card</h1>
+			</div>
+		</div></div>
+		
+		<div class="row">
+			<div class="span8">
+				<p>
+				On this page you can obtain a digital student card on your IRMA
+				card. Obviously, you will need your IRMA card and a card reader for
+				this. 
+				</p><p>
+				The process has two steps. First, in order to receive this
+				credential, you have to prove that you already have a SURFnet
+				credential. Second, your university will issue the new credential on
+				your IRMA card.
+				</p><p>
+				Don't worry! It's self-explanatory.
+				<p>
+				<ol>
+					<li>Insert your card into the card reader.</li>
+					<li>Click on the Issuing button.</li>
+					<li>Follow the instructions. You may need to enter your PIN
+						code during the process.</li>
+				</ol>
+				<object classid="clsid:8AD9C840-044E-11D1-B3E9-00805F499D93"
+					height="10" width="10">
+					<param name="code" value="org.ovchip.SmartCardJS.class" />
+					<param name="archive" value="smartcardjs.jar" />
+					<param name="type" value="application/x-java-applet;version=1.6" />
+					<param name="scriptable" value="true" />
+					<param name="mayscript" value="true" />
+					<embed type="application/x-java-applet;version=1.6" hidden="true"
+						code="org.irmacard.scjs.SmartCardJS.class"
+						archive="../../smartcardjs.jar" scriptable="true" mayscript="true"
+						height="10" width="10" />
+				</object>
+				<br />
+				<button id="verify" type="button" class="btn btn-primary" data-loading-text="Issueing...">Proceed</button>
+			</div>
+			<div class="span4">
+				<div id="alerts">
+			</div></div>
+		</div>
+	</div>
+	<div class="modal hide fade in" id="verify-modal" aria-hidden="true" role="dialog">
+		<div class="modal-header">
+			<h3>Verifying SURFNet Credential...</h3>
+		</div>
+		<div class="modal-body">
+			<p>
+			We are retrieving your identifier from you IRMACard. We will use this
+			to verify that you are eligible to receive an Radboud University
+			Student credential.
+			</p>
+			<div style="text-align: center">
+				<img alt="Loading..." src="../../img/ajax-loader.gif" />
+			</div>
+		</div>
+		<div class="modal-footer">
+			<button class="btn" data-dismiss="verify-modal">Cancel</button>
+		</div>
+	</div>
+	<div class="modal hide fade in" id="check-modal" aria-hidden="true" role="dialog">
+		<div class="modal-header">
+			<h3>Preparing to issue Radboud University Credential</h3>
+		</div>
+		<div class="modal-body">
+			<p>
+			We determined that you are eligible to receive a Student Card Credential.
+			We have recovered the following data to issue on the card:
+			</p>
+			<table class="table">
+				<thead>
+					<tr>
+						<th>Attribute</th>
+						<th>Value</th>
+					</tr>
+				</thead>
+				<tbody>
+					<tr>
+						<td>University</td>
+						<td id="field-university"></td>
+					</tr>
+					<tr>
+						<td>Student ID</td>
+						<td id="field-studentid"></td>
+					</tr>
+					<tr>
+						<td>Student Card Number</td>
+						<td id="field-studentcardnr"></td>
+					</tr>
+					<tr>
+						<td>Level</td>
+						<td id="field-level"></td>
+					</tr>
+				</tbody>
+			</table>
+			<p>Please click issue if you wish to proceed.</p>
+			<div class="alert">
+				<b>Heads up!</b> You will be asked for your pin!
+			</div>
+		</div>
+		<div class="modal-footer">
+			<button class="btn" id="cancel-issue-button">Cancel</button>
+			<button class="btn btn-primary" id="check-button" data-dismiss="verify-modal">Issue!</button>
+		</div>
+	</div>
+	<div class="modal hide fade in" id="issue-modal" aria-hidden="true" role="dialog">
+		<div class="modal-header">
+			<h3>Issuing Radboud University Student Credential...</h3>
+		</div>
+		<div class="modal-body">
+			<p>
+			We are now issuing you your brand new credential. Please wait...
+			</p>
+			<div style="text-align: center">
+				<img alt="Loading..." src="../../img/ajax-loader.gif" />
+			</div>
+		</div>
+		<div class="modal-footer">
+			<button class="btn" id="modal-verify-button" data-dismiss="verify-modal">Cancel</button>
+		</div>
+	</div>
+		<div class="modal hide fade in" id="result-modal" aria-hidden="true" role="dialog">
+		<div class="modal-header">
+			<h3>Congratulation! Radboud University Student Credential has been succesfully issued</h3>
+		</div>
+		<div class="modal-body">
+			<p>
+			We have issued you with a brand new Radboud University Student Credential which you can
+			now use for several cool applications, such as:
+			</p>
+			<ul>
+			  <li>Free printing, and</li>
+			  <li>Cheaper coffee</li>
+			</ul>
+		</div>
+		<div class="modal-footer">
+			<button class="btn btn-primary" id="result-button" data-dismiss="result-modal">Ok</button>
+		</div>
+	</div>
+	<script src="../../js/jquery.js" type="text/javascript"></script>
+	<script src="../../js/bootstrap.min.js" type="text/javascript"></script>
+	<script src="../../js/smartcardjs.js" type="text/javascript"></script>
+	<script type="text/javascript">
+	$(function() {
+		SmartCardHandler.init();
+		var response;
+		var nextAction;
+		var proceedToCheck = function () {
+			console.log("Proceeding to checking-modal");
+		  	$("#verify-modal").fadeOut();
+		  	
+		  	$.ajax({
+		  		url: nextAction.responseurl,
+		  		contentType: 'application/json',
+		  		data: JSON.stringify(response),
+		  		type: 'POST',
+		  		success: function(data) {
+		  			$("#field-university").text(data.attributes.university);
+		  			$("#field-studentid").text(data.attributes.studentID);
+		  			$("#field-studentcardnr").text(data.attributes.studentCardNumber);
+		  			$("#field-level").text(data.attributes.level);
+		  			$("#check-modal").fadeIn();
+		  			console.log(data);
+		  			nextAction = data;
+		  			$("#check-button").button().on('click', function(event) {
+		  				proceedToIssue();
+		  			})
+		  		}
+		  	})
+		};
+		var proceedToIssue = function () {
+			console.log("Proceeding to issuing-modal");
+			$("#check-modal").fadeOut();
+			$("#issue-modal").fadeIn();
+			console.log(SmartCardHandler.applet.verifyPin());
+			response = SmartCardHandler.transmitCommandSet(nextAction.commands);
+			console.log(response);
+			$.ajax({
+			 	url: nextAction.responseurl,
+			 	contentType: 'application/json',
+			 	data: JSON.stringify(response),
+			 	type: 'POST',
+			 	success: function(data) {
+					console.log('and back once more! Got final part of issuance data');
+					console.log(data);
+					var response = SmartCardHandler.transmitCommandSet(data.commands);
+			  		console.log(response);
+			  		proceedToFinalize();
+			 	}
+			});
+		};
+		var proceedToFinalize = function () {
+			$("#issue-modal").fadeOut();
+			showAlert('success', "RU Student Credential issued");
+			$("#result-modal").fadeIn();
+		}
+		$("#verify").button().toggleClass('disabled', false);
+		$("#cancel-issue-button").button().on('click', function(e) { $("#check-modal").fadeOut()});
+		$("#result-button").button().on('click', function(e) { $("#result-modal").fadeOut()});
+		var showAlert = function(alerttype, message) {
+			// alerttype is one of 'error', 'success', 'info'
+			$('<div class="alert alert-' + alerttype + '">' + message + '</div>').hide().prependTo('#alerts').slideDown('fast');
+		};
+		$("#verify")
+			.button()
+			.toggleClass('disabled',false)
+			.on('click', function(event) {
+				$("#verify-modal").show();
+				$.ajax({
+					  url: '/irma_web_service/protocols/issue/studentCred',
+					  contentType: 'application/json',
+					  data: JSON.stringify({crednr: 4}),
+					  type: 'POST',
+					  success: function(data) {
+						  console.log(data);
+						  nextAction = data;
+						  SmartCardHandler.connectFirstCard();
+						  response = SmartCardHandler.transmitCommandSet(data.commands);
+						  console.log(response);
+						  proceedToCheck();
+					  }
+				});
+			});
+		
+	  	SmartCardHandler.bind("cardInserted", function() {
+			 SmartCardHandler.connectFirstCard();
+			 if (SmartCardHandler.selectApplet('6964656D6978')) {
+				 showAlert('success', 'IRMA card found!');
+				 $("#verify").toggleClass("disabled", false);
+			 } else {
+				 showAlert('error', 'Inserted card is not an IRMA card!');
+			 }
+		  });
+	  	
+		  SmartCardHandler.bind("cardRemoved", function() {
+			  $("#verify").toggleClass("disabled",false);
+		  });
+		  
+		  SmartCardHandler.bind("appletReady", function() {
+			  showAlert('success', 'Applet was loaded!');
+			  SmartCardHandler.connectFirstCard();
+			  if (SmartCardHandler.selectApplet('6964656D6978')) {
+					 showAlert('success', 'IRMA card found!');
+					 $("#verify").toggleClass("disabled", false);
+			  }
+		  });
+	});
+	</script>
+</body>

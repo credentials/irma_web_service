@@ -2,6 +2,7 @@ package org.irmacard.web.restapi.resources;
 
 import java.lang.reflect.Field;
 import java.math.BigInteger;
+import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.UUID;
@@ -32,6 +33,7 @@ import credentials.idemix.IdemixNonce;
 import credentials.idemix.IdemixPrivateKey;
 import credentials.idemix.spec.IdemixIssueSpecification;
 import credentials.idemix.spec.IdemixVerifySpecification;
+import credentials.idemix.util.VerifyCredentialInformation;
 
 import credentials.Attributes;
 
@@ -46,7 +48,7 @@ public class IssueStudentCredResource extends ProtocolResource {
 	private class IssuanceCommandSet {
 	    public List<ProtocolCommand> commands;
 	    public String responseurl;
-	    public Attributes attributes;
+	    public Map<String,String> attributes;
 	}
 	
     /** Attribute values */
@@ -81,9 +83,8 @@ public class IssueStudentCredResource extends ProtocolResource {
 	}
 	
 	private IdemixVerifySpecification getProofSpec() {
-		// FIXME: proper credential
-		return IdemixVerifySpecification
-				.fromIdemixProofSpec(IRMASetup.PROOF_SPEC_LOCATION, (short) 4);
+		VerifyCredentialInformation vci = new VerifyCredentialInformation("Surfnet", "root", "RU", "rootID");
+		return vci.getIdemixVerifySpecification();
 	}
 	
 	public String processVerify(String value, String id) {
@@ -111,7 +112,6 @@ public class IssueStudentCredResource extends ProtocolResource {
 		
 		IdemixCredentials ic = new IdemixCredentials();
 		IssueCredentialInformation ici = new IssueCredentialInformation("RU", "studentCard");
-		ici.setCredentialNr((short) 23);
 		IdemixIssueSpecification spec = ici.getIdemixIssueSpecification();
 
 		// Initialize the issuer
@@ -149,9 +149,14 @@ public class IssueStudentCredResource extends ProtocolResource {
 		noncemap.put(id, nonce1);
 		attributemap.put(id, attributes);
 		
+		Map<String,String> attributesReadable = new HashMap<String,String>();
+		for(String k : attributes.getIdentifiers()) {
+			attributesReadable.put(k, new String(attributes.get(k)));
+		}
+		
 		IssuanceCommandSet ics = new IssuanceCommandSet();
 		ics.commands = commands;
-		ics.attributes = attributes;
+		ics.attributes = attributesReadable;
 		String path = getReference().getPath();
 		ics.responseurl = path.substring(0, path.length() - 1) + "2";
 		
@@ -170,7 +175,7 @@ public class IssueStudentCredResource extends ProtocolResource {
 		System.out.println("==== Setting up credential infromation ===");
 		IdemixCredentials ic = new IdemixCredentials();
 		IssueCredentialInformation ici = new IssueCredentialInformation("RU", "studentCard");
-		ici.setCredentialNr((short) 23);
+
 		System.out.println("=== Getting issuance information ===");
 		IdemixIssueSpecification spec = ici.getIdemixIssueSpecification();
 
@@ -228,7 +233,7 @@ public class IssueStudentCredResource extends ProtocolResource {
         Attributes attributes = new Attributes();
 
 		attributes.add("university", "Radboud University".getBytes());
-		attributes.add("studentCardNumber", "0812345673".getBytes());
+		attributes.add("studentCardNumber", "0813371337".getBytes());
 		attributes.add("studentID", "s1234567".getBytes());
 		attributes.add("level", "PhD".getBytes());
 		

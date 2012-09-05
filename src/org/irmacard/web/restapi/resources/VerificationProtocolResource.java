@@ -42,8 +42,10 @@ import credentials.idemix.spec.IdemixVerifySpecification;
 public class VerificationProtocolResource extends ServerResource {
 
     private class CommandSet {
-    	public List<ProtocolCommand> commands;
-    	public String responseurl;
+    	@SuppressWarnings("unused")
+		public List<ProtocolCommand> commands;
+    	@SuppressWarnings("unused")
+		public String responseurl;
     }
     
 	@Post("json")

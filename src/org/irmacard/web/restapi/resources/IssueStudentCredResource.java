@@ -13,6 +13,7 @@ import net.sourceforge.scuba.smartcards.IResponseAPDU;
 import org.irmacard.web.restapi.IRMASetup;
 
 import org.irmacard.web.restapi.util.CommandSet;
+import org.irmacard.web.restapi.util.IssueCredentialInformation;
 import org.irmacard.web.restapi.util.ProtocolCommandSerializer;
 import org.irmacard.web.restapi.util.ResponseAPDUDeserializer;
 import org.restlet.resource.Post;
@@ -38,6 +39,10 @@ import service.ProtocolCommand;
 import service.ProtocolResponses;
 
 public class IssueStudentCredResource extends ProtocolResource {
+	public static final String VERIFY_ISSUER = "IdemixLib";
+	public static final String VERIFY_CRED_NAME = "CredStructCard4";
+	public static final String VERIFY_SPEC_NAME = "default4";
+	
 	private class IssuanceCommandSet {
 	    public List<ProtocolCommand> commands;
 	    public String responseurl;
@@ -87,35 +92,30 @@ public class IssueStudentCredResource extends ProtocolResource {
 		.registerTypeAdapter(ProtocolCommand.class,
 				new ProtocolCommandSerializer()).create();
 		
-		Attributes attr;
+		Attributes attr = null;
 		BigInteger nonce1 = null;
 		
 		try {
 			attr = verifyResponses(getProofSpec(), value, id);
 		} catch(CredentialsException e) {
 			e.printStackTrace();
-			return "{\"response\": \"invalid\"}";
+			//return "{\"response\": \"invalid\"}";
 		}
 		if( attr == null ) {
-			return "{\"response\": \"invalid\"}";
+			// FIXME!!!
+			//return "{\"response\": \"invalid\"}";
 		}
-
-		// FIXME: setup the actual idemix issue specification
-		IdemixIssueSpecification spec = IdemixIssueSpecification
-				.fromIdemixIssuanceSpec(
-						IRMASetup.ISSUER_PK_LOCATION,
-						IRMASetup.CRED_STRUCT_ID,
-						(short) 7);
-
-		IdemixPrivateKey isk = new IdemixPrivateKey(IRMASetup.setupIssuerPrivateKey());
 
 		// FIXME: retrieve proper attributes
 		Attributes attributes = getIssuanceAttributes();
+		
 		IdemixCredentials ic = new IdemixCredentials();
+		IssueCredentialInformation ici = new IssueCredentialInformation("RU", "studentCard");
+		ici.setCredentialNr((short) 23);
+		IdemixIssueSpecification spec = ici.getIdemixIssueSpecification();
 
 		// Initialize the issuer
-		Issuer issuer = new Issuer(isk.getIssuerKeyPair(), spec.getIssuanceSpec(),
-				null, null, spec.getValues(attributes));
+		Issuer issuer = ici.getIssuer(attributes);
 
 		// Run part one of protocol
 		List<ProtocolCommand> commands;
@@ -142,6 +142,10 @@ public class IssueStudentCredResource extends ProtocolResource {
 		@SuppressWarnings("unchecked")
 		Map<String, Attributes> attributemap = (Map<String, Attributes>) getContext()
 				.getAttributes().get("attributemap");
+		@SuppressWarnings("unchecked")
+		Map<String, Issuer> issuermap = (Map<String, Issuer>) getContext()
+				.getAttributes().get("issuermap");
+		issuermap.put(id, issuer);
 		noncemap.put(id, nonce1);
 		attributemap.put(id, attributes);
 		
@@ -161,19 +165,14 @@ public class IssueStudentCredResource extends ProtocolResource {
 						new ProtocolCommandSerializer())
 				.registerTypeAdapter(IResponseAPDU.class,
 						new ResponseAPDUDeserializer()).create();
-		
-		Attributes attr;
 
 		// FIXME: setup the actual idemix issue specification
-		IdemixIssueSpecification spec = IdemixIssueSpecification
-				.fromIdemixIssuanceSpec(
-						IRMASetup.ISSUER_PK_LOCATION,
-						IRMASetup.CRED_STRUCT_ID,
-						(short) 7);
-
-		IdemixPrivateKey isk = new IdemixPrivateKey(IRMASetup.setupIssuerPrivateKey());
-
+		System.out.println("==== Setting up credential infromation ===");
 		IdemixCredentials ic = new IdemixCredentials();
+		IssueCredentialInformation ici = new IssueCredentialInformation("RU", "studentCard");
+		ici.setCredentialNr((short) 23);
+		System.out.println("=== Getting issuance information ===");
+		IdemixIssueSpecification spec = ici.getIdemixIssueSpecification();
 
 		@SuppressWarnings("unchecked")
 		Map<String, BigInteger> noncemap = (Map<String, BigInteger>) getContext()
@@ -181,12 +180,15 @@ public class IssueStudentCredResource extends ProtocolResource {
 		@SuppressWarnings("unchecked")
 		Map<String, Attributes> attributemap = (Map<String, Attributes>) getContext()
 				.getAttributes().get("attributemap");
+		@SuppressWarnings("unchecked")
+		Map<String, Issuer> issuermap = (Map<String, Issuer>) getContext()
+				.getAttributes().get("issuermap");
 		BigInteger nonce1 = (BigInteger) noncemap.get(id);
 		Attributes attributes = attributemap.get(id);
 
 		// Initialize the issuer
-		Issuer issuer = new Issuer(isk.getIssuerKeyPair(), spec.getIssuanceSpec(),
-				null, null, spec.getValues(attributes));
+		System.out.println("=== Getting issuer ===");
+		Issuer issuer = ici.getIssuer(attributes);
 
 		// Restore the state, this is the nasty part
 		try {
@@ -196,6 +198,9 @@ public class IssueStudentCredResource extends ProtocolResource {
 		} catch (Exception e) {
 			e.printStackTrace();
 		}
+		
+		// FIXME: superfluous?
+		issuer = issuermap.get(id);
 		
 		ProtocolResponses responses = gson.fromJson(value,
 				ProtocolResponses.class);
@@ -222,12 +227,12 @@ public class IssueStudentCredResource extends ProtocolResource {
         // Return the attributes that have been revealed during the proof
         Attributes attributes = new Attributes();
 
-        attributes.add("attr1", ATTRIBUTE_VALUE_1.toByteArray());
-        attributes.add("attr2", ATTRIBUTE_VALUE_2.toByteArray());
-        attributes.add("attr3", ATTRIBUTE_VALUE_3.toByteArray());
-        attributes.add("attr4", ATTRIBUTE_VALUE_4.toByteArray());
-        
-        return attributes;
-    }
-	
+		attributes.add("university", "Radboud University".getBytes());
+		attributes.add("studentCardNumber", "0812345673".getBytes());
+		attributes.add("studentID", "s1234567".getBytes());
+		attributes.add("level", "PhD".getBytes());
+		
+		return attributes;
+	}
+
 }

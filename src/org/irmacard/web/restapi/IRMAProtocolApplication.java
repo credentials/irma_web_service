@@ -12,6 +12,8 @@ import org.restlet.Application;
 import org.restlet.Restlet;
 import org.restlet.routing.Router;
 
+import com.ibm.zurich.idmx.issuance.Issuer;
+
 import credentials.Attributes;
 import credentials.idemix.util.CredentialInformation;
 
@@ -43,6 +45,8 @@ public class IRMAProtocolApplication extends Application {
        getContext().getAttributes().put("noncemap", noncemap);
        Map<String,Attributes> attributemap = new HashMap<String, Attributes>();
        getContext().getAttributes().put("attributemap", attributemap);
+       Map<String,Issuer> issuermap = new HashMap<String, Issuer>();
+       getContext().getAttributes().put("issuermap", issuermap);
 
        router.attach("/verification/{crednr}", VerificationProtocolResource.class); 
        router.attach("/verification/{crednr}/{id}/{round}", VerificationProtocolResource.class);

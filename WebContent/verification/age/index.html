@@ -66,23 +66,31 @@ $(function() {
 				  SmartCardHandler.connectFirstCard();
 				  var response = SmartCardHandler.transmitCommandSet(data.commands);
 				  console.log(response);
-				  $.ajax({
-					  url: data.responseurl,
-					  contentType: 'application/json',
-					  data: JSON.stringify(response),
-					  type: 'POST',
-					  success: function(data) {
-						  $("#verify").button('reset');
-						  console.log('and back!');
-						  console.log(data);
-						  if (data.response === 'valid') {
-							  window.location = data.url;
-						  } else {
-							  alert('No valid >16 credential found!');
-							  showAlert('error', 'No valid >16 credential found!');
+				  if (response.smartcardstatus === 'failed') {
+					  $("#verify").button('reset');
+					  alert('No valid >16 credential found!');
+					  showAlert('error', 'No valid >16 credential found!');										  
+				  } else {
+					  $.ajax({
+						  url: data.responseurl,
+						  contentType: 'application/json',
+						  data: JSON.stringify(response),
+						  type: 'POST',
+						  success: function(data) {
+							  $("#verify").button('reset');
+							  console.log('and back!');
+							  console.log(data);
+							  if (data.response === 'valid') {
+								  alert('Found >16 credential, press OK to continue.');
+								  window.location = data.url;
+							  } else {
+								  alert('No valid >16 credential found!');
+								  showAlert('error', 'No valid >16 credential found!');
+							  }
 						  }
-					  }
-				  });
+					  });
+					  
+				  }
 			  }
 		  });
 	});

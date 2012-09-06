@@ -175,6 +175,10 @@
 		var proceedToCheck = function () {
 			console.log("Proceeding to checking-modal");
 		  	$("#verify-modal").fadeOut();
+		  	
+		  	if(response.smartcardstatus === "failed") {
+		  		showAlert('error', "No credential found");
+		  	}
 
 		  	$.ajax({
 		  		url: nextAction.responseurl,

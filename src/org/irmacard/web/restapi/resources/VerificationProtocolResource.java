@@ -136,7 +136,7 @@ public class VerificationProtocolResource extends ServerResource {
 				return "{\"response\": \"invalid\"}";
 			} else {
 				attr.print();
-				return "{\"response\": \"valid\"}";
+				return "{\"response\": \"valid\", \"url\": \"http://spuitenenslikken.bnn.nl/\"}";
 			}
 		} catch (CredentialsException e) {
 			e.printStackTrace();

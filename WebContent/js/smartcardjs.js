@@ -51,6 +51,7 @@
 				  responses[commands[i].key] = response;
 				  if (response.slice(-4) !== "9000") {
 					  // Don't bother continuing when the response is not ok
+					  responses['smartcardstatus'] = 'failed';
 					  break;
 				  }
 			  }

@@ -141,7 +141,7 @@
 	</div>
 		<div class="modal hide fade in" id="result-modal" aria-hidden="true" role="dialog">
 		<div class="modal-header">
-			<h3>Congratulation! Radboud University Student Credential has been succesfully issued</h3>
+			<h3>Congratulations! Radboud University Student Credential has been succesfully issued</h3>
 		</div>
 		<div class="modal-body">
 			<p>
@@ -165,16 +165,29 @@
 		SmartCardHandler.init();
 		var response;
 		var nextAction;
+		var isError = function (data) {
+			if ((typeof data.status) != "undefined") {
+				return data.status === "error";
+			} else {
+				return false;
+			}
+		}
 		var proceedToCheck = function () {
 			console.log("Proceeding to checking-modal");
 		  	$("#verify-modal").fadeOut();
-		  	
+
 		  	$.ajax({
 		  		url: nextAction.responseurl,
 		  		contentType: 'application/json',
 		  		data: JSON.stringify(response),
 		  		type: 'POST',
 		  		success: function(data) {
+				  	if( isError(data) ){
+				  		console.log(data);
+				  		showAlert('error', data.message);
+				  		return;
+				  	}
+				  	
 		  			$("#field-university").text(data.attributes.university);
 		  			$("#field-studentid").text(data.attributes.studentID);
 		  			$("#field-studentcardnr").text(data.attributes.studentCardNumber);

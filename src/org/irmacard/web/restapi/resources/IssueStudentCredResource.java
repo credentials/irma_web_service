@@ -51,6 +51,15 @@ public class IssueStudentCredResource extends ProtocolResource {
 	    public Map<String,String> attributes;
 	}
 	
+	private class IssueError {
+		public String status;
+		public String message;
+		public IssueError(String message) {
+			status = "error";
+			this.message = message;
+		}
+	}
+	
     /** Attribute values */
     public static final BigInteger ATTRIBUTE_VALUE_1 = BigInteger.valueOf(1313);
     public static final BigInteger ATTRIBUTE_VALUE_2 = BigInteger.valueOf(1314);
@@ -100,15 +109,21 @@ public class IssueStudentCredResource extends ProtocolResource {
 			attr = verifyResponses(getProofSpec(), value, id);
 		} catch(CredentialsException e) {
 			e.printStackTrace();
-			//return "{\"response\": \"invalid\"}";
+			return gson.toJson(new IssueError("Invalid root credential"));
 		}
-		if( attr == null ) {
-			// FIXME!!!
-			//return "{\"response\": \"invalid\"}";
+		if( attr == null) {
+			return gson.toJson(new IssueError("Invalid root credential"));
+		}
+		
+		String userID = new String(attr.get("http://www.irmacard.org/credentials/phase1/Surfnet/root/structure.xml;someRandomName;userID"));
+		
+		// Check if eligible
+		if(! eligibleForIssuance(userID)){
+			return gson.toJson(new IssueError("ID " + userID + " is not eligible"));
 		}
 
 		// FIXME: retrieve proper attributes
-		Attributes attributes = getIssuanceAttributes();
+		Attributes attributes = getIssuanceAttributes(userID);
 		
 		IdemixCredentials ic = new IdemixCredentials();
 		IssueCredentialInformation ici = new IssueCredentialInformation("RU", "studentCard");
@@ -228,16 +243,26 @@ public class IssueStudentCredResource extends ProtocolResource {
 		return gson.toJson(cs);
 	}
 	
-    private Attributes getIssuanceAttributes() {
+    private Attributes getIssuanceAttributes(String id) {
         // Return the attributes that have been revealed during the proof
         Attributes attributes = new Attributes();
-
-		attributes.add("university", "Radboud University".getBytes());
-		attributes.add("studentCardNumber", "0813371337".getBytes());
-		attributes.add("studentID", "s1234567".getBytes());
-		attributes.add("level", "PhD".getBytes());
+        
+        if(id.equals("s112233@ru.nl")) {
+    		attributes.add("university", "Radboud University".getBytes());
+    		attributes.add("studentCardNumber", "081122337".getBytes());
+    		attributes.add("studentID", "s112233".getBytes());
+    		attributes.add("level", "PhD".getBytes());
+        } else {
+			attributes.add("university", "Radboud University".getBytes());
+			attributes.add("studentCardNumber", "0813371337".getBytes());
+			attributes.add("studentID", "s1234567".getBytes());
+			attributes.add("level", "PhD".getBytes());
+        }
 		
 		return attributes;
 	}
-
+    
+    private boolean eligibleForIssuance(String id) {
+    	return id.toLowerCase().substring(0, 1).equals("s");
+    }
 }

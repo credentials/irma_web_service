@@ -19,7 +19,7 @@
     	<div class="span8">
      <p>The website you requested has age restrictions, you have to be
 		<div class="huge">
-	    &gt;16
+	    &ge;16
 	    </div>    
     </p>
     <p>
@@ -81,11 +81,11 @@ $(function() {
 							  console.log('and back!');
 							  console.log(data);
 							  if (data.response === 'valid') {
-								  alert('Found >16 credential, press OK to continue.');
+								  alert('Found >=16 credential, press OK to continue to the website you requested.');
 								  window.location = data.url;
 							  } else {
-								  alert('No valid >16 credential found!');
-								  showAlert('error', 'No valid >16 credential found!');
+								  alert('No valid >=16 credential found!');
+								  showAlert('error', 'No valid >=16 credential found!');
 							  }
 						  }
 					  });

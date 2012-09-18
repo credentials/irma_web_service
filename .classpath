@@ -8,5 +8,10 @@
 	</classpathentry>
 	<classpathentry kind="con" path="org.eclipse.jst.j2ee.internal.web.container"/>
 	<classpathentry kind="con" path="org.eclipse.jst.j2ee.internal.module.container"/>
+	<classpathentry combineaccessrules="false" kind="src" path="/idemix_library"/>
+	<classpathentry combineaccessrules="false" kind="src" path="/credentials_api"/>
+	<classpathentry combineaccessrules="false" kind="src" path="/scuba_smartcards"/>
+	<classpathentry combineaccessrules="false" kind="src" path="/scuba_util"/>
+	<classpathentry combineaccessrules="false" kind="src" path="/idemix_terminal"/>
 	<classpathentry kind="output" path="build/classes"/>
 </classpath>

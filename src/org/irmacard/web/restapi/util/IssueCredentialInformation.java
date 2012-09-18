@@ -2,8 +2,6 @@ package org.irmacard.web.restapi.util;
 
 import java.net.URI;
 
-import org.irmacard.web.restapi.IRMASetup;
-
 import com.ibm.zurich.credsystem.utils.Locations;
 import com.ibm.zurich.idmx.issuance.Issuer;
 import com.ibm.zurich.idmx.key.IssuerKeyPair;

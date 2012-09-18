@@ -1,16 +1,11 @@
 package org.irmacard.web.restapi.resources;
 
-import java.lang.reflect.Type;
 import java.math.BigInteger;
-import java.util.List;
 import java.util.Map;
 import java.util.UUID;
 
 import net.sourceforge.scuba.smartcards.IResponseAPDU;
-import net.sourceforge.scuba.smartcards.ResponseAPDU;
-import net.sourceforge.scuba.util.Hex;
 
-import org.irmacard.web.restapi.IRMASetup;
 import org.irmacard.web.restapi.util.CommandSet;
 import org.irmacard.web.restapi.util.ProtocolCommandSerializer;
 import org.irmacard.web.restapi.util.ResponseAPDUDeserializer;
@@ -22,13 +17,6 @@ import service.ProtocolResponses;
 
 import com.google.gson.Gson;
 import com.google.gson.GsonBuilder;
-import com.google.gson.JsonDeserializationContext;
-import com.google.gson.JsonDeserializer;
-import com.google.gson.JsonElement;
-import com.google.gson.JsonObject;
-import com.google.gson.JsonParseException;
-import com.google.gson.JsonSerializationContext;
-import com.google.gson.JsonSerializer;
 
 import credentials.Attributes;
 import credentials.CredentialsException;
@@ -36,7 +24,6 @@ import credentials.Nonce;
 import credentials.idemix.IdemixCredentials;
 import credentials.idemix.IdemixNonce;
 import credentials.idemix.spec.IdemixVerifySpecification;
-
 import credentials.idemix.util.VerifyCredentialInformation;
 
 /**

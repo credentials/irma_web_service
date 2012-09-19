@@ -257,6 +257,11 @@ public class IssueStudentCredResource extends ProtocolResource {
     		attributes.add("studentCardNumber", "081122336".getBytes());
     		attributes.add("studentID", "u012147".getBytes());
     		attributes.add("level", "PhD".getBytes());
+        } else if(id.toLowerCase().equals("u921154@ru.nl")) {
+        	attributes.add("university", "Radboud University".getBytes());
+    		attributes.add("studentCardNumber", "2300921154".getBytes());
+    		attributes.add("studentID", "u921154".getBytes());
+    		attributes.add("level", "PhD".getBytes());
         } else {
 			attributes.add("university", "Radboud University".getBytes());
 			attributes.add("studentCardNumber", "0813371337".getBytes());
@@ -269,6 +274,7 @@ public class IssueStudentCredResource extends ProtocolResource {
     
     private boolean eligibleForIssuance(String id) {
     	return id.toLowerCase().substring(0, 1).equals("s") ||
-    			id.toLowerCase().equals("u012147@ru.nl");
+    			id.toLowerCase().equals("u012147@ru.nl") ||
+    			id.toLowerCase().equals("u921154@ru.nl");
     }
 }

@@ -1,7 +1,5 @@
 package org.irmacard.web.restapi.util;
 
-import java.io.IOException;
-import java.net.MalformedURLException;
 import java.net.URI;
 import java.net.URISyntaxException;
 import java.util.Scanner;
@@ -9,7 +7,6 @@ import java.util.Scanner;
 import org.irmacard.web.restapi.resources.VerificationProtocolResource;
 
 import com.ibm.zurich.credsystem.utils.Locations;
-import com.ibm.zurich.idmx.key.IssuerKeyPair;
 
 public class CredentialInformation {
 	URI CORE_LOCATION;

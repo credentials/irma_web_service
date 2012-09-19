@@ -1,13 +1,10 @@
 package org.irmacard.web.restapi.resources;
 
 import java.math.BigInteger;
-import java.util.List;
 import java.util.Map;
-import java.util.UUID;
 
 import net.sourceforge.scuba.smartcards.IResponseAPDU;
 
-import org.irmacard.web.restapi.IRMASetup;
 import org.irmacard.web.restapi.util.CommandSet;
 import org.irmacard.web.restapi.util.ProtocolCommandSerializer;
 import org.irmacard.web.restapi.util.ResponseAPDUDeserializer;

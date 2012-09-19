@@ -19,8 +19,8 @@ public class ProtocolCommandSerializer implements JsonSerializer<ProtocolCommand
 	public JsonElement serialize(ProtocolCommand src, Type typeOfSrc,
 			JsonSerializationContext context) {
 		JsonObject obj = new JsonObject();
-		obj.addProperty("key", src.key);
-		obj.addProperty("command", Hex.bytesToHexString(src.command.getBytes()));
+		obj.addProperty("key", src.getKey());
+		obj.addProperty("command", Hex.bytesToHexString(src.getAPDU().getBytes()));
 		return obj;
 	}
 }

@@ -7,50 +7,41 @@ import java.util.List;
 import java.util.Map;
 import java.util.UUID;
 
-import javax.security.auth.login.CredentialException;
-
 import net.sourceforge.scuba.smartcards.IResponseAPDU;
-
-import org.irmacard.web.restapi.IRMASetup;
 
 import org.irmacard.web.restapi.util.CommandSet;
 import org.irmacard.web.restapi.util.IssueCredentialInformation;
 import org.irmacard.web.restapi.util.ProtocolCommandSerializer;
 import org.irmacard.web.restapi.util.ResponseAPDUDeserializer;
 import org.restlet.resource.Post;
-import org.restlet.resource.ServerResource;
-
-import com.google.gson.Gson;
-import com.google.gson.GsonBuilder;
-import com.ibm.zurich.idmx.dm.Values;
-import com.ibm.zurich.idmx.issuance.Issuer;
-import com.ibm.zurich.idmx.utils.SystemParameters;
-
-import credentials.CredentialsException;
-import credentials.Nonce;
-import credentials.idemix.IdemixCredentials;
-import credentials.idemix.IdemixNonce;
-import credentials.idemix.IdemixPrivateKey;
-import credentials.idemix.spec.IdemixIssueSpecification;
-import credentials.idemix.spec.IdemixVerifySpecification;
-import credentials.idemix.util.VerifyCredentialInformation;
-
-import credentials.Attributes;
 
 import service.ProtocolCommand;
 import service.ProtocolResponses;
+
+import com.google.gson.Gson;
+import com.google.gson.GsonBuilder;
+import com.ibm.zurich.idmx.issuance.Issuer;
+
+import credentials.Attributes;
+import credentials.CredentialsException;
+import credentials.idemix.IdemixCredentials;
+import credentials.idemix.spec.IdemixIssueSpecification;
+import credentials.idemix.spec.IdemixVerifySpecification;
+import credentials.idemix.util.VerifyCredentialInformation;
 
 public class IssueStudentCredResource extends ProtocolResource {
 	public static final String VERIFY_ISSUER = "IdemixLib";
 	public static final String VERIFY_CRED_NAME = "CredStructCard4";
 	public static final String VERIFY_SPEC_NAME = "default4";
 	
+    @SuppressWarnings("unused")
 	private class IssuanceCommandSet {
-	    public List<ProtocolCommand> commands;
+		public List<ProtocolCommand> commands;
 	    public String responseurl;
 	    public Map<String,String> attributes;
 	}
 	
+    @SuppressWarnings("unused")
 	private class IssueError {
 		public String status;
 		public String message;

@@ -3,14 +3,13 @@ package org.irmacard.web.restapi.resources;
 import java.math.BigInteger;
 import java.util.Map;
 
-import net.sourceforge.scuba.smartcards.IResponseAPDU;
-
 import org.irmacard.web.restapi.util.CommandSet;
 import org.irmacard.web.restapi.util.ProtocolCommandSerializer;
-import org.irmacard.web.restapi.util.ResponseAPDUDeserializer;
+import org.irmacard.web.restapi.util.ProtocolResponseDeserializer;
 import org.restlet.resource.ServerResource;
 
 import service.ProtocolCommand;
+import service.ProtocolResponse;
 import service.ProtocolResponses;
 
 import com.google.gson.Gson;
@@ -65,8 +64,8 @@ public class ProtocolResource extends ServerResource {
 			String value, String id) throws CredentialsException {
 		Gson gson = new GsonBuilder()
 				.setPrettyPrinting()
-				.registerTypeAdapter(IResponseAPDU.class,
-						new ResponseAPDUDeserializer()).create();
+				.registerTypeAdapter(ProtocolResponse.class,
+						new ProtocolResponseDeserializer()).create();
 
 		// Get the nonce based on the id
 		@SuppressWarnings("unchecked")

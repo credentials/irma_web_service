@@ -7,15 +7,14 @@ import java.util.List;
 import java.util.Map;
 import java.util.UUID;
 
-import net.sourceforge.scuba.smartcards.IResponseAPDU;
-
 import org.irmacard.web.restapi.util.CommandSet;
 import org.irmacard.web.restapi.util.IssueCredentialInformation;
 import org.irmacard.web.restapi.util.ProtocolCommandSerializer;
-import org.irmacard.web.restapi.util.ResponseAPDUDeserializer;
+import org.irmacard.web.restapi.util.ProtocolResponseDeserializer;
 import org.restlet.resource.Post;
 
 import service.ProtocolCommand;
+import service.ProtocolResponse;
 import service.ProtocolResponses;
 
 import com.google.gson.Gson;
@@ -174,8 +173,8 @@ public class IssueStudentCredResource extends ProtocolResource {
 				.setPrettyPrinting()
 				.registerTypeAdapter(ProtocolCommand.class,
 						new ProtocolCommandSerializer())
-				.registerTypeAdapter(IResponseAPDU.class,
-						new ResponseAPDUDeserializer()).create();
+				.registerTypeAdapter(ProtocolResponse.class,
+						new ProtocolResponseDeserializer()).create();
 
 		// FIXME: setup the actual idemix issue specification
 		System.out.println("==== Setting up credential infromation ===");

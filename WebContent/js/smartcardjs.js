@@ -48,7 +48,7 @@
 			  var responses = {};
 			  for(var i=0, len=commands.length; i < len; i++) {
 				  response = this.transmit(commands[i].command);
-				  responses[commands[i].key] = response;
+				  responses[commands[i].key] = { key: commands[i].key, apdu: response };
 				  if (response.slice(-4) !== "9000") {
 					  // Don't bother continuing when the response is not ok
 					  responses['smartcardstatus'] = 'failed';
@@ -63,7 +63,7 @@
 			  responses['result'] = 'succes';
 			  for(var i=0, len=commands.length; i < len; i++) {
 				  response = this.transmit(commands[i].command);
-				  responses[commands[i].key] = response;
+				  responses[commands[i].key] = { key: commands[i].key, apdu: response };
 				  if (response.slice(-4) !== "9000") {
 					  // Don't bother continuing when the response is not ok
 					  responses['result'] = 'failed';

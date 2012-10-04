@@ -4,15 +4,14 @@ import java.math.BigInteger;
 import java.util.Map;
 import java.util.UUID;
 
-import net.sourceforge.scuba.smartcards.IResponseAPDU;
-
 import org.irmacard.web.restapi.util.CommandSet;
 import org.irmacard.web.restapi.util.ProtocolCommandSerializer;
-import org.irmacard.web.restapi.util.ResponseAPDUDeserializer;
+import org.irmacard.web.restapi.util.ProtocolResponseDeserializer;
 import org.restlet.resource.Post;
 import org.restlet.resource.ServerResource;
 
 import service.ProtocolCommand;
+import service.ProtocolResponse;
 import service.ProtocolResponses;
 
 import com.google.gson.Gson;
@@ -99,7 +98,7 @@ public class VerificationProtocolResource extends ServerResource {
 	public String step1(int crednr, String value, String verificationId) {
 		Gson gson = new GsonBuilder().
 				setPrettyPrinting().
-				registerTypeAdapter(IResponseAPDU.class, new ResponseAPDUDeserializer()).
+				registerTypeAdapter(ProtocolResponse.class, new ProtocolResponseDeserializer()).
 				create();
 		
 		// Get the nonce based on the id

@@ -6,6 +6,8 @@ import java.net.URISyntaxException;
 import java.util.HashMap;
 import java.util.Map;
 
+import org.irmacard.credentials.Attributes;
+import org.irmacard.credentials.idemix.util.CredentialInformation;
 import org.irmacard.web.restapi.resources.IssueStudentCredResource;
 import org.irmacard.web.restapi.resources.VerificationProtocolResource;
 import org.restlet.Application;
@@ -14,8 +16,6 @@ import org.restlet.routing.Router;
 
 import com.ibm.zurich.idmx.issuance.Issuer;
 
-import credentials.Attributes;
-import credentials.idemix.util.CredentialInformation;
 
 public class IRMAProtocolApplication extends Application {
     /**

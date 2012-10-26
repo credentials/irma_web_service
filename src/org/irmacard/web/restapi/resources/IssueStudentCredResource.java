@@ -7,6 +7,12 @@ import java.util.List;
 import java.util.Map;
 import java.util.UUID;
 
+import org.irmacard.credentials.Attributes;
+import org.irmacard.credentials.CredentialsException;
+import org.irmacard.credentials.idemix.IdemixCredentials;
+import org.irmacard.credentials.idemix.spec.IdemixIssueSpecification;
+import org.irmacard.credentials.idemix.spec.IdemixVerifySpecification;
+import org.irmacard.credentials.idemix.util.VerifyCredentialInformation;
 import org.irmacard.web.restapi.util.CommandSet;
 import org.irmacard.web.restapi.util.IssueCredentialInformation;
 import org.irmacard.web.restapi.util.ProtocolCommandSerializer;
@@ -21,12 +27,6 @@ import com.google.gson.Gson;
 import com.google.gson.GsonBuilder;
 import com.ibm.zurich.idmx.issuance.Issuer;
 
-import credentials.Attributes;
-import credentials.CredentialsException;
-import credentials.idemix.IdemixCredentials;
-import credentials.idemix.spec.IdemixIssueSpecification;
-import credentials.idemix.spec.IdemixVerifySpecification;
-import credentials.idemix.util.VerifyCredentialInformation;
 
 public class IssueStudentCredResource extends ProtocolResource {
 	public static final String VERIFY_ISSUER = "IdemixLib";
@@ -105,7 +105,7 @@ public class IssueStudentCredResource extends ProtocolResource {
 			return gson.toJson(new IssueError("Invalid root credential"));
 		}
 		
-		String userID = new String(attr.get("http://www.irmacard.org/credentials/phase1/Surfnet/root/structure.xml;someRandomName;userID"));
+		String userID = new String(attr.get("http://www.irmacard.org/org.irmacard.credentials/phase1/Surfnet/root/structure.xml;someRandomName;userID"));
 		
 		// Check if eligible
 		if(! eligibleForIssuance(userID)){

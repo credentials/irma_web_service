@@ -2,13 +2,14 @@ package org.irmacard.web.restapi.util;
 
 import java.net.URI;
 
+import org.irmacard.credentials.Attributes;
+import org.irmacard.credentials.idemix.IdemixPrivateKey;
+import org.irmacard.credentials.idemix.spec.IdemixIssueSpecification;
+
 import com.ibm.zurich.credsystem.utils.Locations;
 import com.ibm.zurich.idmx.issuance.Issuer;
 import com.ibm.zurich.idmx.key.IssuerKeyPair;
 
-import credentials.Attributes;
-import credentials.idemix.IdemixPrivateKey;
-import credentials.idemix.spec.IdemixIssueSpecification;
 
 public class IssueCredentialInformation extends CredentialInformation {
 	URI issuerSKLocation;

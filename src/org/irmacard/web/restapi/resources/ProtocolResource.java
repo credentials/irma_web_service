@@ -3,6 +3,12 @@ package org.irmacard.web.restapi.resources;
 import java.math.BigInteger;
 import java.util.Map;
 
+import org.irmacard.credentials.Attributes;
+import org.irmacard.credentials.CredentialsException;
+import org.irmacard.credentials.Nonce;
+import org.irmacard.credentials.idemix.IdemixCredentials;
+import org.irmacard.credentials.idemix.IdemixNonce;
+import org.irmacard.credentials.idemix.spec.IdemixVerifySpecification;
 import org.irmacard.web.restapi.util.CommandSet;
 import org.irmacard.web.restapi.util.ProtocolCommandSerializer;
 import org.irmacard.web.restapi.util.ProtocolResponseDeserializer;
@@ -15,12 +21,6 @@ import service.ProtocolResponses;
 import com.google.gson.Gson;
 import com.google.gson.GsonBuilder;
 
-import credentials.Attributes;
-import credentials.CredentialsException;
-import credentials.Nonce;
-import credentials.idemix.IdemixCredentials;
-import credentials.idemix.IdemixNonce;
-import credentials.idemix.spec.IdemixVerifySpecification;
 
 public class ProtocolResource extends ServerResource {
 	/**

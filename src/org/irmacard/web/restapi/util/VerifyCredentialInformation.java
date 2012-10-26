@@ -2,7 +2,8 @@ package org.irmacard.web.restapi.util;
 
 import java.net.URI;
 
-import credentials.idemix.spec.IdemixVerifySpecification;
+import org.irmacard.credentials.idemix.spec.IdemixVerifySpecification;
+
 
 public class VerifyCredentialInformation extends CredentialInformation {
 	private URI proofSpecLocation;

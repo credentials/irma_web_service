@@ -38,7 +38,7 @@ public class ProtocolResource extends ServerResource {
 				.setPrettyPrinting()
 				.registerTypeAdapter(ProtocolCommand.class,
 						new ProtocolCommandSerializer()).create();
-		IdemixCredentials ic = new IdemixCredentials();
+		IdemixCredentials ic = new IdemixCredentials(null);
 
 		try {
 			CommandSet cs = new CommandSet();
@@ -76,7 +76,7 @@ public class ProtocolResource extends ServerResource {
 
 		ProtocolResponses responses = gson.fromJson(value,
 				ProtocolResponses.class);
-		IdemixCredentials ic = new IdemixCredentials();
+		IdemixCredentials ic = new IdemixCredentials(null);
 
 		return ic.verifyProofResponses(vspec, nonce, responses);
 	}

@@ -63,7 +63,7 @@ public class VerificationProtocolResource extends ServerResource {
 		
 		VerifyCredentialInformation vci = new VerifyCredentialInformation(
 				ISSUER, CRED_NAME, VERIFIER, SPEC_NAME);
-		IdemixCredentials ic = new IdemixCredentials();
+		IdemixCredentials ic = new IdemixCredentials(null);
 		IdemixVerifySpecification vspec = vci.getIdemixVerifySpecification();
 
 		try {
@@ -111,7 +111,7 @@ public class VerificationProtocolResource extends ServerResource {
 
 		VerifyCredentialInformation vci = new VerifyCredentialInformation(
 				ISSUER, CRED_NAME, VERIFIER, SPEC_NAME);
-		IdemixCredentials ic = new IdemixCredentials();
+		IdemixCredentials ic = new IdemixCredentials(null);
 		IdemixVerifySpecification vspec = vci.getIdemixVerifySpecification();
 
 		try {

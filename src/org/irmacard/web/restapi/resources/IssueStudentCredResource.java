@@ -115,7 +115,7 @@ public class IssueStudentCredResource extends ProtocolResource {
 		// FIXME: retrieve proper attributes
 		Attributes attributes = getIssuanceAttributes(userID);
 		
-		IdemixCredentials ic = new IdemixCredentials();
+		IdemixCredentials ic = new IdemixCredentials(null);
 		IssueCredentialInformation ici = new IssueCredentialInformation("RU", "studentCard");
 		IdemixIssueSpecification spec = ici.getIdemixIssueSpecification();
 
@@ -178,7 +178,7 @@ public class IssueStudentCredResource extends ProtocolResource {
 
 		// FIXME: setup the actual idemix issue specification
 		System.out.println("==== Setting up credential infromation ===");
-		IdemixCredentials ic = new IdemixCredentials();
+		IdemixCredentials ic = new IdemixCredentials(null);
 		IssueCredentialInformation ici = new IssueCredentialInformation("RU", "studentCard");
 
 		System.out.println("=== Getting issuance information ===");

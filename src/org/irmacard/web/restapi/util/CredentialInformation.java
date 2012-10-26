@@ -51,6 +51,7 @@ public class CredentialInformation {
 		try {
 			sc = new Scanner(baseLocation.resolve("baseURL.txt").toURL().openStream());
 			issuerBaseID = new URI(sc.nextLine());
+			sc.close();
 		} catch (Exception e) {
 			e.printStackTrace();
 			throw new RuntimeException(e.toString());
@@ -62,6 +63,7 @@ public class CredentialInformation {
 		try {
 		sc = new Scanner(credStructBaseLocation.resolve("id.txt").toURL().openStream());
 		credNr = (short) sc.nextInt();
+		sc.close();
 		} catch (Exception e) {
 			e.printStackTrace();
 			throw new RuntimeException(e.toString());

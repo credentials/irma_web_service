@@ -105,7 +105,7 @@ public class IssueStudentCredResource extends ProtocolResource {
 			return gson.toJson(new IssueError("Invalid root credential"));
 		}
 		
-		String userID = new String(attr.get("http://www.irmacard.org/org.irmacard.credentials/phase1/Surfnet/root/structure.xml;someRandomName;userID"));
+		String userID = new String(attr.get("http://www.irmacard.org/credentials/phase1/Surfnet/root/structure.xml;someRandomName;userID"));
 		
 		// Check if eligible
 		if(! eligibleForIssuance(userID)){

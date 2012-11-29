@@ -18,7 +18,7 @@ public class SurfnetCredSetup {
 	/** Actual setup */
     private static String CRED_STRUCT_NAME = "root";
     private static String ISSUER_NAME = "Surfnet";
-    private static String ISSUER_BASE_URL = "http://www.irmacard.org/org.irmacard.credentials/phase1/surfnet/";
+    private static String ISSUER_BASE_URL = "http://www.irmacard.org/credentials/phase1/surfnet/";
     
 	
 	public static URI BASE_LOCATION = null;
@@ -72,7 +72,7 @@ public class SurfnetCredSetup {
     /**
 	 * Setup the system including private key
 	 * 
-	 * For use with the org.irmacard.credentials-api it is not advisable to use initIssuer.
+	 * For use with the credentials-api it is not advisable to use initIssuer.
 	 * Using the seperate functions for setting up the material gives a bit more
 	 * control.
 	 */

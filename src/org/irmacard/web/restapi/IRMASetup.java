@@ -79,7 +79,7 @@ public class IRMASetup {
     /**
 	 * Setup the system including private key
 	 * 
-	 * For use with the org.irmacard.credentials-api it is not advisable to use initIssuer.
+	 * For use with the credentials-api it is not advisable to use initIssuer.
 	 * Using the seperate functions for setting up the material gives a bit more
 	 * control.
 	 */

@@ -242,21 +242,25 @@ public class IssueStudentCredResource extends ProtocolResource {
     		attributes.add("studentCardNumber", "081122337".getBytes());
     		attributes.add("studentID", "s112233".getBytes());
     		attributes.add("level", "PhD".getBytes());
+    		attributes.add("expiry", "halfyear".getBytes());
         } else if(id.toLowerCase().equals("u012147@ru.nl")) {
         	attributes.add("university", "Radboud University".getBytes());
     		attributes.add("studentCardNumber", "081122336".getBytes());
     		attributes.add("studentID", "u012147".getBytes());
     		attributes.add("level", "PhD".getBytes());
+    		attributes.add("expiry", "halfyear".getBytes());
         } else if(id.toLowerCase().equals("u921154@ru.nl")) {
         	attributes.add("university", "Radboud University".getBytes());
     		attributes.add("studentCardNumber", "2300921154".getBytes());
     		attributes.add("studentID", "u921154".getBytes());
     		attributes.add("level", "PhD".getBytes());
+    		attributes.add("expiry", "halfyear".getBytes());
         } else {
 			attributes.add("university", "Radboud University".getBytes());
 			attributes.add("studentCardNumber", "0813371337".getBytes());
 			attributes.add("studentID", "s1234567".getBytes());
 			attributes.add("level", "PhD".getBytes());
+    		attributes.add("expiry", "halfyear".getBytes());
         }
 		
 		return attributes;

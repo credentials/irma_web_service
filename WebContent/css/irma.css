@@ -1,0 +1,163 @@
+#IRMA_verify, #IRMA_issue {
+  position: fixed;
+  top: 0;
+  right: 0;
+  bottom: 0;
+  left: 0;
+  z-index: 1040;
+  font-family: Ubuntu, sans-serif;
+  font-size: 24px;
+  line-height: 30px;
+}
+
+#load_credentials {
+  cursor: pointer;
+}
+
+#IRMA_verify {
+  background-color: #004289;
+  color: #004289;
+}
+
+#IRMA_issue {
+  background-color: #d0d0d0;
+  color: #000000;
+}
+
+.IRMA_container {
+  position: absolute;
+  left: 150px;
+  top: 90px;
+  width: 676px;
+}
+
+.IRMA_title {
+  position: absolute;
+  right: 0px;
+  top: -40px;
+  height: 40px;
+  width: 480px;		
+  z-index: 2;
+  color: #ffffff;
+  text-align: right;
+  font-size: 24px;
+  line-height: 30px;
+  font-weight: 700;
+}
+
+.IRMA_main_scherm {
+  position: absolute;
+  left: 0px;
+  top: 0px;
+  height: 488px;
+  width: 676px;
+  background-color: #ffffff;
+  -moz-border-radius: 12px;
+  border-radius: 12px;
+  padding: 10px;
+  z-index: 1;
+}
+
+.IRMA_logo_top {
+  position: absolute;
+  left: -73px;
+  top: -68px;
+  height: 211px;
+  width: 264px;		
+  z-index: 2;
+}
+	
+.IRMA_verifier_logo {
+  position:	absolute;
+  right: 20px;
+  bottom: -90px;
+  height: 180px;
+  width: 180px;
+  border: 1px solid #004289;
+  background-color: #ffffff;
+  -moz-border-radius: 12px;
+  border-radius: 12px;
+}
+
+.IRMA_arrow {
+  position: absolute;
+  right: 210px;
+  bottom: -82px;
+  height: 78px;
+  width: 78px;
+}
+
+.IRMA_buttons {
+  position: absolute;
+  bottom: -166px;
+  right: 0px;
+  height: 56px;
+  width: auto;
+}
+
+.IRMA_button_submit {
+  height: 56px;
+  -moz-border-radius: 12px;
+  border-radius: 12px;
+  color: #ffffff;
+  text-align: center;
+  font-size: 24px;
+  line-height: 30px;
+  font-weight: 700;
+  border: 0px;
+  cursor: pointer;
+  display: inline-block;
+  margin: 0px;
+  width: 332px;
+  background-color: #00b1e6;
+}
+
+.IRMA_button_gray_verify, .IRMA_button_gray_issue {
+  height: 56px;
+  -moz-border-radius: 12px;
+  border-radius: 12px;
+  color: #ffffff;
+  text-align: center;
+  font-size: 24px;
+  line-height: 30px;
+  font-weight: 700;
+  border: 0px;
+  cursor: pointer;
+  margin: 0px;
+  display: inline-block;
+  width: 166px;	
+}
+
+.IRMA_button_gray_verify {
+  background-color: #d0d0d0;
+}
+
+.IRMA_button_gray_issue {
+  background-color: #888888;
+}
+
+.IRMA_content {
+  position: absolute;
+  left: 254px;
+  top: 135px;
+  width: 400px;
+  height: auto;
+}
+
+.IRMA_content_credential {
+  display: block;
+  font-weight: 700;
+}
+	
+.IRMA_content_status {
+  display: block;
+  font-weight: 300;
+}
+
+.IRMA_content_icon {
+  position: absolute;
+  left: 108px;
+  top: 110px;
+  width: 130px;
+  height: 130px;
+}

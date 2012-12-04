@@ -49,7 +49,7 @@
             <img id="IRMA_status_icon" src="../../img/irma_icon_waiting_520px.png" width="130" height="130" />
           </div>
         
-        <div class="IRMA_content">
+        <div class="IRMA_content_verify">
           <span class="IRMA_content_credential">Age: &ge;16</span>
           <span class="IRMA_content_status" id="IRMA_status_text"></span>
         </div>
@@ -96,6 +96,10 @@ $(function() {
     SmartCardHandler.bind("cardRemoved", function() {
       disableVerify();
     });
+    SmartCardHandler.connectFirstCard();
+    if (SmartCardHandler.connectFirstCard() && SmartCardHandler.selectApplet('6964656D6978')) {
+      enableVerify();
+    }
   };
     
   var enableVerify = function () {
@@ -167,44 +171,6 @@ $(function() {
 	$("#verify").button().on('click', function(event) {
 		startVerify();
 	});
-/*		$("#verify").button('loading');
-		$.ajax({
-			  url: '/irma_web_service/protocols/verification/4',
-			  contentType: 'application/json',
-			  data: JSON.stringify({crednr: 4}),
-			  type: 'POST',
-			  success: function(data) {
-				  console.log(data);
-				  SmartCardHandler.connectFirstCard();
-				  var response = SmartCardHandler.transmitCommandSet(data.commands);
-				  console.log(response);
-				  if (response.smartcardstatus === 'failed') {
-					  $("#verify").button('reset');
-					  alert('No valid >16 credential found!');
-					  showAlert('error', 'No valid >16 credential found!');										  
-				  } else {
-					  $.ajax({
-						  url: data.responseurl,
-						  contentType: 'application/json',
-						  data: JSON.stringify(response),
-						  type: 'POST',
-						  success: function(data) {
-							  $("#verify").button('reset');
-							  console.log('and back!');
-							  console.log(data);
-							  if (data.response === 'valid') {
-								  alert('Found >=16 credential, press OK to continue to the website you requested.');
-								  window.location = data.url;
-							  } else {
-								  alert('No valid >=16 credential found!');
-								  showAlert('error', 'No valid >=16 credential found!');
-							  }
-						  }
-					  });					  
-				  }
-			  }
-		  });
-	});*/
 });
   </script>
 

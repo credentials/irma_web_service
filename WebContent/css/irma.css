@@ -4,6 +4,7 @@
   right: 0;
   bottom: 0;
   left: 0;
+  overflow: auto;
   z-index: 1040;
   font-family: Ubuntu, sans-serif;
   font-size: 24px;
@@ -24,9 +25,13 @@
   color: #000000;
 }
 
+.IRMA_page {
+	margin: 0 auto;
+	width: 676px;
+}
+
 .IRMA_container {
   position: absolute;
-  left: 150px;
   top: 90px;
   width: 676px;
 }
@@ -49,7 +54,7 @@
   position: absolute;
   left: 0px;
   top: 0px;
-  height: 488px;
+  height: 388px;
   width: 676px;
   background-color: #ffffff;
   -moz-border-radius: 12px;
@@ -95,7 +100,7 @@
   width: auto;
 }
 
-.IRMA_button_submit {
+.IRMA_button_primary {
   height: 56px;
   -moz-border-radius: 12px;
   border-radius: 12px;
@@ -109,6 +114,10 @@
   display: inline-block;
   margin: 0px;
   width: 332px;
+  background-color: #888888;
+}
+
+.IRMA_button_primary.enabled {
   background-color: #00b1e6;
 }
 

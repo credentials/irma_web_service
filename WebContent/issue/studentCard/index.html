@@ -3,12 +3,12 @@
 <head>
 	<meta charset="utf-8">
 	<title>Radboud University IRMA Student Card</title>
-	<link href="../../css/bootstrap.min.css" rel="stylesheet" type="text/css" />
 	<link href="../../css/irma.css" rel="stylesheet" type="text/css" />
-    <link href="http://fonts.googleapis.com/css?family=Ubuntu:regular,bold&subset=Latin" rel="stylesheet" type="text/css" />
-    <style>
-      body { background-color: #eaecef; }
-    </style>
+  <link href="http://fonts.googleapis.com/css?family=Ubuntu:regular,bold&subset=Latin" rel="stylesheet" type="text/css" />
+  <link href="../../css/bootstrap.css" rel="stylesheet" type="text/css" />
+  <style>
+    body { background-color: #eaecef; }
+  </style>
 </head>
 <body>
   <object classid="clsid:8AD9C840-044E-11D1-B3E9-00805F499D93" height="10" width="10">
@@ -56,42 +56,43 @@
   </div>
   
   <div id="IRMA_verify" class="hide fade in">
-  
-  <div class="IRMA_container">
-    <div class="IRMA_title">
-      CHECKING CREDENTIAL(S)
-    </div>
-
-    <div class="IRMA_logo_top">
-      <img src="../../img/irma_logo_1024px.png" width="264" height="211" />
-    </div>
-
-    <div class="IRMA_main_scherm">
-      <div class="IRMA_content_icon">
-        <img src="../../img/irma_icon_ok_520px.png" width="130" height="130" />
-      </div>
+    <div class="IRMA_page">
+      <div class="IRMA_container">
+        <div class="IRMA_title">
+          CHECKING CREDENTIAL(S)
+        </div>
     
-    <div class="IRMA_content">
-      <span class="IRMA_content_credential">SurfNET: User ID</span>
-      <span class="IRMA_content_status">Hit 'VERIFY' to check credential</span>
-    </div>
+        <div class="IRMA_logo_top">
+          <img src="../../img/irma_logo_1024px.png" width="264" height="211" />
+        </div>
+    
+        <div class="IRMA_main_scherm">
+          <div class="IRMA_content_icon">
+            <img id="IRMA_status_icon" src="../../img/irma_icon_waiting_520px.png" width="130" height="130" />
+          </div>
         
-    <div class="IRMA_verifier_logo">
-      <br /><br />
-      <img src="../../img/RU_logo.png" width="174" />
-    </div>
-    
-    <div class="IRMA_arrow">
-        <img src="../../img/irma_arrow_312px.png" width="78" height="78">
-    </div>
-    
-    <div class="IRMA_buttons">
-        <input type="button" class="IRMA_button_gray_verify" value="BACK" />
-        <input type="button" class="IRMA_button_gray_verify" value="HELP" />
-        <input type="button" class="IRMA_button_submit" value="VERIFY" />
+        <div class="IRMA_content">
+          <span class="IRMA_content_credential">SurfNET: User ID</span>
+          <span class="IRMA_content_status" id="IRMA_status_text">Insert your IRMA card an hit 'VERIFY' to check credential</span>
+        </div>
+            
+        <div class="IRMA_verifier_logo">
+          <br /><br />
+          <img src="../../img/RU_logo.png" width="174" />
+        </div>
+        
+        <div class="IRMA_arrow">
+            <img src="../../img/irma_arrow_312px.png" width="78" height="78">
+        </div>
+        
+        <div class="IRMA_buttons">
+          <button class="IRMA_button_gray_verify">BACK</button>
+          <button class="IRMA_button_gray_verify">HELP</button>
+          <button id="IRMA_button_verify" class="IRMA_button_primary">WAITING FOR CARD</button>
+        </div>
+      </div>
     </div>
   </div>
-</div>
   <div id="IRMA_issue" class="hide fade in">
   </div>
 <!-- 				<button id="verify" type="button" class="btn btn-primary" data-loading-text="Issueing...">Proceed</button>
@@ -215,42 +216,63 @@
 			}
 		}
 		var startVerify = function () {
-			$("#RU_welcome").fadeOut();
+			console.log("Starting IRMA verification");
 			$("#IRMA_verify").fadeIn();
+      $("#RU_welcome").hide();
 		};
-		var proceedToCheck = function () {
-			console.log("Proceeding to checking-modal");
-		  	$("#verify-modal").fadeOut();
-		  	
-		  	if(response.smartcardstatus === "failed") {
-		  		showAlert('error', "No credential found");
-		  	}
+		
+		var enableVerify = function () {
+			$("#IRMA_button_verify").addClass("enabled");
+			$("#IRMA_button_verify").html("VERIFY");
+		};
+		
+		var finishVerify = function () {
+			console.log("Finished IRMA verification");
+			if (response.smartcardstatus === "failed") {
+	      showAlert('error', "No credential found");
+	    } else {
+  			$("#IRMA_status_icon").prop("src", "../../img/irma_icon_ok_520px.png");
+  			$("#IRMA_status_text").html("Hit 'CONTINUE' to proceed to the issuing step");
+        $("#IRMA_button_verify").addClass("enabled");
+        $("#IRMA_button_verify").html("CONTINUE");
+      }
+		  console.log("Finished IRMA verification");
+		}
 
-		  	$.ajax({
-		  		url: nextAction.responseurl,
-		  		contentType: 'application/json',
-		  		data: JSON.stringify(response),
-		  		type: 'POST',
-		  		success: function(data) {
-				  	if( isError(data) ){
-				  		console.log(data);
-				  		showAlert('error', data.message);
-				  		return;
-				  	}
-				  	
-		  			$("#field-university").text(data.attributes.university);
-		  			$("#field-studentid").text(data.attributes.studentID);
-		  			$("#field-studentcardnr").text(data.attributes.studentCardNumber);
-		  			$("#field-level").text(data.attributes.level);
-		  			$("#check-modal").fadeIn();
-		  			console.log(data);
-		  			nextAction = data;
-		  			$("#check-button").button().on('click', function(event) {
-		  				proceedToIssue();
-		  			})
-		  		}
-		  	})
+		var startIssue = function () {
+      console.log("Starting IRMA issuance");
+      $("#IRMA_verify").fadeOut();
+      $("#IRMA_issue").fadeIn();
+    	$.ajax({
+	  		url: nextAction.responseurl,
+	  		contentType: 'application/json',
+	  		data: JSON.stringify(response),
+	  		type: 'POST',
+	  		success: function(data) {
+			  	if( isError(data) ){
+			  		console.log(data);
+			  		showAlert('error', data.message);
+			  		return;
+			  	}
+			  	
+	  			$("#field-university").text(data.attributes.university);
+	  			$("#field-studentid").text(data.attributes.studentID);
+	  			$("#field-studentcardnr").text(data.attributes.studentCardNumber);
+	  			$("#field-level").text(data.attributes.level);
+	  			console.log(data);
+	  			nextAction = data;
+	  			$("#check-button").button().on('click', function(event) {
+	  				proceedToIssue();
+	  			})
+	  		}
+	  	})
 		};
+
+    var enableIssue = function () {
+	    $("#IRMA_button_issue").addClass("enabled");
+	    $("#IRMA_button_issue").html("ISSUE");
+	  };
+
 		var proceedToIssue = function () {
 			console.log("Proceeding to issuing-modal");
 			$("#check-modal").fadeOut();
@@ -284,11 +306,11 @@
 			// alerttype is one of 'error', 'success', 'info'
 			$('<div class="alert alert-' + alerttype + '">' + message + '</div>').hide().prependTo('#alerts').slideDown('fast');
 		};
-		$("#verify")
+		$("#IRMA_button_verify")
 			.button()
-			.toggleClass('disabled',false)
 			.on('click', function(event) {
-				$("#verify-modal").show();
+				$("IRMA_button_verify").removeClass("enabled");
+				$("IRMA_button_verify").innerHTML = "VERIFYING..."
 				$.ajax({
 					  url: '/irma_web_service/protocols/issue/studentCred',
 					  contentType: 'application/json',
@@ -300,7 +322,7 @@
 						  SmartCardHandler.connectFirstCard();
 						  response = SmartCardHandler.transmitCommandSet(data.commands);
 						  console.log(response);
-						  proceedToCheck();
+						  finishVerify();
 					  }
 				});
 			});
@@ -312,15 +334,16 @@
 	  	SmartCardHandler.bind("cardInserted", function() {
 			 SmartCardHandler.connectFirstCard();
 			 if (SmartCardHandler.selectApplet('6964656D6978')) {
-				 showAlert('success', 'IRMA card found!');
-				 $("#verify").toggleClass("disabled", false);
+				 enableVerify();
+				 enableIssue();
 			 } else {
 				 showAlert('error', 'Inserted card is not an IRMA card!');
 			 }
 		  });
 	  	
 		  SmartCardHandler.bind("cardRemoved", function() {
-			  $("#verify").toggleClass("disabled",false);
+			  disableVerify();
+			  disableIssue();
 		  });
 		  
 		  SmartCardHandler.bind("appletReady", function() {

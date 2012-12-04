@@ -73,7 +73,7 @@
         
         <div class="IRMA_content">
           <span class="IRMA_content_credential">SurfNET: User ID</span>
-          <span class="IRMA_content_status" id="IRMA_status_text">Insert your IRMA card an hit 'VERIFY' to check credential</span>
+          <span class="IRMA_content_status" id="IRMA_status_text"></span>
         </div>
             
         <div class="IRMA_verifier_logo">
@@ -215,29 +215,76 @@
 				return false;
 			}
 		}
+
 		var startVerify = function () {
+      disableVerify(); // Reset state
 			console.log("Starting IRMA verification");
 			$("#IRMA_verify").fadeIn();
       $("#RU_welcome").hide();
+      SmartCardHandler.bind("cardInserted", function() {
+        SmartCardHandler.connectFirstCard();
+        if (SmartCardHandler.selectApplet('6964656D6978')) {
+          enableVerify();
+        } else {
+          $("#IRMA_status_icon").prop("src", "../../img/irma_icon_warning_520px.png");
+          $("#IRMA_status_text").html("Inserted card is not an IRMA card");
+        }
+      });
+      SmartCardHandler.bind("cardRemoved", function() {
+        disableVerify();
+      });
 		};
 		
 		var enableVerify = function () {
+      $("#IRMA_status_icon").prop("src", "../../img/irma_icon_ready_520px.png");
+      $("#IRMA_status_text").html("Hit 'VERIFY' to check your credential");
+      $("#IRMA_button_verify").html("VERIFY");
 			$("#IRMA_button_verify").addClass("enabled");
-			$("#IRMA_button_verify").html("VERIFY");
+      $("#IRMA_button_verify").button().on("click", function(event) {
+          $("#IRMA_button_verify").off("click");
+          $("#IRMA_button_verify").removeClass("enabled");
+          $("#IRMA_button_verify").html("VERIFYING...");
+	        $.ajax({
+	            url: '/irma_web_service/protocols/issue/studentCred',
+	            contentType: 'application/json',
+	            data: JSON.stringify({crednr: 4}),
+	            type: 'POST',
+	            success: function(data) {
+	              console.log(data);
+	              nextAction = data;
+	              SmartCardHandler.connectFirstCard();
+	              response = SmartCardHandler.transmitCommandSet(data.commands);
+	              console.log(response);
+	              finishVerify();
+	            }
+	        });
+	      });
 		};
+		
+		var disableVerify = function () {
+      $("#IRMA_status_icon").prop("src", "../../img/irma_icon_waiting_520px.png");
+      $("#IRMA_status_text").html("Insert your IRMA card");
+      $("#IRMA_button_verify").off("click");
+      $("#IRMA_button_verify").removeClass("enabled");
+      $("#IRMA_button_verify").html("WAITING FOR CARD...");
+		} 
 		
 		var finishVerify = function () {
 			console.log("Finished IRMA verification");
 			if (response.smartcardstatus === "failed") {
-	      showAlert('error', "No credential found");
+	      $("#IRMA_status_icon").prop("src", "../../img/irma_icon_missing_520px.png");
+	      $("#IRMA_status_text").html("Credential not found");
+	      $("#IRMA_button_verify").html("NOT FOUND");
 	    } else {
   			$("#IRMA_status_icon").prop("src", "../../img/irma_icon_ok_520px.png");
   			$("#IRMA_status_text").html("Hit 'CONTINUE' to proceed to the issuing step");
-        $("#IRMA_button_verify").addClass("enabled");
-        $("#IRMA_button_verify").html("CONTINUE");
+	      $("#IRMA_button_verify").html("CONTINUE");
+ 	      $("#IRMA_button_verify").addClass("enabled");
+ 	      $("#IRMA_button_verify").button().on("click", function(event) {
+ 	        startIssue();
+ 	      });
       }
-		  console.log("Finished IRMA verification");
-		}
+		};
 
 		var startIssue = function () {
       console.log("Starting IRMA issuance");
@@ -306,26 +353,6 @@
 			// alerttype is one of 'error', 'success', 'info'
 			$('<div class="alert alert-' + alerttype + '">' + message + '</div>').hide().prependTo('#alerts').slideDown('fast');
 		};
-		$("#IRMA_button_verify")
-			.button()
-			.on('click', function(event) {
-				$("IRMA_button_verify").removeClass("enabled");
-				$("IRMA_button_verify").innerHTML = "VERIFYING..."
-				$.ajax({
-					  url: '/irma_web_service/protocols/issue/studentCred',
-					  contentType: 'application/json',
-					  data: JSON.stringify({crednr: 4}),
-					  type: 'POST',
-					  success: function(data) {
-						  console.log(data);
-						  nextAction = data;
-						  SmartCardHandler.connectFirstCard();
-						  response = SmartCardHandler.transmitCommandSet(data.commands);
-						  console.log(response);
-						  finishVerify();
-					  }
-				});
-			});
 		
 		$("#load_credentials").on("click", function() {
 			startVerify();

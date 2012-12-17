@@ -1,0 +1,75 @@
+<?xml version="1.0" encoding="UTF-8" standalone="no"?>
+<project name="Idemix terminal service" default="all">
+  
+  <property file="build.properties" />
+  <property file="deploy.properties" />
+
+  <path id="classpath">
+    <fileset dir="${lib.dir}">
+        <include name="*.jar"/>
+    </fileset>
+    <fileset dir="${deploy.libs}">
+        <include name="*.jar"/>
+    </fileset>
+  </path>
+
+  <!-- Configure the custom Ant tasks for the Tomcat application manager -->
+  <taskdef name="deploy"    classname="org.apache.catalina.ant.DeployTask" classpathref="classpath" />
+  <taskdef name="list"      classname="org.apache.catalina.ant.ListTask" classpathref="classpath" />
+  <taskdef name="reload"    classname="org.apache.catalina.ant.ReloadTask" classpathref="classpath" />
+  <taskdef name="findleaks" classname="org.apache.catalina.ant.FindLeaksTask" classpathref="classpath" />
+  <taskdef name="resources" classname="org.apache.catalina.ant.ResourcesTask" classpathref="classpath" />
+  <taskdef name="start"     classname="org.apache.catalina.ant.StartTask" classpathref="classpath" />
+  <taskdef name="stop"      classname="org.apache.catalina.ant.StopTask" classpathref="classpath" />
+  <taskdef name="undeploy"  classname="org.apache.catalina.ant.UndeployTask" classpathref="classpath" />
+
+  <target name="clean">
+    <delete dir="${bin.dir}" />
+  </target>
+
+  <target name="distclean" depends="clean">
+    <delete file="${deploy.file}" />
+  </target>
+
+  <target name="compile">
+    <mkdir dir="${bin.dir}" />
+    <javac srcdir="${src.dir}" destdir="${bin.dir}" includeantruntime="false">
+       <classpath refid="classpath" />
+    </javac>
+  </target>
+
+  <target name="service" depends="compile">
+    <war destfile="${deploy.file}" webxml="${web.dir}/WEB-INF/web.xml" update="true">
+      <lib dir="${lib.dir}" />
+      <classes dir="${bin.dir}" />
+      <fileset dir="${web.dir}">
+        <exclude name="WEB-INF/web.xml"/>
+      </fileset>
+      <fileset dir="${conf.dir}" />
+    </war>
+  </target>
+
+  <target name="all" depends="service" />
+
+  <target name="eclipse">
+    <copy file="${eclipse.dir}/.project" todir="${base.dir}" />
+    <copy file="${eclipse.dir}/.classpath" todir="${base.dir}" />
+  </target>
+
+  <!-- Tomcat web application management -->
+  <target name="deploy" description="Install web service" depends="service">
+    <deploy username="${deploy.user}" password="${deploy.pass}"
+      url="${deploy.host}" path="${deploy.path}"
+      war="file:${deploy.file}"/>
+  </target>
+
+  <target name="reload" description="Reload web service" depends="service">
+    <reload username="${deploy.user}" password="${deploy.pass}"
+      url="${deploy.host}" path="${deploy.path}" />
+  </target>
+
+  <target name="undeploy" description="Remove web service">
+    <undeploy username="${deploy.user}" password="${deploy.pass}"
+      url="${deploy.host}" path="${deploy.path}"/>
+  </target>  
+</project>

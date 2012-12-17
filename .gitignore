@@ -2,3 +2,8 @@ build
 bin
 irma_configuration
 *.war
+WebContent/WEB-INF/lib/credentials_api.lib.jar
+WebContent/WEB-INF/lib/credentials_idemix.lib.jar
+WebContent/WEB-INF/lib/idemix_library.lib.jar
+WebContent/WEB-INF/lib/idemix_terminal.lib.jar
+WebContent/WEB-INF/lib/scuba.lib.jar

@@ -7,20 +7,19 @@
   <link href="http://fonts.googleapis.com/css?family=Ubuntu:regular,bold&subset=Latin" rel="stylesheet" type="text/css" />
   <link href="../../css/bootstrap.css" rel="stylesheet" type="text/css" />
   <style>
-    body { background-color: #eaecef; }
+    body { background-color: #ffffff; }
 		div.huge {font-size: 300px; line-height: 1em;}
+    #verify {cursor: pointer; }
 	</style>
 </head>
 <body>
   <div id="SnS_welcome" class="container">
     <div class="page-header">    
-      <h1><img alt="IRMA" src="../../img/IRMA_logo_200.png"> Age verification</h1>
+      <h1><img alt="Spuiten en Slikken" src="../../img/SnS_logo.png"> Age verification</h1>
     </div>
     <div class="row">
-      <p>The website you requested has age restrictions, you have to be    </p>
-		  <div class="huge">&ge;16</div>    
-      <p>Please insert your IRMA card to anonymously verify your age.</p>
-      <button id="verify" class="btn btn-primary">Verify age</button>
+      <p>The website you requested has age restrictions, you have to be <strong>at least 16 years old</strong>.</p>
+      <p><img id="verify" src="../../img/verify16.png"/></p>
     </div>
 
     <object classid="clsid:8AD9C840-044E-11D1-B3E9-00805F499D93" height="10" width="10">
@@ -168,7 +167,7 @@ $(function() {
     }
   };
 
-	$("#verify").button().on('click', function(event) {
+	$("#verify").on('click', function(event) {
 		startVerify();
 	});
 });

@@ -3,12 +3,9 @@ package org.irmacard.web.restapi.resources;
 import java.net.URI;
 import java.net.URISyntaxException;
 
-import org.irmacard.web.restapi.resources.VerificationProtocolResource;
-
 import com.ibm.zurich.credsystem.utils.Locations;
 import com.ibm.zurich.idmx.issuance.IssuanceSpec;
 import com.ibm.zurich.idmx.key.IssuerKeyPair;
-
 
 /**
  * A place for storing idemix parameters and references to idemix-related files.

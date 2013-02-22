@@ -3,6 +3,10 @@ package org.irmacard.web.restapi.resources;
 import java.math.BigInteger;
 import java.util.Map;
 
+import net.sourceforge.scuba.smartcards.ProtocolCommand;
+import net.sourceforge.scuba.smartcards.ProtocolResponse;
+import net.sourceforge.scuba.smartcards.ProtocolResponses;
+
 import org.irmacard.credentials.Attributes;
 import org.irmacard.credentials.CredentialsException;
 import org.irmacard.credentials.Nonce;
@@ -14,13 +18,8 @@ import org.irmacard.web.restapi.util.ProtocolCommandSerializer;
 import org.irmacard.web.restapi.util.ProtocolResponseDeserializer;
 import org.restlet.resource.ServerResource;
 
-import service.ProtocolCommand;
-import service.ProtocolResponse;
-import service.ProtocolResponses;
-
 import com.google.gson.Gson;
 import com.google.gson.GsonBuilder;
-
 
 public class ProtocolResource extends ServerResource {
 	/**

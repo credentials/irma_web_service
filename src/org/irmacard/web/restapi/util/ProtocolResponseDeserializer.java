@@ -2,8 +2,7 @@ package org.irmacard.web.restapi.util;
 
 import java.lang.reflect.Type;
 
-import service.ProtocolResponse;
-
+import net.sourceforge.scuba.smartcards.ProtocolResponse;
 import net.sourceforge.scuba.smartcards.ResponseAPDU;
 import net.sourceforge.scuba.util.Hex;
 

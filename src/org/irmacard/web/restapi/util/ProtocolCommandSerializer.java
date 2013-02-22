@@ -2,8 +2,8 @@ package org.irmacard.web.restapi.util;
 
 import java.lang.reflect.Type;
 
+import net.sourceforge.scuba.smartcards.ProtocolCommand;
 import net.sourceforge.scuba.util.Hex;
-import service.ProtocolCommand;
 
 import com.google.gson.JsonElement;
 import com.google.gson.JsonObject;

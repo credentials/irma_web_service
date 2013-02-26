@@ -18,6 +18,7 @@ import org.irmacard.credentials.idemix.util.VerifyCredentialInformation;
 import org.irmacard.web.restapi.util.ProtocolStep;
 import org.irmacard.web.restapi.util.ProtocolCommandSerializer;
 import org.irmacard.web.restapi.util.ProtocolResponseDeserializer;
+import org.restlet.resource.Get;
 import org.restlet.resource.Post;
 import org.restlet.resource.ServerResource;
 
@@ -48,6 +49,11 @@ public class VerificationProtocolResource extends ServerResource {
 		return null;
 	}
 	
+	@Get
+	public String handleGet() {
+		return CRED_NAME;
+		
+	}
 	/**
 	 * Start new verification protocol
 	 * @param crednr credential number
@@ -85,6 +91,34 @@ public class VerificationProtocolResource extends ServerResource {
 		}
 
 		return null; 		
+	}
+	
+	/**
+	 * Start new verification protocol
+	 * @param crednr credential number
+	 * @param value request body
+	 * @return
+	 */
+	public String step0qr(int crednr, String value) {
+		VerifyCredentialInformation vci = new VerifyCredentialInformation(
+				ISSUER, CRED_NAME, VERIFIER, SPEC_NAME);
+		IdemixCredentials ic = new IdemixCredentials(null);
+		IdemixVerifySpecification vspec = vci.getIdemixVerifySpecification();
+		try {
+			Nonce nonce = ic.generateNonce(vspec);
+			
+			// Save the state, use random id as key
+			UUID id = UUID.randomUUID();
+			BigInteger intNonce = ((IdemixNonce)nonce).getNonce();
+			
+			@SuppressWarnings("unchecked")
+			Map<String ,BigInteger> noncemap = (Map<String,BigInteger>)getContext().getAttributes().get("noncemap");
+			noncemap.put(id.toString(), intNonce);			
+		} catch (CredentialsException e) {
+			e.printStackTrace();
+		}
+		
+		return null;
 	}
 	
 	/**

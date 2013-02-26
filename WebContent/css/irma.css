@@ -11,6 +11,13 @@
   line-height: 30px;
 }
 
+
+.IRMA_text {
+  font-family: Ubuntu, sans-serif;
+  font-size: 24px;
+  line-height: 30px;
+  color: #004289;
+}
 #load_credentials {
   cursor: pointer;
 }

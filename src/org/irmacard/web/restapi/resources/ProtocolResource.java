@@ -32,7 +32,7 @@ public class ProtocolResource extends ServerResource {
 	 * @return
 	 */
 	public String startVerify(IdemixVerifySpecification vspec, String value,
-			String id, String step) {
+			String id, String responseurl) {
 		Gson gson = new GsonBuilder()
 				.setPrettyPrinting()
 				.registerTypeAdapter(ProtocolCommand.class,
@@ -40,18 +40,18 @@ public class ProtocolResource extends ServerResource {
 		IdemixCredentials ic = new IdemixCredentials(null);
 
 		try {
-			ProtocolStep cs = new ProtocolStep();
+			ProtocolStep ps = new ProtocolStep();
 			Nonce nonce = ic.generateNonce(vspec);
-			cs.commands = ic.requestProofCommands(vspec, nonce);
+			ps.commands = ic.requestProofCommands(vspec, nonce);
+			ps.feedbackMessage = "Verifying";
 
 			@SuppressWarnings("unchecked")
 			Map<String, BigInteger> noncemap = (Map<String, BigInteger>) getContext()
 					.getAttributes().get("noncemap");
 			noncemap.put(id, ((IdemixNonce) nonce).getNonce());
 
-			cs.responseurl = getReference().getPath() + "/" + id.toString()
-					+ "/" + step;
-			return gson.toJson(cs);
+			ps.responseurl = responseurl;
+			return gson.toJson(ps);
 		} catch (CredentialsException e) {
 			e.printStackTrace();
 		}
@@ -78,6 +78,9 @@ public class ProtocolResource extends ServerResource {
 		IdemixCredentials ic = new IdemixCredentials(null);
 
 		return ic.verifyProofResponses(vspec, nonce, responses);
+	}
+	public String getBaseURL() {
+		return getReference().getScheme() +"://" + getReference().getHostDomain() + ":" + getReference().getHostPort();
 	}
 
 }

@@ -1,5 +1,8 @@
 package org.irmacard.web.restapi.resources;
 
+import java.io.ByteArrayOutputStream;
+import java.io.IOException;
+import java.io.OutputStream;
 import java.lang.reflect.Field;
 import java.math.BigInteger;
 import java.util.HashMap;
@@ -7,9 +10,8 @@ import java.util.List;
 import java.util.Map;
 import java.util.UUID;
 
-import net.sourceforge.scuba.smartcards.ProtocolCommand;
-import net.sourceforge.scuba.smartcards.ProtocolResponse;
-import net.sourceforge.scuba.smartcards.ProtocolResponses;
+import net.glxn.qrgen.QRCode;
+import net.glxn.qrgen.image.ImageType;
 
 import org.irmacard.credentials.Attributes;
 import org.irmacard.credentials.CredentialsException;
@@ -21,14 +23,25 @@ import org.irmacard.web.restapi.util.ProtocolStep;
 import org.irmacard.web.restapi.util.IssueCredentialInformation;
 import org.irmacard.web.restapi.util.ProtocolCommandSerializer;
 import org.irmacard.web.restapi.util.ProtocolResponseDeserializer;
+import org.irmacard.web.restapi.util.QRResponse;
+import org.restlet.data.Form;
+import org.restlet.data.MediaType;
+import org.restlet.representation.ObjectRepresentation;
+import org.restlet.representation.Representation;
+import org.restlet.representation.StringRepresentation;
+import org.restlet.resource.Get;
 import org.restlet.resource.Post;
+
+import net.sourceforge.scuba.smartcards.ProtocolCommand;
+import net.sourceforge.scuba.smartcards.ProtocolResponse;
+import net.sourceforge.scuba.smartcards.ProtocolResponses;
 
 import com.google.gson.Gson;
 import com.google.gson.GsonBuilder;
 import com.ibm.zurich.idmx.issuance.Issuer;
 
 
-public class IssueStudentCredResource extends ProtocolResource {
+public class QRIssueStudentCredResource extends ProtocolResource {
 	public static final String VERIFY_ISSUER = "IdemixLib";
 	public static final String VERIFY_CRED_NAME = "CredStructCard4";
 	public static final String VERIFY_SPEC_NAME = "default4";
@@ -63,27 +76,130 @@ public class IssueStudentCredResource extends ProtocolResource {
 		int iround;
 		String baseURL;
 		
+		boolean useQR = isQROptionSet();
+
 		if (id == null) {
 			iround = 0;
 			id = UUID.randomUUID().toString();
+			
+			@SuppressWarnings("unchecked")
+			Map<String, String> statemap = (Map<String,String>)getContext().getAttributes().get("statemap");
+			statemap.put(id.toString(), "start");
+			
 			baseURL = getBaseURL() + getReference().getPath() + "/" + id.toString() + "/";
 		} else {
+			iround = Integer.parseInt(round);
 			String path = getReference().getPath();
 			baseURL = getBaseURL() + path.substring(0, path.lastIndexOf('/')+1);
-			iround = Integer.parseInt(round);
 		} 
+		
 		
 		switch (iround) {
 		case 0:
-			return startVerify(getProofSpec(), value, id, baseURL + "1");
+			if (useQR) {
+				return createQRResponse(id);
+			} else {
+				@SuppressWarnings("unchecked")
+				Map<String, String> statemap = (Map<String,String>)getContext().getAttributes().get("statemap");
+				statemap.put(id.toString(), "step1");
+				
+				return startVerify(getProofSpec(), value, id, baseURL + "1");
+			}
 		case 1:
 			return processVerify(value, id);
 		case 2:
 			return processIssuance(value, id);
+		case 3:
+			return processIssuancEnd(value, id);
 		}
 		
 		return null;
 	}
+	
+	private boolean isQROptionSet() {
+		try {
+			return getReference().getQueryAsForm().getFirstValue("qr").equals("true");
+		} catch (NullPointerException e) {
+			return false;
+		}
+	}
+	
+	@Get
+	public Representation handleGet() {
+		String id = (String) getRequestAttributes().get("id");
+		String round = (String) getRequestAttributes().get("round");
+		if (id == null) {
+			return null;
+		}
+		if (round != null) {
+			if (round.equals("qr")) {
+				return generateQRImage(id,"0");
+			} else if (round.equals("state")) {
+				return generateState(id);
+			} else if (round.equals("attributes")) {
+				return getAttributes(id);
+			}
+			
+		}
+		return null;
+	}
+	
+	public Representation getAttributes(String id) {
+		@SuppressWarnings("unchecked")
+		Map<String, Attributes> attributemap = (Map<String, Attributes>) getContext()
+				.getAttributes().get("attributemap");
+		Attributes attributes = attributemap.get(id);
+		Map<String,String> attributesReadable = new HashMap<String,String>();
+		for(String k : attributes.getIdentifiers()) {
+			attributesReadable.put(k, new String(attributes.get(k)));
+		}
+		Gson gson = new GsonBuilder().setPrettyPrinting().create();
+		return new StringRepresentation(gson.toJson(attributesReadable));
+	}
+	
+	public String createQRResponse(String id) {
+		QRResponse qrr = new QRResponse();
+		qrr.qr_url = getReference().getPath() + "/" + id + "/qr";
+		qrr.state_url = getReference().getPath() + "/" + id + "/state";
+		Gson gson = new GsonBuilder().
+				setPrettyPrinting().
+				create();
+		return gson.toJson(qrr);
+	}
+	
+	public Representation generateState(String id) {
+		@SuppressWarnings("unchecked")
+		Map<String, String> statemap = (Map<String,String>)getContext().getAttributes().get("statemap");
+		if (statemap.containsKey(id)) {
+			String state = statemap.get(id);
+			if (state.equals("valid")) {
+				return new StringRepresentation("{\"state\": \"" + state + "\", \"url\": \"http://spuitenenslikken.bnn.nl/\"}");
+			} else {
+				return new StringRepresentation("{\"state\": \"" + state + "\"}");
+			}
+		}
+		return null;
+	}
+	
+	
+	public Representation generateQRImage(String id, String step) {
+		String path = getReference().getPath();
+		String qrURL = getBaseURL() + path.substring(0, path.lastIndexOf('/')+1) + step;
+		 
+		 ByteArrayOutputStream out = QRCode.from(qrURL).to(
+	                ImageType.PNG).withSize(300, 300).stream();
+		 byte[] data = out.toByteArray();
+		 ObjectRepresentation<byte[]> or=new ObjectRepresentation<byte[]>(data, MediaType.IMAGE_PNG) {
+		        @Override
+		        public void write(OutputStream os) throws IOException {
+		            super.write(os);
+		            os.write(this.getObject());
+		        }
+		    };
+
+		 return or; 		 
+	}
+	
 	
 	private IdemixVerifySpecification getProofSpec() {
 		VerifyCredentialInformation vci = new VerifyCredentialInformation("Surfnet", "root", "RU", "rootID");
@@ -116,6 +232,10 @@ public class IssueStudentCredResource extends ProtocolResource {
 			return gson.toJson(new IssueError("ID " + userID + " is not eligible"));
 		}
 
+		@SuppressWarnings("unchecked")
+		Map<String, String> statemap = (Map<String,String>)getContext().getAttributes().get("statemap");
+		statemap.put(id.toString(), "issueready");
+		
 		// FIXME: retrieve proper attributes
 		Attributes attributes = getIssuanceAttributes(userID);
 		
@@ -162,14 +282,18 @@ public class IssueStudentCredResource extends ProtocolResource {
 		for(String k : attributes.getIdentifiers()) {
 			attributesReadable.put(k, new String(attributes.get(k)));
 		}
-		
-		IssuanceCommandSet ics = new IssuanceCommandSet();
-		ics.commands = commands;
-		ics.attributes = attributesReadable;
 		String path = getReference().getPath();
-		ics.responseurl = path.substring(0, path.length() - 1) + "2";
 		
-		return gson.toJson(ics);
+		ProtocolStep ps = new ProtocolStep();
+		ps.commands = commands;
+		ps.responseurl = getBaseURL() + path.substring(0, path.length() - 1) + "2";
+		ps.confirmationMessage = "Are you sure you want this credential to be issued to your IRMA card?";
+		ps.askConfirmation = true;
+		ps.usePIN = true;
+		ps.protocolDone = false;
+		ps.feedbackMessage = "Issuing credential (1)";
+		
+		return gson.toJson(ps);
 	}
 	
 	public String processIssuance(String value, String id) {
@@ -230,11 +354,32 @@ public class IssueStudentCredResource extends ProtocolResource {
 			return "{\"response\": \"invalid\", \"error\": \"}" + e.toString() + "\"";
 		}
 		
+		@SuppressWarnings("unchecked")
+		Map<String, String> statemap = (Map<String,String>)getContext().getAttributes().get("statemap");
+		statemap.put(id.toString(), "issuing");
+		
+		String path = getReference().getPath();
 		ProtocolStep cs = new ProtocolStep();
 		cs.commands = commands;
-		cs.responseurl = "";
+		cs.responseurl = getBaseURL() + path.substring(0, path.length() - 1) + "3";
+		cs.protocolDone = false;
+		cs.feedbackMessage = "Issuing credential (2)";
+
 		
 		return gson.toJson(cs);
+	}
+	
+	private String processIssuancEnd(String value, String id) {
+		Gson gson = new GsonBuilder()
+			.setPrettyPrinting()
+			.create();
+		@SuppressWarnings("unchecked")
+		Map<String, String> statemap = (Map<String,String>)getContext().getAttributes().get("statemap");
+		statemap.put(id.toString(), "issuingdone");
+		ProtocolStep ps = new ProtocolStep();
+		ps.feedbackMessage = "Issuance successful";
+		ps.protocolDone = true;
+		return gson.toJson(ps);
 	}
 	
     private Attributes getIssuanceAttributes(String id) {

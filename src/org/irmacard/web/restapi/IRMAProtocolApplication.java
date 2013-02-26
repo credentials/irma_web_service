@@ -9,6 +9,8 @@ import java.util.Map;
 import org.irmacard.credentials.Attributes;
 import org.irmacard.credentials.idemix.util.CredentialInformation;
 import org.irmacard.web.restapi.resources.IssueStudentCredResource;
+import org.irmacard.web.restapi.resources.QRIssueStudentCredResource;
+import org.irmacard.web.restapi.resources.QRVerificationProtocolResource;
 import org.irmacard.web.restapi.resources.VerificationProtocolResource;
 import org.restlet.Application;
 import org.restlet.Restlet;
@@ -47,12 +49,21 @@ public class IRMAProtocolApplication extends Application {
        getContext().getAttributes().put("attributemap", attributemap);
        Map<String,Issuer> issuermap = new HashMap<String, Issuer>();
        getContext().getAttributes().put("issuermap", issuermap);
-
+       Map<String,String> statemap = new HashMap<String, String>();
+       getContext().getAttributes().put("statemap", statemap);
+       
        router.attach("/verification/{crednr}", VerificationProtocolResource.class); 
        router.attach("/verification/{crednr}/{id}/{round}", VerificationProtocolResource.class);
 
+       router.attach("/qrverification/{crednr}", QRVerificationProtocolResource.class); 
+       router.attach("/qrverification/{crednr}/{id}/{round}", QRVerificationProtocolResource.class);
+       
        router.attach("/issue/studentCred", IssueStudentCredResource.class);
        router.attach("/issue/studentCred/{id}/{round}", IssueStudentCredResource.class);
+       
+       router.attach("/qrissue/studentCred", QRIssueStudentCredResource.class);
+       router.attach("/qrissue/studentCred/{id}/{round}", QRIssueStudentCredResource.class);
+       
        return router;
    }   
 }

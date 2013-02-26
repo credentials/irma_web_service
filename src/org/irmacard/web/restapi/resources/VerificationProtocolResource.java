@@ -15,7 +15,7 @@ import org.irmacard.credentials.idemix.IdemixCredentials;
 import org.irmacard.credentials.idemix.IdemixNonce;
 import org.irmacard.credentials.idemix.spec.IdemixVerifySpecification;
 import org.irmacard.credentials.idemix.util.VerifyCredentialInformation;
-import org.irmacard.web.restapi.util.CommandSet;
+import org.irmacard.web.restapi.util.ProtocolStep;
 import org.irmacard.web.restapi.util.ProtocolCommandSerializer;
 import org.irmacard.web.restapi.util.ProtocolResponseDeserializer;
 import org.restlet.resource.Post;
@@ -66,7 +66,7 @@ public class VerificationProtocolResource extends ServerResource {
 		IdemixVerifySpecification vspec = vci.getIdemixVerifySpecification();
 
 		try {
-			CommandSet cs = new CommandSet();
+			ProtocolStep cs = new ProtocolStep();
 			Nonce nonce = ic.generateNonce(vspec);
 			cs.commands = ic.requestProofCommands(vspec, nonce);
 			

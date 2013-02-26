@@ -4,7 +4,7 @@ import java.util.List;
 
 import net.sourceforge.scuba.smartcards.ProtocolCommand;
 
-public class CommandSet {
+public class ProtocolStep {
     public List<ProtocolCommand> commands;
     public String responseurl;
 }

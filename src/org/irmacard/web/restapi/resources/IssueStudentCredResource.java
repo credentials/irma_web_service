@@ -17,7 +17,7 @@ import org.irmacard.credentials.idemix.IdemixCredentials;
 import org.irmacard.credentials.idemix.spec.IdemixIssueSpecification;
 import org.irmacard.credentials.idemix.spec.IdemixVerifySpecification;
 import org.irmacard.credentials.idemix.util.VerifyCredentialInformation;
-import org.irmacard.web.restapi.util.CommandSet;
+import org.irmacard.web.restapi.util.ProtocolStep;
 import org.irmacard.web.restapi.util.IssueCredentialInformation;
 import org.irmacard.web.restapi.util.ProtocolCommandSerializer;
 import org.irmacard.web.restapi.util.ProtocolResponseDeserializer;
@@ -226,7 +226,7 @@ public class IssueStudentCredResource extends ProtocolResource {
 			return "{\"response\": \"invalid\", \"error\": \"}" + e.toString() + "\"";
 		}
 		
-		CommandSet cs = new CommandSet();
+		ProtocolStep cs = new ProtocolStep();
 		cs.commands = commands;
 		cs.responseurl = "";
 		

@@ -147,7 +147,7 @@ $(function() {
     });
     $("#IRMA_button_usephone").button().on("click",function(event) {
     	$.ajax({
-            url: '/irma_web_service/protocols/qrverification/4',
+            url: '/irma_web_service/protocols/verification/UitzendingGemist/ageLowerOver16?qr=true',
             contentType: 'application/json',
             data: JSON.stringify({crednr: 4}),
             type: 'POST',
@@ -156,25 +156,25 @@ $(function() {
               $("#qr_image").attr("src", data.qr_url);
               $("#qr_overlay").show();
               checkInterval = window.setInterval(function(){
-            	  var url = data.qr_url.substring(0,data.qr_url.lastIndexOf("/")) + '/state';
+            	  var url = data.qr_url.substring(0,data.qr_url.lastIndexOf("/")) + '/status';
             	  $.get(url,function(data) {
-            		  if (data.state !== "start") {
+            		  if (data.status !== "start") {
             			  $("#qr_overlay").hide();
             			  $("#IRMA_status_icon").prop("src", "../../img/irma_icon_ready_520px.png");
             			  $("#IRMA_status_text").html("Apply your IRMA card to your phone");
             			  $("#IRMA_button_verify").html("VERIFYING...");
             		  } 
-            		  if (data.state === "valid") {
+            		  if (data.status === "success") {
             			  window.clearInterval(checkInterval);
             	            $("#IRMA_status_icon").prop("src", "../../img/irma_icon_ok_520px.png");
             	            $("#IRMA_status_text").html("Hit 'CONTINUE' to proceed to the website");
             	            $("#IRMA_button_verify").html("CONTINUE");
             	            $("#IRMA_button_verify").addClass("enabled");
             	            $("#IRMA_button_verify").button().on("click", function(event) {
-            	              window.location = data.url;
+            	              window.location = data.result;
             	            });          			  
             		  }
-            		  if (data.state === "invalid") {
+            		  if (data.status === "failure") {
             			  window.clearInterval(checkInterval);
             			  $("#IRMA_status_icon").prop("src", "../../img/irma_icon_missing_520px.png");
             		      $("#IRMA_status_text").html("Credential not found");
@@ -205,7 +205,7 @@ $(function() {
       $("#IRMA_button_verify").removeClass("enabled");
       $("#IRMA_button_verify").html("VERIFYING...");
       $.ajax({
-        url: '/irma_web_service/protocols/verification/4',
+        url: '/irma_web_service/protocols/verification/UitzendingGemist/ageLowerOver16',
         contentType: 'application/json',
         data: JSON.stringify({crednr: 4}),
         type: 'POST',

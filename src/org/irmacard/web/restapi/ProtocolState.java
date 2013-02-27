@@ -19,6 +19,7 @@ public class ProtocolState {
 	private static Map<String,Attributes> attributesMap = new HashMap<String, Attributes>();
 	private static Map<String,Issuer> issuerMap = new HashMap<String, Issuer>();
 	private static Map<String,String> stateMap = new HashMap<String, String>();
+	private static Map<String,String> resultMap = new HashMap<String, String>();
 	
 	public static BigInteger getNonce(String id) {
 		return nonceMap.get(id);
@@ -41,10 +42,17 @@ public class ProtocolState {
 		issuerMap.put(id, issuer);
 	}
 	
-	public static String getState(String id) {
+	public static String getStatus(String id) {
 		return stateMap.get(id);
 	}
-	public static void putState(String id, String state) {
+	public static void putStatus(String id, String state) {
 		stateMap.put(id, state);
+	}
+	
+	public static String getResult(String id) {
+		return resultMap.get(id);
+	}
+	public static void putResult(String id, String state) {
+		resultMap.put(id, state);
 	}
 }

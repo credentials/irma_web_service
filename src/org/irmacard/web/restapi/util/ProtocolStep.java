@@ -4,14 +4,31 @@ import java.util.List;
 
 import net.sourceforge.scuba.smartcards.ProtocolCommand;
 
+/**
+ * Data structure for communicating protocol steps.
+ * @author Maarten Everts (TNO)
+ *
+ */
 public class ProtocolStep {
+	public String status;
     public List<ProtocolCommand> commands;
     public String responseurl;
-    public boolean usePIN;
-    public String feedbackMessage;
-    public String confirmationMessage;
-    public boolean askConfirmation = false;
+
     public boolean protocolDone = false;
+
+    public boolean usePIN = false;
+
+    public boolean askConfirmation = false;
+    public String confirmationMessage;
+    
+    public String feedbackMessage;
+    
     public String result = null;
-    public String data = null; 
+    public static ProtocolStep newError(String errorMessage) {
+    	ProtocolStep ps = new ProtocolStep();
+		ps.feedbackMessage = errorMessage;
+		ps.status = "error";
+		ps.protocolDone = true;
+		return ps;
+    }
 }

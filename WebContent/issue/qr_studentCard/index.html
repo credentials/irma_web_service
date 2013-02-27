@@ -204,7 +204,7 @@ $(function() {
     });
     $("#IRMA_button_usephone").button().on("click",function(event) {
     	$.ajax({
-            url: '/irma_web_service/protocols/qrissue/studentCred?qr=true',
+            url: '/irma_web_service/protocols/issue/studentCred?qr=true',
             contentType: 'application/json',
             data: JSON.stringify({crednr: 4}),
             type: 'POST',
@@ -213,17 +213,17 @@ $(function() {
               $("#qr_image").attr("src", data.qr_url);
               $("#qr_overlay").show();
               checkInterval = window.setInterval(function(){
-            	  var url = data.qr_url.substring(0,data.qr_url.lastIndexOf("/")) + '/state';
+            	  var url = data.qr_url.substring(0,data.qr_url.lastIndexOf("/")) + '/status';
             	  var attributesurl = data.qr_url.substring(0,data.qr_url.lastIndexOf("/")) + '/attributes';
             	  $.get(url,function(data) {
             		  console.log("state: " + data.state);
-            		  if (data.state !== "start") {
+            		  if (data.status !== "start") {
             			  $("#qr_overlay").hide();
             			  $("#IRMA_status_icon").prop("src", "../../img/irma_icon_ready_520px.png");
             			  $("#IRMA_status_text").html("Apply your IRMA card to your phone");
             			  $("#IRMA_button_verify").html("VERIFYING...");
             		  } 
-            		  if (data.state === "issueready") {
+            		  if (data.status === "issueready") {
             	            $("#IRMA_status_icon").prop("src", "../../img/irma_icon_ok_520px.png");
             	            $("#IRMA_status_text").html("Hit 'CONTINUE' to proceed to the issuing step");
             	            $("#IRMA_button_verify").html("CONTINUE");
@@ -232,16 +232,16 @@ $(function() {
             	              startIssue(attributesurl);
             	            });          			  
             		  }
-            		  if (data.state === "invalid") {
+            		  if (data.status === "error") {
             			  window.clearInterval(checkInterval);
             			  $("#IRMA_status_icon").prop("src", "../../img/irma_icon_missing_520px.png");
             		      $("#IRMA_status_text").html("Credential not found");
             		      $("#IRMA_button_verify").html("NOT FOUND");
             		  }
-            		  if (data.state === "issuing") {
+            		  if (data.status === "issuing") {
             			  $("#IRMA_button_issue").html("ISSUING...");
             		  }
-            		  if (data.state === "issuingdone") {
+            		  if (data.status === "success") {
             			  window.clearInterval(checkInterval);
             			  $("#IRMA_button_issue").html("DONE");
             		      $("#IRMA_button_issue").addClass("enabled");

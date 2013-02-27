@@ -17,6 +17,7 @@ import org.irmacard.credentials.idemix.IdemixCredentials;
 import org.irmacard.credentials.idemix.IdemixNonce;
 import org.irmacard.credentials.idemix.spec.IdemixVerifySpecification;
 import org.irmacard.credentials.idemix.util.VerifyCredentialInformation;
+import org.irmacard.web.restapi.ProtocolState;
 import org.irmacard.web.restapi.util.ProtocolStep;
 import org.irmacard.web.restapi.util.ProtocolCommandSerializer;
 import org.irmacard.web.restapi.util.ProtocolResponseDeserializer;
@@ -88,10 +89,8 @@ public class QRVerificationProtocolResource extends ServerResource {
 	}
 
 	public Representation generateState(int crednr, String id) {
-		@SuppressWarnings("unchecked")
-		Map<String, String> statemap = (Map<String,String>)getContext().getAttributes().get("statemap");
-		if (statemap.containsKey(id)) {
-			String state = statemap.get(id);
+		String state = ProtocolState.getState(id);
+		if (state != null) {
 			if (state.equals("valid")) {
 				return new StringRepresentation("{\"state\": \"" + state + "\", \"url\": \"http://spuitenenslikken.bnn.nl/\"}");
 			} else {
@@ -122,44 +121,7 @@ public class QRVerificationProtocolResource extends ServerResource {
 
 		 return or; 		 
 	}
-	/**
-	 * Start new verification protocol
-	 * @param crednr credential number
-	 * @param value request body
-	 * @return
-	 */
-	public String step0(int crednr, String value) {
-		Gson gson = new GsonBuilder().
-				setPrettyPrinting().
-				registerTypeAdapter(ProtocolCommand.class, new ProtocolCommandSerializer()).
-				create();
-		
-		VerifyCredentialInformation vci = new VerifyCredentialInformation(
-				ISSUER, CRED_NAME, VERIFIER, SPEC_NAME);
-		IdemixCredentials ic = new IdemixCredentials(null);
-		IdemixVerifySpecification vspec = vci.getIdemixVerifySpecification();
 
-		try {
-			ProtocolStep cs = new ProtocolStep();
-			Nonce nonce = ic.generateNonce(vspec);
-			cs.commands = ic.requestProofCommands(vspec, nonce);
-			
-			// Save the state, use random id as key
-			UUID id = UUID.randomUUID();
-			BigInteger intNonce = ((IdemixNonce)nonce).getNonce();
-			
-			@SuppressWarnings("unchecked")
-			Map<String ,BigInteger> noncemap = (Map<String,BigInteger>)getContext().getAttributes().get("noncemap");
-			noncemap.put(id.toString(), intNonce);
-
-			cs.responseurl = getReference().getPath() + "/" + id.toString() + "/1";
-			return gson.toJson(cs);
-		} catch (CredentialsException e) {
-			e.printStackTrace();
-		}
-
-		return null; 		
-	}
 	
 	/**
 	 * Start new verification protocol
@@ -185,13 +147,8 @@ public class QRVerificationProtocolResource extends ServerResource {
 			UUID id = UUID.randomUUID();
 			BigInteger intNonce = ((IdemixNonce)nonce).getNonce();
 			
-			@SuppressWarnings("unchecked")
-			Map<String ,BigInteger> noncemap = (Map<String,BigInteger>)getContext().getAttributes().get("noncemap");
-			noncemap.put(id.toString(), intNonce);
-			
-			@SuppressWarnings("unchecked")
-			Map<String, String> statemap = (Map<String,String>)getContext().getAttributes().get("statemap");
-			statemap.put(id.toString(), "start");
+			ProtocolState.putNonce(id.toString(), intNonce);
+			ProtocolState.putState(id.toString(), "start");
 			
 			qrr.qr_url = getReference().getPath() + "/" + id.toString() + "/qr";
 			qrr.state_url = getReference().getPath() + "/" + id.toString() + "/state";
@@ -204,47 +161,7 @@ public class QRVerificationProtocolResource extends ServerResource {
 		return null;
 	}
 	
-	/**
-	 * Handle the next step of the verification protocol.
-	 * @param crednr credential number
-	 * @param value request body (with the card responses)
-	 * @param verificationId 
-	 * @return
-	 */
-	public String step1(int crednr, String value, String verificationId) {
-		Gson gson = new GsonBuilder().
-				setPrettyPrinting().
-				registerTypeAdapter(ProtocolResponse.class, new ProtocolResponseDeserializer()).
-				create();
-		
-		// Get the nonce based on the id
-		@SuppressWarnings("unchecked")
-		Map<String ,BigInteger> noncemap = (Map<String,BigInteger>)getContext().getAttributes().get("noncemap");
-		BigInteger intNonce = noncemap.get(verificationId);
-		IdemixNonce nonce = new IdemixNonce(intNonce);
-		
-		ProtocolResponses responses = gson.fromJson(value, ProtocolResponses.class);		
 
-		VerifyCredentialInformation vci = new VerifyCredentialInformation(
-				ISSUER, CRED_NAME, VERIFIER, SPEC_NAME);
-		IdemixCredentials ic = new IdemixCredentials(null);
-		IdemixVerifySpecification vspec = vci.getIdemixVerifySpecification();
-		ProtocolStep ps = new ProtocolStep();
-		ps.protocolDone = true;
-		ps.result = "invalid";
-		try {
-			Attributes attr = ic.verifyProofResponses(vspec, nonce, responses);
-			// TODO: do something with the results!
-			if (attr != null) {
-				ps.result = "valid";
-				ps.data = "http://spuitenenslikken.bnn.nl";
-				attr.print();
-			}
-		} catch (CredentialsException e) {
-			e.printStackTrace();
-		}
-		return gson.toJson(ps);
-	}
 	/**
 	 * Handle the next step of the verification protocol.
 	 * @param crednr credential number
@@ -259,13 +176,9 @@ public class QRVerificationProtocolResource extends ServerResource {
 				create();
 		
 		// Get the nonce based on the id
-		@SuppressWarnings("unchecked")
-		Map<String ,BigInteger> noncemap = (Map<String,BigInteger>)getContext().getAttributes().get("noncemap");
-		BigInteger intNonce = noncemap.get(id);
+		BigInteger intNonce = ProtocolState.getNonce(id);
 		
-		@SuppressWarnings("unchecked")
-		Map<String, String> statemap = (Map<String,String>)getContext().getAttributes().get("statemap");
-		statemap.put(id.toString(), "step1");
+		ProtocolState.putState(id.toString(), "step1");
 		
 		IdemixNonce nonce = new IdemixNonce(intNonce);
 		
@@ -280,7 +193,6 @@ public class QRVerificationProtocolResource extends ServerResource {
 		try {
 			cs.commands = ic.requestProofCommands(vspec, nonce);
 			String path = getReference().getPath();
-			
 			
 			cs.responseurl = getBaseURL() + path.substring(0, path.lastIndexOf('/')+1) + "2";
 			return gson.toJson(cs);
@@ -304,14 +216,9 @@ public class QRVerificationProtocolResource extends ServerResource {
 				create();
 		
 		// Get the nonce based on the id
-		@SuppressWarnings("unchecked")
-		Map<String ,BigInteger> noncemap = (Map<String,BigInteger>)getContext().getAttributes().get("noncemap");
-		BigInteger intNonce = noncemap.get(id);
+
+		BigInteger intNonce = ProtocolState.getNonce(id);
 		IdemixNonce nonce = new IdemixNonce(intNonce);
-		
-		@SuppressWarnings("unchecked")
-		Map<String, String> statemap = (Map<String,String>)getContext().getAttributes().get("statemap");
-		
 		
 		ProtocolResponses responses = gson.fromJson(value, ProtocolResponses.class);		
 
@@ -335,7 +242,7 @@ public class QRVerificationProtocolResource extends ServerResource {
 		} catch (Exception e) {
 			e.printStackTrace();
 		}
-		statemap.put(id.toString(), ps.result);
+		ProtocolState.putState(id.toString(), ps.result);
 		return gson.toJson(ps);
 
 	}	

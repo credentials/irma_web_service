@@ -40,17 +40,6 @@ public class IRMAProtocolApplication extends Application {
 		}
 		CredentialInformation.setCoreLocation(CORE_LOCATION);
 
-
-       // This is a quick 'hack' to have some state, there is most probably
-       // a better way :)
-       Map<String,BigInteger> noncemap = new HashMap<String, BigInteger>();
-       getContext().getAttributes().put("noncemap", noncemap);
-       Map<String,Attributes> attributemap = new HashMap<String, Attributes>();
-       getContext().getAttributes().put("attributemap", attributemap);
-       Map<String,Issuer> issuermap = new HashMap<String, Issuer>();
-       getContext().getAttributes().put("issuermap", issuermap);
-       Map<String,String> statemap = new HashMap<String, String>();
-       getContext().getAttributes().put("statemap", statemap);
        
        router.attach("/verification/{crednr}", VerificationProtocolResource.class); 
        router.attach("/verification/{crednr}/{id}/{round}", VerificationProtocolResource.class);

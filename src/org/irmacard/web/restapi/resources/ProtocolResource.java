@@ -13,6 +13,7 @@ import org.irmacard.credentials.Nonce;
 import org.irmacard.credentials.idemix.IdemixCredentials;
 import org.irmacard.credentials.idemix.IdemixNonce;
 import org.irmacard.credentials.idemix.spec.IdemixVerifySpecification;
+import org.irmacard.web.restapi.ProtocolState;
 import org.irmacard.web.restapi.util.ProtocolStep;
 import org.irmacard.web.restapi.util.ProtocolCommandSerializer;
 import org.irmacard.web.restapi.util.ProtocolResponseDeserializer;
@@ -45,11 +46,8 @@ public class ProtocolResource extends ServerResource {
 			ps.commands = ic.requestProofCommands(vspec, nonce);
 			ps.feedbackMessage = "Verifying";
 
-			@SuppressWarnings("unchecked")
-			Map<String, BigInteger> noncemap = (Map<String, BigInteger>) getContext()
-					.getAttributes().get("noncemap");
-			noncemap.put(id, ((IdemixNonce) nonce).getNonce());
-
+			ProtocolState.putNonce(id, ((IdemixNonce) nonce).getNonce());
+			
 			ps.responseurl = responseurl;
 			return gson.toJson(ps);
 		} catch (CredentialsException e) {
@@ -66,13 +64,8 @@ public class ProtocolResource extends ServerResource {
 				.registerTypeAdapter(ProtocolResponse.class,
 						new ProtocolResponseDeserializer()).create();
 
-		// Get the nonce based on the id
-		@SuppressWarnings("unchecked")
-		Map<String, BigInteger> noncemap = (Map<String, BigInteger>) getContext()
-				.getAttributes().get("noncemap");
-		BigInteger intNonce = noncemap.get(id);
-		IdemixNonce nonce = new IdemixNonce(intNonce);
-
+		IdemixNonce nonce = new IdemixNonce(ProtocolState.getNonce(id));
+		
 		ProtocolResponses responses = gson.fromJson(value,
 				ProtocolResponses.class);
 		IdemixCredentials ic = new IdemixCredentials(null);

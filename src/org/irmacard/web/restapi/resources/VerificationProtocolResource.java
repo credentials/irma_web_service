@@ -15,6 +15,7 @@ import org.irmacard.credentials.idemix.IdemixCredentials;
 import org.irmacard.credentials.idemix.IdemixNonce;
 import org.irmacard.credentials.idemix.spec.IdemixVerifySpecification;
 import org.irmacard.credentials.idemix.util.VerifyCredentialInformation;
+import org.irmacard.web.restapi.ProtocolState;
 import org.irmacard.web.restapi.util.ProtocolStep;
 import org.irmacard.web.restapi.util.ProtocolCommandSerializer;
 import org.irmacard.web.restapi.util.ProtocolResponseDeserializer;
@@ -80,9 +81,7 @@ public class VerificationProtocolResource extends ServerResource {
 			UUID id = UUID.randomUUID();
 			BigInteger intNonce = ((IdemixNonce)nonce).getNonce();
 			
-			@SuppressWarnings("unchecked")
-			Map<String ,BigInteger> noncemap = (Map<String,BigInteger>)getContext().getAttributes().get("noncemap");
-			noncemap.put(id.toString(), intNonce);
+			ProtocolState.putNonce(id.toString(), intNonce);
 
 			cs.responseurl = getReference().getPath() + "/" + id.toString() + "/1";
 			return gson.toJson(cs);
@@ -111,9 +110,7 @@ public class VerificationProtocolResource extends ServerResource {
 			UUID id = UUID.randomUUID();
 			BigInteger intNonce = ((IdemixNonce)nonce).getNonce();
 			
-			@SuppressWarnings("unchecked")
-			Map<String ,BigInteger> noncemap = (Map<String,BigInteger>)getContext().getAttributes().get("noncemap");
-			noncemap.put(id.toString(), intNonce);			
+			ProtocolState.putNonce(id.toString(), intNonce);
 		} catch (CredentialsException e) {
 			e.printStackTrace();
 		}
@@ -135,9 +132,7 @@ public class VerificationProtocolResource extends ServerResource {
 				create();
 		
 		// Get the nonce based on the id
-		@SuppressWarnings("unchecked")
-		Map<String ,BigInteger> noncemap = (Map<String,BigInteger>)getContext().getAttributes().get("noncemap");
-		BigInteger intNonce = noncemap.get(verificationId);
+		BigInteger intNonce = ProtocolState.getNonce(verificationId);
 		IdemixNonce nonce = new IdemixNonce(intNonce);
 		
 		ProtocolResponses responses = gson.fromJson(value, ProtocolResponses.class);		

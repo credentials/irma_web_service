@@ -17,6 +17,7 @@ import org.irmacard.credentials.idemix.IdemixCredentials;
 import org.irmacard.credentials.idemix.spec.IdemixIssueSpecification;
 import org.irmacard.credentials.idemix.spec.IdemixVerifySpecification;
 import org.irmacard.credentials.idemix.util.VerifyCredentialInformation;
+import org.irmacard.web.restapi.ProtocolState;
 import org.irmacard.web.restapi.util.ProtocolStep;
 import org.irmacard.web.restapi.util.IssueCredentialInformation;
 import org.irmacard.web.restapi.util.ProtocolCommandSerializer;
@@ -145,18 +146,9 @@ public class IssueStudentCredResource extends ProtocolResource {
 			e.printStackTrace();
 		}
 		
-		@SuppressWarnings("unchecked")
-		Map<String, BigInteger> noncemap = (Map<String, BigInteger>) getContext()
-				.getAttributes().get("noncemap");
-		@SuppressWarnings("unchecked")
-		Map<String, Attributes> attributemap = (Map<String, Attributes>) getContext()
-				.getAttributes().get("attributemap");
-		@SuppressWarnings("unchecked")
-		Map<String, Issuer> issuermap = (Map<String, Issuer>) getContext()
-				.getAttributes().get("issuermap");
-		issuermap.put(id, issuer);
-		noncemap.put(id, nonce1);
-		attributemap.put(id, attributes);
+		ProtocolState.putIssuer(id, issuer);
+		ProtocolState.putNonce(id, nonce1);
+		ProtocolState.putAttributes(id, attributes);
 		
 		Map<String,String> attributesReadable = new HashMap<String,String>();
 		for(String k : attributes.getIdentifiers()) {
@@ -187,19 +179,10 @@ public class IssueStudentCredResource extends ProtocolResource {
 
 		System.out.println("=== Getting issuance information ===");
 		IdemixIssueSpecification spec = ici.getIdemixIssueSpecification();
-
-		@SuppressWarnings("unchecked")
-		Map<String, BigInteger> noncemap = (Map<String, BigInteger>) getContext()
-				.getAttributes().get("noncemap");
-		@SuppressWarnings("unchecked")
-		Map<String, Attributes> attributemap = (Map<String, Attributes>) getContext()
-				.getAttributes().get("attributemap");
-		@SuppressWarnings("unchecked")
-		Map<String, Issuer> issuermap = (Map<String, Issuer>) getContext()
-				.getAttributes().get("issuermap");
-		BigInteger nonce1 = (BigInteger) noncemap.get(id);
-		Attributes attributes = attributemap.get(id);
-
+		
+		BigInteger nonce1 = ProtocolState.getNonce(id);
+		Attributes attributes = ProtocolState.getAttributes(id);
+		
 		// Initialize the issuer
 		System.out.println("=== Getting issuer ===");
 		Issuer issuer = ici.getIssuer(attributes);
@@ -214,7 +197,7 @@ public class IssueStudentCredResource extends ProtocolResource {
 		}
 		
 		// FIXME: superfluous?
-		issuer = issuermap.get(id);
+		issuer = ProtocolState.getIssuer(id);
 		
 		ProtocolResponses responses = gson.fromJson(value,
 				ProtocolResponses.class);

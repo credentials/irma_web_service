@@ -19,6 +19,7 @@ import org.irmacard.credentials.idemix.IdemixCredentials;
 import org.irmacard.credentials.idemix.spec.IdemixIssueSpecification;
 import org.irmacard.credentials.idemix.spec.IdemixVerifySpecification;
 import org.irmacard.credentials.idemix.util.VerifyCredentialInformation;
+import org.irmacard.web.restapi.ProtocolState;
 import org.irmacard.web.restapi.util.ProtocolStep;
 import org.irmacard.web.restapi.util.IssueCredentialInformation;
 import org.irmacard.web.restapi.util.ProtocolCommandSerializer;
@@ -81,10 +82,8 @@ public class QRIssueStudentCredResource extends ProtocolResource {
 		if (id == null) {
 			iround = 0;
 			id = UUID.randomUUID().toString();
-			
-			@SuppressWarnings("unchecked")
-			Map<String, String> statemap = (Map<String,String>)getContext().getAttributes().get("statemap");
-			statemap.put(id.toString(), "start");
+
+			ProtocolState.putState(id.toString(), "start");
 			
 			baseURL = getBaseURL() + getReference().getPath() + "/" + id.toString() + "/";
 		} else {
@@ -99,10 +98,7 @@ public class QRIssueStudentCredResource extends ProtocolResource {
 			if (useQR) {
 				return createQRResponse(id);
 			} else {
-				@SuppressWarnings("unchecked")
-				Map<String, String> statemap = (Map<String,String>)getContext().getAttributes().get("statemap");
-				statemap.put(id.toString(), "step1");
-				
+				ProtocolState.putState(id.toString(), "step1");
 				return startVerify(getProofSpec(), value, id, baseURL + "1");
 			}
 		case 1:
@@ -145,10 +141,7 @@ public class QRIssueStudentCredResource extends ProtocolResource {
 	}
 	
 	public Representation getAttributes(String id) {
-		@SuppressWarnings("unchecked")
-		Map<String, Attributes> attributemap = (Map<String, Attributes>) getContext()
-				.getAttributes().get("attributemap");
-		Attributes attributes = attributemap.get(id);
+		Attributes attributes = ProtocolState.getAttributes(id);
 		Map<String,String> attributesReadable = new HashMap<String,String>();
 		for(String k : attributes.getIdentifiers()) {
 			attributesReadable.put(k, new String(attributes.get(k)));
@@ -168,10 +161,8 @@ public class QRIssueStudentCredResource extends ProtocolResource {
 	}
 	
 	public Representation generateState(String id) {
-		@SuppressWarnings("unchecked")
-		Map<String, String> statemap = (Map<String,String>)getContext().getAttributes().get("statemap");
-		if (statemap.containsKey(id)) {
-			String state = statemap.get(id);
+		String state = ProtocolState.getState(id);
+		if (state != null) {
 			if (state.equals("valid")) {
 				return new StringRepresentation("{\"state\": \"" + state + "\", \"url\": \"http://spuitenenslikken.bnn.nl/\"}");
 			} else {
@@ -232,9 +223,7 @@ public class QRIssueStudentCredResource extends ProtocolResource {
 			return gson.toJson(new IssueError("ID " + userID + " is not eligible"));
 		}
 
-		@SuppressWarnings("unchecked")
-		Map<String, String> statemap = (Map<String,String>)getContext().getAttributes().get("statemap");
-		statemap.put(id.toString(), "issueready");
+		ProtocolState.putState(id, "issueready");
 		
 		// FIXME: retrieve proper attributes
 		Attributes attributes = getIssuanceAttributes(userID);
@@ -265,23 +254,10 @@ public class QRIssueStudentCredResource extends ProtocolResource {
 			e.printStackTrace();
 		}
 		
-		@SuppressWarnings("unchecked")
-		Map<String, BigInteger> noncemap = (Map<String, BigInteger>) getContext()
-				.getAttributes().get("noncemap");
-		@SuppressWarnings("unchecked")
-		Map<String, Attributes> attributemap = (Map<String, Attributes>) getContext()
-				.getAttributes().get("attributemap");
-		@SuppressWarnings("unchecked")
-		Map<String, Issuer> issuermap = (Map<String, Issuer>) getContext()
-				.getAttributes().get("issuermap");
-		issuermap.put(id, issuer);
-		noncemap.put(id, nonce1);
-		attributemap.put(id, attributes);
+		ProtocolState.putIssuer(id, issuer);
+		ProtocolState.putNonce(id, nonce1);
+		ProtocolState.putAttributes(id, attributes);
 		
-		Map<String,String> attributesReadable = new HashMap<String,String>();
-		for(String k : attributes.getIdentifiers()) {
-			attributesReadable.put(k, new String(attributes.get(k)));
-		}
 		String path = getReference().getPath();
 		
 		ProtocolStep ps = new ProtocolStep();
@@ -312,17 +288,9 @@ public class QRIssueStudentCredResource extends ProtocolResource {
 		System.out.println("=== Getting issuance information ===");
 		IdemixIssueSpecification spec = ici.getIdemixIssueSpecification();
 
-		@SuppressWarnings("unchecked")
-		Map<String, BigInteger> noncemap = (Map<String, BigInteger>) getContext()
-				.getAttributes().get("noncemap");
-		@SuppressWarnings("unchecked")
-		Map<String, Attributes> attributemap = (Map<String, Attributes>) getContext()
-				.getAttributes().get("attributemap");
-		@SuppressWarnings("unchecked")
-		Map<String, Issuer> issuermap = (Map<String, Issuer>) getContext()
-				.getAttributes().get("issuermap");
-		BigInteger nonce1 = (BigInteger) noncemap.get(id);
-		Attributes attributes = attributemap.get(id);
+		
+		BigInteger nonce1 = ProtocolState.getNonce(id);
+		Attributes attributes = ProtocolState.getAttributes(id);
 
 		// Initialize the issuer
 		System.out.println("=== Getting issuer ===");
@@ -338,7 +306,7 @@ public class QRIssueStudentCredResource extends ProtocolResource {
 		}
 		
 		// FIXME: superfluous?
-		issuer = issuermap.get(id);
+		issuer = ProtocolState.getIssuer(id);
 		
 		ProtocolResponses responses = gson.fromJson(value,
 				ProtocolResponses.class);
@@ -353,10 +321,8 @@ public class QRIssueStudentCredResource extends ProtocolResource {
 			e.printStackTrace();
 			return "{\"response\": \"invalid\", \"error\": \"}" + e.toString() + "\"";
 		}
-		
-		@SuppressWarnings("unchecked")
-		Map<String, String> statemap = (Map<String,String>)getContext().getAttributes().get("statemap");
-		statemap.put(id.toString(), "issuing");
+
+		ProtocolState.putState(id, "issuing");
 		
 		String path = getReference().getPath();
 		ProtocolStep cs = new ProtocolStep();
@@ -364,7 +330,6 @@ public class QRIssueStudentCredResource extends ProtocolResource {
 		cs.responseurl = getBaseURL() + path.substring(0, path.length() - 1) + "3";
 		cs.protocolDone = false;
 		cs.feedbackMessage = "Issuing credential (2)";
-
 		
 		return gson.toJson(cs);
 	}
@@ -373,9 +338,7 @@ public class QRIssueStudentCredResource extends ProtocolResource {
 		Gson gson = new GsonBuilder()
 			.setPrettyPrinting()
 			.create();
-		@SuppressWarnings("unchecked")
-		Map<String, String> statemap = (Map<String,String>)getContext().getAttributes().get("statemap");
-		statemap.put(id.toString(), "issuingdone");
+		ProtocolState.putState(id, "issuingdone");
 		ProtocolStep ps = new ProtocolStep();
 		ps.feedbackMessage = "Issuance successful";
 		ps.protocolDone = true;

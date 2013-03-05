@@ -39,13 +39,17 @@
   </target>
 
   <target name="service" depends="compile">
+    <copy todir="${bin.dir}/resources/">
+      <fileset dir="${conf.dir}"/>
+    </copy>
+
     <war destfile="${deploy.file}" webxml="${web.dir}/WEB-INF/web.xml" update="true">
       <lib dir="${lib.dir}" />
       <classes dir="${bin.dir}" />
       <fileset dir="${web.dir}">
-        <exclude name="WEB-INF/web.xml"/>
+        <exclude name="WEB-INF/" />
+        <exclude name="META-INF/" />
       </fileset>
-      <fileset dir="${conf.dir}" />
     </war>
   </target>
 

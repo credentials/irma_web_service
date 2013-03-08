@@ -38,7 +38,7 @@
 		  selectApplet: function(aid) {
 			  var hexlength = (aid.length/2).toString(16),
 			  	  selectAPDU = '00A40400' + (hexlength.length == 1 ? '0' : '') + hexlength + aid + '00';
-			  return this.transmit(selectAPDU) === '9000';
+			  return this.transmit(selectAPDU).slice(-4) === '9000';
 		  },
 		  transmit: function(command) {
 			  console.log("Transmit: " + command);

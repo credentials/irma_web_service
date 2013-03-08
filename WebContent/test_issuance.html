@@ -33,7 +33,7 @@
 	  })
 	  $('#testbutton').bind('click', function() {
 		  $.ajax({
-			  url: '/irma_web_service/protocols/issue/studentCred',
+			  url: '/irma_web_service_qr/protocols/issue/studentCred',
 			  contentType: 'application/json',
 			  data: JSON.stringify({crednr: 4}),
 			  type: 'POST',

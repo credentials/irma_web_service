@@ -204,7 +204,7 @@ $(function() {
     });
     $("#IRMA_button_usephone").button().on("click",function(event) {
     	$.ajax({
-            url: '/irma_web_service/protocols/issue/studentCred?qr=true',
+            url: '/irma_web_service_qr/protocols/issue/studentCred?qr=true',
             contentType: 'application/json',
             data: JSON.stringify({crednr: 4}),
             type: 'POST',
@@ -273,7 +273,7 @@ $(function() {
       $("#IRMA_button_verify").removeClass("enabled");
       $("#IRMA_button_verify").html("VERIFYING...");
       $.ajax({
-        url: '/irma_web_service/protocols/issue/studentCred',
+        url: '/irma_web_service_qr/protocols/issue/studentCred',
         contentType: 'application/json',
         data: JSON.stringify({crednr: 4}),
         type: 'POST',

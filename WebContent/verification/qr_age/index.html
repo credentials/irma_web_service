@@ -147,7 +147,7 @@ $(function() {
     });
     $("#IRMA_button_usephone").button().on("click",function(event) {
     	$.ajax({
-            url: '/irma_web_service/protocols/verification/UitzendingGemist/ageLowerOver16?qr=true',
+            url: '/irma_web_service_qr/protocols/verification/UitzendingGemist/ageLowerOver16?qr=true',
             contentType: 'application/json',
             data: JSON.stringify({crednr: 4}),
             type: 'POST',
@@ -205,7 +205,7 @@ $(function() {
       $("#IRMA_button_verify").removeClass("enabled");
       $("#IRMA_button_verify").html("VERIFYING...");
       $.ajax({
-        url: '/irma_web_service/protocols/verification/UitzendingGemist/ageLowerOver16',
+        url: '/irma_web_service_qr/protocols/verification/UitzendingGemist/ageLowerOver16',
         contentType: 'application/json',
         data: JSON.stringify({crednr: 4}),
         type: 'POST',

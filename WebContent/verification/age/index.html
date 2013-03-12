@@ -10,6 +10,49 @@
     body { background-color: #ffffff; }
 		div.huge {font-size: 300px; line-height: 1em;}
     #verify {cursor: pointer; }
+    #qr_overlay {
+	    position: absolute;
+	    text-align: center;
+	    top: 0;
+	    left: 0;
+	    width: 100%;
+	    height: 100%;
+	    z-index: 10000;
+	}
+	#qr_overlay_background {
+	    position: absolute;
+	    text-align: center;
+	    top: 0;
+	    left: 0;
+	    width: 100%;
+	    height: 100%;
+	    background-color: #000;
+	    -moz-opacity:0.7;
+	    -khtml-opacity: 0.7;
+	    opacity: 0.7;
+	    z-index: 10000;
+	}
+	#IRMA_qr_main {
+	    position: absolute;
+	    text-align: center;
+	    top: 0;
+	    left: 0;
+		-moz-opacity:1.0;
+	    -khtml-opacity: 1.0;
+	    opacity: 1.0;
+	    width: 40%;
+	    height: 400px;
+	    margin-left: 30%;
+	    margin-right: 30%;
+	    margin-top: 10%;
+	    background: white;
+	    z-index: 10001;
+	    -moz-border-radius: 12px;
+  		border-radius: 12px;
+  		padding-top: 20px;
+  		padding-left: 20px;
+  		padding-right: 20px;
+	}
 	</style>
 </head>
 <body>
@@ -23,8 +66,8 @@
     </div>
 
     <object classid="clsid:8AD9C840-044E-11D1-B3E9-00805F499D93" height="10" width="10">
-      <param name="code" value="org.ovchip.SmartCardJS.class" />
-      <param name="archive" value="smartcardjs.jar" />
+      <param name="code" value="org.irmacard.scjs.SmartCardJS.class" />
+      <param name="archive" value="../../smartcardjs.jar" />
       <param name="type" value="application/x-java-applet;version=1.6" />
       <param name="scriptable" value="true" />
       <param name="mayscript" value="true" />
@@ -32,6 +75,16 @@
     </object>
   </div>
 
+  <div id="qr_overlay" class="hide fade in">
+  <div id="qr_overlay_background">
+  </div>
+  <div id="IRMA_qr_main">
+  <span class="IRMA_text">Please scan this QR image with the IRMA app on your NFC-enabled phone and apply your IRMA card to your phone.</span>
+  <br><img id="qr_image" src="" />
+  </div>
+  </div>
+  
+  
   <div id="IRMA_verify" class="hide fade in">
     <div class="IRMA_page">
       <div class="IRMA_container">
@@ -62,14 +115,14 @@
         </div>
         
         <div class="IRMA_buttons">
-          <button class="IRMA_button_gray_verify">BACK</button>
           <button class="IRMA_button_gray_verify">HELP</button>
+          <button id="IRMA_button_usephone" class="IRMA_button_gray_verify">USE PHONE</button>
           <button id="IRMA_button_verify" class="IRMA_button_primary">WAITING FOR CARD</button>
         </div>
       </div>
     </div>
   </div>
-
+</div>
 
   <script src="../../js/jquery.js" type="text/javascript"></script>
   <script src="../../js/bootstrap.min.js" type="text/javascript"></script>
@@ -92,6 +145,47 @@ $(function() {
         $("#IRMA_status_text").html("Inserted card is not an IRMA card");
       }
     });
+    $("#IRMA_button_usephone").button().on("click",function(event) {
+    	$.ajax({
+            url: '/irma_web_service/protocols/verification/UitzendingGemist/ageLowerOver16?qr=true',
+            contentType: 'application/json',
+            data: JSON.stringify({crednr: 4}),
+            type: 'POST',
+            success: function(data) {
+              console.log(data);
+              $("#qr_image").attr("src", data.qr_url);
+              $("#qr_overlay").show();
+              checkInterval = window.setInterval(function(){
+            	  var url = data.qr_url.substring(0,data.qr_url.lastIndexOf("/")) + '/status';
+            	  $.get(url,function(data) {
+            		  if (data.status !== "start") {
+            			  $("#qr_overlay").hide();
+            			  $("#IRMA_status_icon").prop("src", "../../img/irma_icon_ready_520px.png");
+            			  $("#IRMA_status_text").html("Apply your IRMA card to your phone");
+            			  $("#IRMA_button_verify").html("VERIFYING...");
+            		  } 
+            		  if (data.status === "success") {
+            			  window.clearInterval(checkInterval);
+            	            $("#IRMA_status_icon").prop("src", "../../img/irma_icon_ok_520px.png");
+            	            $("#IRMA_status_text").html("Hit 'CONTINUE' to proceed to the website");
+            	            $("#IRMA_button_verify").html("CONTINUE");
+            	            $("#IRMA_button_verify").addClass("enabled");
+            	            $("#IRMA_button_verify").button().on("click", function(event) {
+            	              window.location = data.result;
+            	            });          			  
+            		  }
+            		  if (data.status === "failure") {
+            			  window.clearInterval(checkInterval);
+            			  $("#IRMA_status_icon").prop("src", "../../img/irma_icon_missing_520px.png");
+            		      $("#IRMA_status_text").html("Credential not found");
+            		      $("#IRMA_button_verify").html("NOT FOUND");
+            		  }
+            	  }, "json");
+              },500);
+            }
+          });
+    	
+    });
     SmartCardHandler.bind("cardRemoved", function() {
       disableVerify();
     });
@@ -111,7 +205,7 @@ $(function() {
       $("#IRMA_button_verify").removeClass("enabled");
       $("#IRMA_button_verify").html("VERIFYING...");
       $.ajax({
-        url: '/irma_web_service/protocols/verification/4',
+        url: '/irma_web_service/protocols/verification/UitzendingGemist/ageLowerOver16',
         contentType: 'application/json',
         data: JSON.stringify({crednr: 4}),
         type: 'POST',
@@ -129,7 +223,7 @@ $(function() {
     
   var disableVerify = function () {
     $("#IRMA_status_icon").prop("src", "../../img/irma_icon_waiting_520px.png");
-    $("#IRMA_status_text").html("Insert your IRMA card");
+    $("#IRMA_status_text").html("Insert your IRMA card or use your phone");
     $("#IRMA_button_verify").off("click");
     $("#IRMA_button_verify").removeClass("enabled");
     $("#IRMA_button_verify").html("WAITING FOR CARD...");
@@ -149,13 +243,13 @@ $(function() {
         type: 'POST',
         success: function(data) {
           console.log(data);
-          if (data.response === 'valid') {
+          if (data.status === 'success') {
             $("#IRMA_status_icon").prop("src", "../../img/irma_icon_ok_520px.png");
             $("#IRMA_status_text").html("Hit 'CONTINUE' to proceed to the website");
             $("#IRMA_button_verify").html("CONTINUE");
             $("#IRMA_button_verify").addClass("enabled");
             $("#IRMA_button_verify").button().on("click", function(event) {
-              window.location = data.url;
+              window.location = data.result;
             });
           } else {
             $("#IRMA_status_icon").prop("src", "../../img/irma_icon_missing_520px.png");

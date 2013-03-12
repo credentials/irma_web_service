@@ -216,7 +216,7 @@ $(function() {
             	  var url = data.qr_url.substring(0,data.qr_url.lastIndexOf("/")) + '/status';
             	  var attributesurl = data.qr_url.substring(0,data.qr_url.lastIndexOf("/")) + '/attributes';
             	  $.get(url,function(data) {
-            		  console.log("state: " + data.state);
+            		  console.log("state: " + data.status);
             		  if (data.status !== "start") {
             			  $("#qr_overlay").hide();
             			  $("#IRMA_status_icon").prop("src", "../../img/irma_icon_ready_520px.png");
@@ -309,7 +309,7 @@ $(function() {
       $("#IRMA_button_verify").html("CONTINUE");
       $("#IRMA_button_verify").addClass("enabled");
       $("#IRMA_button_verify").button().on("click", function(event) {
-        startIssue();
+        startIssue2();
       });
     }
 	};
@@ -337,8 +337,62 @@ $(function() {
   			$("#IRMA_status_icon").prop("src", "../../img/irma_icon_ready_520px.png");
   			$("#IRMA_button_issue").html("CONFIRM ON PHONE");
   		}
-  	})
+  	});
 	};
+	var startIssue2 = function () {
+	    console.log("Starting IRMA issuance");
+	    $("#IRMA_verify").fadeOut();
+	    $("#IRMA_issue").fadeIn();
+	  	$.ajax({
+	  		url: nextAction.responseurl,
+	  		contentType: 'application/json',
+	  		data: JSON.stringify(response),
+	  		type: 'POST',
+	  		success: function(data) {
+			  	if( isError(data) ){
+			  		console.log(data);
+			  		showAlert('error', data.message);
+			  		return;
+			  	}
+			    var attributesurl = nextAction.responseurl.substring(0,nextAction.responseurl.lastIndexOf("/")) + '/attributes';
+			  	$.ajax({
+			  		url: attributesurl,
+			  		contentType: 'application/json',
+			  		type: 'GET',
+			  		dataType: 'json',
+			  		success: function(data) {
+					  	if( isError(data) ){
+					  		console.log(data);
+					  		showAlert('error', data.message);
+					  		return;
+					  	}
+			  			$("#field-university").text(data.university);
+			  			$("#field-studentid").text(data.studentID);
+			  			$("#field-studentcardnr").text(data.studentCardNumber);
+			  			$("#field-level").text(data.level);
+			  			console.log(data);
+			  		}
+			  	});
+	  			console.log(data);
+	  			nextAction = data;
+	 		    SmartCardHandler.bind("cardInserted", function() {
+	 		      SmartCardHandler.connectFirstCard();
+			      if (SmartCardHandler.selectApplet('6964656D6978')) {
+			        enableIssue();
+			      } else {
+			        $("#IRMA_status_icon").prop("src", "../../img/irma_icon_warning_520px.png");
+			        $("#IRMA_status_text").html("Inserted card is not an IRMA card");
+			      }
+			    });
+			    SmartCardHandler.bind("cardRemoved", function() {
+			      disableIssue();
+			    });
+			    if (SmartCardHandler.connectFirstCard() && SmartCardHandler.selectApplet('6964656D6978')) {
+	          enableIssue();
+		      }
+	  		}
+	  	})
+		};
 
   var enableIssue = function () {
     $("#IRMA_status_icon").prop("src", "../../img/irma_icon_ready_520px.png");

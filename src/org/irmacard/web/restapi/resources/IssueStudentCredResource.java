@@ -40,15 +40,16 @@ public class IssueStudentCredResource  extends ProtocolBaseResource {
 		switch (step) {
 		case 0:
 			ps = VerificationProtocolResource.createVerificationProtocolStep(id, vspec);
-			ps.responseurl = makeResponseURL(step+1);
+			ps.responseurl = makeResponseURL(id, step+1);
+			ProtocolState.putStatus(id, "step1");
 			break;
 		case 1:
 			ps = createIssuanceProtocolStep1(id, value);
-			ps.responseurl = makeResponseURL(step + 1);
+			ps.responseurl = makeResponseURL(id, step + 1);
 			break;
 		case 2:
 			ps = createIssuanceProtocolStep2(id, value);
-			ps.responseurl = makeResponseURL(step + 1);
+			ps.responseurl = makeResponseURL(id, step + 1);
 			break;
 		case 3:
 			ps = createIssuanceProtocolStepEnd(id, value);
@@ -66,10 +67,10 @@ public class IssueStudentCredResource  extends ProtocolBaseResource {
 			attr = VerificationProtocolResource.processVerificationResponse(id, vspec, value);
 		} catch (CredentialsException e) {
 			e.printStackTrace();
-			return ProtocolStep.newError("Invalid root credential.");
+			return ProtocolStep.newError("Invalid root credential (exception).");
 		}
 		if (attr == null) {
-			return ProtocolStep.newError("Invalid root credential.");
+			return ProtocolStep.newError("Invalid root credential (attributes null).");
 		}
 		
 		String userID = new String(attr.get("http://www.irmacard.org/credentials/phase1/Surfnet/root/structure.xml;someRandomName;userID"));

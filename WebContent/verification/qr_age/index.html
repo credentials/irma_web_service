@@ -243,13 +243,13 @@ $(function() {
         type: 'POST',
         success: function(data) {
           console.log(data);
-          if (data.response === 'valid') {
+          if (data.status === 'success') {
             $("#IRMA_status_icon").prop("src", "../../img/irma_icon_ok_520px.png");
             $("#IRMA_status_text").html("Hit 'CONTINUE' to proceed to the website");
             $("#IRMA_button_verify").html("CONTINUE");
             $("#IRMA_button_verify").addClass("enabled");
             $("#IRMA_button_verify").button().on("click", function(event) {
-              window.location = data.url;
+              window.location = data.result;
             });
           } else {
             $("#IRMA_status_icon").prop("src", "../../img/irma_icon_missing_520px.png");

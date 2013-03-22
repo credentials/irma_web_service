@@ -46,7 +46,7 @@ public class VerificationProtocolResource extends ProtocolBaseResource {
 		switch (step) {
 		case 0:
 			ps = createVerificationProtocolStep(id, vspec);
-			ps.responseurl = makeResponseURL(step+1);
+			ps.responseurl = makeResponseURL(id, step+1);
 			ProtocolState.putStatus(id, "step1");
 			break;
 		case 1:

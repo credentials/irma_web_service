@@ -8,6 +8,49 @@
   <link href="../../css/bootstrap.css" rel="stylesheet" type="text/css" />
   <style>
     body { background-color: #eaecef; }
+     #qr_overlay {
+	    position: absolute;
+	    text-align: center;
+	    top: 0;
+	    left: 0;
+	    width: 100%;
+	    height: 100%;
+	    z-index: 10000;
+	}
+	#qr_overlay_background {
+	    position: absolute;
+	    text-align: center;
+	    top: 0;
+	    left: 0;
+	    width: 100%;
+	    height: 100%;
+	    background-color: #000;
+	    -moz-opacity:0.7;
+	    -khtml-opacity: 0.7;
+	    opacity: 0.7;
+	    z-index: 10000;
+	}
+	#IRMA_qr_main {
+	    position: absolute;
+	    text-align: center;
+	    top: 0;
+	    left: 0;
+		-moz-opacity:1.0;
+	    -khtml-opacity: 1.0;
+	    opacity: 1.0;
+	    width: 40%;
+	    height: 400px;
+	    margin-left: 30%;
+	    margin-right: 30%;
+	    margin-top: 10%;
+	    background: white;
+	    z-index: 10001;
+	    -moz-border-radius: 12px;
+  		border-radius: 12px;
+  		padding-top: 20px;
+  		padding-left: 20px;
+  		padding-right: 20px;
+	}   
   </style>
 </head>
 <body>
@@ -37,6 +80,16 @@
     </div>
   </div>
   
+  
+  <div id="qr_overlay" class="hide fade in">
+  <div id="qr_overlay_background">
+  </div>
+  <div id="IRMA_qr_main">
+  <span class="IRMA_text">Please scan this QR image with the IRMA app on your NFC-enabled phone and apply your IRMA card to your phone.</span>
+  <br><img id="qr_image" src="" />
+  </div>
+  </div>
+  
   <div id="IRMA_verify" class="hide fade in">
     <div class="IRMA_page">
       <div class="IRMA_container">
@@ -56,7 +109,7 @@
           
           <div class="IRMA_buttons">
             <button class="IRMA_button_gray_verify">BACK</button>
-            <button class="IRMA_button_gray_verify">HELP</button>
+            <button id="IRMA_button_usephone" class="IRMA_button_gray_verify">USE PHONE</button>
             <button id="IRMA_button_verify" class="IRMA_button_primary">WAITING FOR CARD</button>
           </div>
         </div>
@@ -109,6 +162,8 @@
     </div>
   </div>
 
+
+
   <script src="../../js/jquery.js" type="text/javascript"></script>
   <script src="../../js/bootstrap.min.js" type="text/javascript"></script>
   <script src="../../js/smartcardjs.js" type="text/javascript"></script>
@@ -147,6 +202,59 @@ $(function() {
         $("#IRMA_status_text").html("Inserted card is not an IRMA card");
       }
     });
+    $("#IRMA_button_usephone").button().on("click",function(event) {
+    	$.ajax({
+            url: '/irma_web_service/protocols/issue/studentCred?qr=true',
+            contentType: 'application/json',
+            data: JSON.stringify({crednr: 4}),
+            type: 'POST',
+            success: function(data) {
+              console.log(data);
+              $("#qr_image").attr("src", data.qr_url);
+              $("#qr_overlay").show();
+              checkInterval = window.setInterval(function(){
+            	  var url = data.qr_url.substring(0,data.qr_url.lastIndexOf("/")) + '/status';
+            	  var attributesurl = data.qr_url.substring(0,data.qr_url.lastIndexOf("/")) + '/attributes';
+            	  $.get(url,function(data) {
+            		  console.log("state: " + data.status);
+            		  if (data.status !== "start") {
+            			  $("#qr_overlay").hide();
+            			  $("#IRMA_status_icon").prop("src", "../../img/irma_icon_ready_520px.png");
+            			  $("#IRMA_status_text").html("Apply your IRMA card to your phone");
+            			  $("#IRMA_button_verify").html("VERIFYING...");
+            		  } 
+            		  if (data.status === "issueready") {
+            	            $("#IRMA_status_icon").prop("src", "../../img/irma_icon_ok_520px.png");
+            	            $("#IRMA_status_text").html("Hit 'CONTINUE' to proceed to the issuing step");
+            	            $("#IRMA_button_verify").html("CONTINUE");
+            	            $("#IRMA_button_verify").addClass("enabled");
+            	            $("#IRMA_button_verify").button().on("click", function(event) {
+            	              startIssue(attributesurl);
+            	            });          			  
+            		  }
+            		  if (data.status === "error") {
+            			  window.clearInterval(checkInterval);
+            			  $("#IRMA_status_icon").prop("src", "../../img/irma_icon_missing_520px.png");
+            		      $("#IRMA_status_text").html("Credential not found");
+            		      $("#IRMA_button_verify").html("NOT FOUND");
+            		  }
+            		  if (data.status === "issuing") {
+            			  $("#IRMA_button_issue").html("ISSUING...");
+            		  }
+            		  if (data.status === "success") {
+            			  window.clearInterval(checkInterval);
+            			  $("#IRMA_button_issue").html("DONE");
+            		      $("#IRMA_button_issue").addClass("enabled");
+            		      $("#IRMA_button_issue").button().on("click", function(event) {
+            		        window.location = "http://www.ru.nl/cybersecurity";
+            		      });
+            		  }
+            	  }, "json");
+              },500);
+            }
+          });
+    	
+    });
     SmartCardHandler.bind("cardRemoved", function() {
       disableVerify();
     });
@@ -183,7 +291,7 @@ $(function() {
 	
 	var disableVerify = function () {
     $("#IRMA_status_icon").prop("src", "../../img/irma_icon_waiting_520px.png");
-    $("#IRMA_status_text").html("Insert your IRMA card");
+    $("#IRMA_status_text").html("Insert your IRMA card or use your phone");
     $("#IRMA_button_verify").off("click");
     $("#IRMA_button_verify").removeClass("enabled");
     $("#IRMA_button_verify").html("WAITING FOR CARD...");
@@ -201,51 +309,90 @@ $(function() {
       $("#IRMA_button_verify").html("CONTINUE");
       $("#IRMA_button_verify").addClass("enabled");
       $("#IRMA_button_verify").button().on("click", function(event) {
-        startIssue();
+        startIssue2();
       });
     }
 	};
 
-	var startIssue = function () {
+	var startIssue = function (attributesurl) {
     console.log("Starting IRMA issuance");
     $("#IRMA_verify").fadeOut();
     $("#IRMA_issue").fadeIn();
   	$.ajax({
-  		url: nextAction.responseurl,
+  		url: attributesurl,
   		contentType: 'application/json',
-  		data: JSON.stringify(response),
-  		type: 'POST',
+  		type: 'GET',
+  		dataType: 'json',
   		success: function(data) {
 		  	if( isError(data) ){
 		  		console.log(data);
 		  		showAlert('error', data.message);
 		  		return;
 		  	}
-		  	
-  			$("#field-university").text(data.attributes.university);
-  			$("#field-studentid").text(data.attributes.studentID);
-  			$("#field-studentcardnr").text(data.attributes.studentCardNumber);
-  			$("#field-level").text(data.attributes.level);
+  			$("#field-university").text(data.university);
+  			$("#field-studentid").text(data.studentID);
+  			$("#field-studentcardnr").text(data.studentCardNumber);
+  			$("#field-level").text(data.level);
   			console.log(data);
-  			nextAction = data;
- 		    SmartCardHandler.bind("cardInserted", function() {
- 		      SmartCardHandler.connectFirstCard();
-		      if (SmartCardHandler.selectApplet('6964656D6978')) {
-		        enableIssue();
-		      } else {
-		        $("#IRMA_status_icon").prop("src", "../../img/irma_icon_warning_520px.png");
-		        $("#IRMA_status_text").html("Inserted card is not an IRMA card");
-		      }
-		    });
-		    SmartCardHandler.bind("cardRemoved", function() {
-		      disableIssue();
-		    });
-		    if (SmartCardHandler.connectFirstCard() && SmartCardHandler.selectApplet('6964656D6978')) {
-          enableIssue();
-	      }
+  			$("#IRMA_status_icon").prop("src", "../../img/irma_icon_ready_520px.png");
+  			$("#IRMA_button_issue").html("CONFIRM ON PHONE");
   		}
-  	})
+  	});
 	};
+	var startIssue2 = function () {
+	    console.log("Starting IRMA issuance");
+	    $("#IRMA_verify").fadeOut();
+	    $("#IRMA_issue").fadeIn();
+	  	$.ajax({
+	  		url: nextAction.responseurl,
+	  		contentType: 'application/json',
+	  		data: JSON.stringify(response),
+	  		type: 'POST',
+	  		success: function(data) {
+			  	if( isError(data) ){
+			  		console.log(data);
+			  		showAlert('error', data.message);
+			  		return;
+			  	}
+			    var attributesurl = nextAction.responseurl.substring(0,nextAction.responseurl.lastIndexOf("/")) + '/attributes';
+			  	$.ajax({
+			  		url: attributesurl,
+			  		contentType: 'application/json',
+			  		type: 'GET',
+			  		dataType: 'json',
+			  		success: function(data) {
+					  	if( isError(data) ){
+					  		console.log(data);
+					  		showAlert('error', data.message);
+					  		return;
+					  	}
+			  			$("#field-university").text(data.university);
+			  			$("#field-studentid").text(data.studentID);
+			  			$("#field-studentcardnr").text(data.studentCardNumber);
+			  			$("#field-level").text(data.level);
+			  			console.log(data);
+			  		}
+			  	});
+	  			console.log(data);
+	  			nextAction = data;
+	 		    SmartCardHandler.bind("cardInserted", function() {
+	 		      SmartCardHandler.connectFirstCard();
+			      if (SmartCardHandler.selectApplet('6964656D6978')) {
+			        enableIssue();
+			      } else {
+			        $("#IRMA_status_icon").prop("src", "../../img/irma_icon_warning_520px.png");
+			        $("#IRMA_status_text").html("Inserted card is not an IRMA card");
+			      }
+			    });
+			    SmartCardHandler.bind("cardRemoved", function() {
+			      disableIssue();
+			    });
+			    if (SmartCardHandler.connectFirstCard() && SmartCardHandler.selectApplet('6964656D6978')) {
+	          enableIssue();
+		      }
+	  		}
+	  	})
+		};
 
   var enableIssue = function () {
     $("#IRMA_status_icon").prop("src", "../../img/irma_icon_ready_520px.png");
@@ -277,7 +424,7 @@ $(function() {
 
   var disableIssue = function () {
 	    $("#IRMA_status_icon").prop("src", "../../img/irma_icon_waiting_520px.png");
-	    $("#IRMA_status_text").html("Insert your IRMA card");
+	    $("#IRMA_status_text").html("Insert your IRMA card or use your phone");
 	    $("#IRMA_button_issue").off("click");
 	    $("#IRMA_button_issue").removeClass("enabled");
 	    $("#IRMA_button_issue").html("WAITING FOR CARD...");	  

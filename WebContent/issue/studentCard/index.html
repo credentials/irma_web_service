@@ -195,7 +195,7 @@ $(function() {
     $("#RU_welcome").hide();
     SmartCardHandler.bind("cardInserted", function() {
       SmartCardHandler.connectFirstCard();
-      if (SmartCardHandler.selectApplet('6964656D6978')) {
+      if (SmartCardHandler.selectApplet('49524D4163617264')) {
         enableVerify();
       } else {
         $("#IRMA_status_icon").prop("src", "../../img/irma_icon_warning_520px.png");
@@ -258,7 +258,7 @@ $(function() {
     SmartCardHandler.bind("cardRemoved", function() {
       disableVerify();
     });
-    if (SmartCardHandler.connectFirstCard() && SmartCardHandler.selectApplet('6964656D6978')) {
+    if (SmartCardHandler.connectFirstCard() && SmartCardHandler.selectApplet('49524D4163617264')) {
       enableVerify();
     }
 	};
@@ -377,7 +377,7 @@ $(function() {
 	  			nextAction = data;
 	 		    SmartCardHandler.bind("cardInserted", function() {
 	 		      SmartCardHandler.connectFirstCard();
-			      if (SmartCardHandler.selectApplet('6964656D6978')) {
+			      if (SmartCardHandler.selectApplet('49524D4163617264')) {
 			        enableIssue();
 			      } else {
 			        $("#IRMA_status_icon").prop("src", "../../img/irma_icon_warning_520px.png");
@@ -387,7 +387,7 @@ $(function() {
 			    SmartCardHandler.bind("cardRemoved", function() {
 			      disableIssue();
 			    });
-			    if (SmartCardHandler.connectFirstCard() && SmartCardHandler.selectApplet('6964656D6978')) {
+			    if (SmartCardHandler.connectFirstCard() && SmartCardHandler.selectApplet('49524D4163617264')) {
 	          enableIssue();
 		      }
 	  		}
@@ -460,7 +460,7 @@ $(function() {
 	
   	SmartCardHandler.bind("cardInserted", function() {
 		 SmartCardHandler.connectFirstCard();
-		 if (SmartCardHandler.selectApplet('6964656D6978')) {
+		 if (SmartCardHandler.selectApplet('49524D4163617264')) {
 			 enableVerify();
 			 enableIssue();
 		 } else {
@@ -471,7 +471,7 @@ $(function() {
 	  SmartCardHandler.bind("appletReady", function() {
 		  showAlert('success', 'Applet was loaded!');
 		  SmartCardHandler.connectFirstCard();
-		  if (SmartCardHandler.selectApplet('6964656D6978')) {
+		  if (SmartCardHandler.selectApplet('49524D4163617264')) {
 				 showAlert('success', 'IRMA card found!');
 				 $("#verify").toggleClass("disabled", false);
 		  }

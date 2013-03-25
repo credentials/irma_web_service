@@ -73,7 +73,7 @@ public class IssueStudentCredResource  extends ProtocolBaseResource {
 			return ProtocolStep.newError("Invalid root credential (attributes null).");
 		}
 		
-		String userID = new String(attr.get("http://www.irmacard.org/credentials/phase1/Surfnet/root/structure.xml;someRandomName;userID"));
+		String userID = new String(attr.get("userID"));
 		
 		// Check if eligible
 		if(! eligibleForIssuance(userID)){

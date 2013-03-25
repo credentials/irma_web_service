@@ -49,7 +49,8 @@
 			  for(var i=0, len=commands.length; i < len; i++) {
 				  response = this.transmit(commands[i].command);
 				  responses[commands[i].key] = { key: commands[i].key, apdu: response };
-				  if (response.slice(-4) !== "9000") {
+				  if (!(response.slice(-4) === "9000" ||  
+						  response.slice(-4) === "6985" /* FIXME: Workaround for broken signature verification on the card */)) {
 					  // Don't bother continuing when the response is not ok
 					  responses['smartcardstatus'] = 'failed';
 					  break;

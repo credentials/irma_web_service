@@ -21,6 +21,7 @@ import org.irmacard.credentials.info.InfoException;
 import org.irmacard.credentials.info.VerificationDescription;
 import org.irmacard.web.restapi.ProtocolState;
 import org.irmacard.web.restapi.util.ProtocolCommandSerializer;
+import org.irmacard.web.restapi.util.ProtocolInfo;
 import org.irmacard.web.restapi.util.ProtocolResponseDeserializer;
 import org.irmacard.web.restapi.util.ProtocolStep;
 
@@ -44,11 +45,22 @@ public abstract class VerificationBaseResource extends ProtocolBaseResource {
 		ProtocolStep ps = null;
 		switch (step) {
 		case 0:
+			ps = new ProtocolStep();
+			ps.info = new ProtocolInfo();
+			ps.info.qr_url = getReference().getPath() + "/" + id + "/qr";
+			ps.info.status_url = getReference().getPath() + "/" + id + "/status";
+			ps.info.verification_names = new HashMap<Short, String>();
+			ps.responseurl = makeResponseURL(id, step+1);
+			for(VerificationDescription vd : getVerifications()) {
+				ps.info.verification_names.put(vd.getID(), vd.getName());
+			}
+			break;
+		case 1:
 			ps = createVerificationProtocolStep(id, getVerifications());
 			ps.responseurl = makeResponseURL(id, step+1);
 			ProtocolState.putStatus(id, "step1");
 			break;
-		case 1:
+		case 2:
 			ps = onSuccess(processVerificationResponse(id, getVerifications(), value));
 			ProtocolState.putResult(id, ps.result);
 			break;

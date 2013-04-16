@@ -12,6 +12,7 @@ import net.sourceforge.scuba.smartcards.ProtocolCommands;
  *
  */
 public class ProtocolStep {
+	public ProtocolInfo info;
 	public String status;
 	public ProtocolCommands commands; // soon to be deprecated
     public Map<Short,List<ProtocolCommand>> commandsSets;

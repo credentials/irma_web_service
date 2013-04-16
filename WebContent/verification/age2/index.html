@@ -132,12 +132,33 @@
   <script type="text/javascript">
 $(function() {
 	SmartCardHandler.init();
+  var lastData;
 	
-  var startVerify = function () {
+  var loadVerification = function () {
+	  console.log("Retrieving verification information");
+      $.ajax({
+          url: '/irma_web_service/protocols/verification/SpuitenEnSlikken',
+          contentType: 'application/json',
+          type: 'POST',
+          success: function(data) {
+        	console.log("Got data for step 0");
+            console.log(data);
+            lastData = data;
+            startVerify(data);
+          }
+        });
+  }
+	
+  var startVerify = function (data) {
     disableVerify(); // Reset state
     console.log("Starting IRMA verification");
     $("#IRMA_verify").fadeIn();
     $("#SnS_welcome").hide();
+    
+    // TODO: do something with Protocol info, now in data.
+    // TODO 800 hardcoded
+    $(".IRMA_content_credential").html(data.info.verification_names['800'])
+    
     SmartCardHandler.bind("cardInserted", function() {
       SmartCardHandler.connectFirstCard();
       if (SmartCardHandler.selectApplet('49524D4163617264')) {
@@ -147,45 +168,37 @@ $(function() {
         $("#IRMA_status_text").html("Inserted card is not an IRMA card");
       }
     });
+
     $("#IRMA_button_usephone").button().on("click",function(event) {
-    	$.ajax({
-            url: '/irma_web_service/protocols/verification/SpuitenEnSlikken?qr=true',
-            contentType: 'application/json',
-            type: 'POST',
-            success: function(data) {
-              console.log(data);
-              $("#qr_image").attr("src", data.qr_url);
-              $("#qr_overlay").show();
-              checkInterval = window.setInterval(function(){
-            	  var url = data.qr_url.substring(0,data.qr_url.lastIndexOf("/")) + '/status';
-            	  $.get(url,function(data) {
-            		  if (data.status !== "start") {
-            			  $("#qr_overlay").hide();
-            			  $("#IRMA_status_icon").prop("src", "../../img/irma_icon_ready_520px.png");
-            			  $("#IRMA_status_text").html("Apply your IRMA card to your phone");
-            			  $("#IRMA_button_verify").html("VERIFYING...");
-            		  } 
-            		  if (data.status === "success") {
-            			  window.clearInterval(checkInterval);
-            	            $("#IRMA_status_icon").prop("src", "../../img/irma_icon_ok_520px.png");
-            	            $("#IRMA_status_text").html("Hit 'CONTINUE' to proceed to the website");
-            	            $("#IRMA_button_verify").html("CONTINUE");
-            	            $("#IRMA_button_verify").addClass("enabled");
-            	            $("#IRMA_button_verify").button().on("click", function(event) {
-            	              window.location = data.result;
-            	            });          			  
-            		  }
-            		  if (data.status === "failure") {
-            			  window.clearInterval(checkInterval);
-            			  $("#IRMA_status_icon").prop("src", "../../img/irma_icon_missing_520px.png");
-            		      $("#IRMA_status_text").html("Credential not found");
-            		      $("#IRMA_button_verify").html("NOT FOUND");
-            		  }
-            	  }, "json");
-              },500);
-            }
-          });
-    	
+      $("#qr_image").attr("src", data.info.qr_url);
+      $("#qr_overlay").show();
+      checkInterval = window.setInterval(function(){
+    	  var url = data.info.qr_url.substring(0, data.info.qr_url.lastIndexOf("/")) + '/status';
+    	  $.get(url,function(data) {
+    		  if (data.status !== "start") {
+    			  $("#qr_overlay").hide();
+    			  $("#IRMA_status_icon").prop("src", "../../img/irma_icon_ready_520px.png");
+    			  $("#IRMA_status_text").html("Apply your IRMA card to your phone");
+    			  $("#IRMA_button_verify").html("VERIFYING...");
+    		  } 
+    		  if (data.status === "success") {
+    			  window.clearInterval(checkInterval);
+    	            $("#IRMA_status_icon").prop("src", "../../img/irma_icon_ok_520px.png");
+    	            $("#IRMA_status_text").html("Hit 'CONTINUE' to proceed to the website");
+    	            $("#IRMA_button_verify").html("CONTINUE");
+    	            $("#IRMA_button_verify").addClass("enabled");
+    	            $("#IRMA_button_verify").button().on("click", function(event) {
+    	              window.location = data.result;
+    	            });          			  
+    		  }
+    		  if (data.status === "failure") {
+    			  window.clearInterval(checkInterval);
+    			  $("#IRMA_status_icon").prop("src", "../../img/irma_icon_missing_520px.png");
+    		      $("#IRMA_status_text").html("Credential not found");
+    		      $("#IRMA_button_verify").html("NOT FOUND");
+    		  }
+    	  }, "json");
+      },500);
     });
     SmartCardHandler.bind("cardRemoved", function() {
       disableVerify();
@@ -206,7 +219,7 @@ $(function() {
       $("#IRMA_button_verify").removeClass("enabled");
       $("#IRMA_button_verify").html("VERIFYING...");
       $.ajax({
-        url: '/irma_web_service/protocols/verification/SpuitenEnSlikken',
+        url: lastData.responseurl,
         contentType: 'application/json',
         type: 'POST',
         success: function(data) {
@@ -275,7 +288,7 @@ $(function() {
   };
 
 	$("#verify").on('click', function(event) {
-		startVerify();
+		loadVerification();
 	});
 });
   </script>

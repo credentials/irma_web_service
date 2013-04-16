@@ -30,7 +30,7 @@ public class ProtocolState {
 	}
 	
 	public static BigInteger getVerificationNonce(String id, short vId) {
-		return nonceMap.get(id + vId);
+		return verificationNonceMap.get(id + vId);
 	}
 	
 	public static void putVerificationNonce(String id, short vId, BigInteger nonce) {

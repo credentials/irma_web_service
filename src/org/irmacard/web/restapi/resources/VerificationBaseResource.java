@@ -1,5 +1,6 @@
 package org.irmacard.web.restapi.resources;
 
+import java.lang.reflect.Type;
 import java.util.HashMap;
 import java.util.Iterator;
 import java.util.List;
@@ -25,9 +26,12 @@ import org.irmacard.web.restapi.util.ProtocolStep;
 
 import com.google.gson.Gson;
 import com.google.gson.GsonBuilder;
+import com.google.gson.reflect.TypeToken;
 
 
 public abstract class VerificationBaseResource extends ProtocolBaseResource {
+	
+	static final Type protocolResponsesType = new TypeToken<Map<String, ProtocolResponses>>() {}.getType();
 	
 	@Override
 	public String handleProtocolStep(String id, int step, String value) {
@@ -52,6 +56,7 @@ public abstract class VerificationBaseResource extends ProtocolBaseResource {
 			break;
 		}
 		ProtocolState.putStatus(id, ps.status);
+		System.out.println(gson.toJson(ps));
 		return gson.toJson(ps);
 	}
 
@@ -89,7 +94,7 @@ public abstract class VerificationBaseResource extends ProtocolBaseResource {
 			.registerTypeAdapter(ProtocolResponse.class,
 				new ProtocolResponseDeserializer()).create();
 
-		ResponsesMap responsesMap = gson.fromJson(value, ResponsesMap.class);
+		Map<String, ProtocolResponses> responsesMap = gson.fromJson(value, protocolResponsesType);
 		IdemixCredentials ic = new IdemixCredentials(null);
 		
 		Map<String, Attributes> attributesMap = new HashMap<String, Attributes>();
@@ -111,8 +116,5 @@ public abstract class VerificationBaseResource extends ProtocolBaseResource {
 		}
 
 		return attributesMap;
-	}
-	
-	private interface ResponsesMap extends Map<String, ProtocolResponses> {
 	}
 }

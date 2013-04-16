@@ -4,7 +4,9 @@ import java.net.URI;
 import java.net.URISyntaxException;
 
 import org.irmacard.credentials.idemix.util.CredentialInformation;
+import org.irmacard.credentials.info.DescriptionStore;
 import org.irmacard.web.restapi.resources.IssueStudentCredResource;
+import org.irmacard.web.restapi.resources.SpuitenEnSlikkenVerificationResource;
 import org.irmacard.web.restapi.resources.VerificationProtocolResource;
 import org.restlet.Application;
 import org.restlet.Restlet;
@@ -31,10 +33,15 @@ public class IRMAProtocolApplication extends Application {
 			throw new RuntimeException(e.toString());
 		}
 		CredentialInformation.setCoreLocation(CORE_LOCATION);
+		DescriptionStore.setCoreLocation(CORE_LOCATION);
 
 
 		router.attach("/verification/{verifier}/{specname}", VerificationProtocolResource.class);
 		router.attach("/verification/{verifier}/{specname}/{id}/{step}", VerificationProtocolResource.class);
+		
+		router.attach("/verification/SpuitenEnSlikken", SpuitenEnSlikkenVerificationResource.class);
+		router.attach("/verification/SpuitenEnSlikken/{id}/{step}", SpuitenEnSlikkenVerificationResource.class);
+
 		
 //		router.attach("/verification/{crednr}", VerificationProtocolResource.class); 
 //		router.attach("/verification/{crednr}/{id}/{round}", VerificationProtocolResource.class);

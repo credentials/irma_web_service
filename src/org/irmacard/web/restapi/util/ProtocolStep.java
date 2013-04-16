@@ -1,8 +1,10 @@
 package org.irmacard.web.restapi.util;
 
 import java.util.List;
+import java.util.Map;
 
 import net.sourceforge.scuba.smartcards.ProtocolCommand;
+import net.sourceforge.scuba.smartcards.ProtocolCommands;
 
 /**
  * Data structure for communicating protocol steps.
@@ -11,7 +13,9 @@ import net.sourceforge.scuba.smartcards.ProtocolCommand;
  */
 public class ProtocolStep {
 	public String status;
-    public List<ProtocolCommand> commands;
+	public ProtocolCommands commands; // soon to be deprecated
+    public Map<Short,List<ProtocolCommand>> commandsSets;
+    
     public String responseurl;
 
     public boolean protocolDone = false;
@@ -24,6 +28,7 @@ public class ProtocolStep {
     public String feedbackMessage;
     
     public String result = null;
+	
     public static ProtocolStep newError(String errorMessage) {
     	ProtocolStep ps = new ProtocolStep();
 		ps.feedbackMessage = errorMessage;

@@ -16,6 +16,7 @@ import com.ibm.zurich.idmx.issuance.Issuer;
  */
 public class ProtocolState {
 	private static Map<String,BigInteger> nonceMap = new HashMap<String, BigInteger>();
+	private static Map<String,BigInteger> verificationNonceMap = new HashMap<String, BigInteger>();
 	private static Map<String,Attributes> attributesMap = new HashMap<String, Attributes>();
 	private static Map<String,Issuer> issuerMap = new HashMap<String, Issuer>();
 	private static Map<String,String> stateMap = new HashMap<String, String>();
@@ -26,6 +27,14 @@ public class ProtocolState {
 	}
 	public static void putNonce(String id, BigInteger nonce) {
 		nonceMap.put(id, nonce);
+	}
+	
+	public static BigInteger getVerificationNonce(String id, short vId) {
+		return nonceMap.get(id + vId);
+	}
+	
+	public static void putVerificationNonce(String id, short vId, BigInteger nonce) {
+		verificationNonceMap.put(id + vId, nonce);
 	}
 	
 	public static Attributes getAttributes(String id) {

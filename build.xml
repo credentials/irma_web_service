@@ -3,6 +3,9 @@
   
   <property file="build.properties" />
   <property file="deploy.properties" />
+  
+  <!-- Provides deploy.user and deploy.pass -->
+  <property file="deploy.credentials" />
 
   <path id="classpath">
     <fileset dir="${lib.dir}">

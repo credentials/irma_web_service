@@ -178,7 +178,7 @@
 .IRMA_content_verify {
   position: absolute;
   left: 254px;
-  top: 135px;
+  top: 110px;
   width: 400px;
   height: auto;
 }
@@ -194,11 +194,13 @@
 .IRMA_content_credential {
   display: block;
   font-weight: 700;
+  margin-bottom: 5px;
 }
 	
 .IRMA_content_status {
   display: block;
   font-weight: 300;
+  margin-top: 20px;
 }
 
 .IRMA_content_icon {

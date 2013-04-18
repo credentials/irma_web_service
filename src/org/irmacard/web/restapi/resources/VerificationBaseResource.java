@@ -123,6 +123,7 @@ public abstract class VerificationBaseResource extends ProtocolBaseResource {
 			try {
 				attributesMap.put(vd.getVerificationID(), ic.verifyProofResponses(vspec, nonce, responses));
 			} catch (CredentialsException e) {
+				// TODO: Expiry is one of the cases that is handled here, should do this better
 				e.printStackTrace();
 			}
 		}

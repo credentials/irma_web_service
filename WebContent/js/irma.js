@@ -69,8 +69,6 @@ var IRMA = {
 	},
 	
 	show_verifications: function(data) {
-	    // TODO: do something with Protocol info, now in data.
-	    // TODO 800 hardcoded
 		for(var key in data.info.verification_names) {
 			if(data.info.verification_names.hasOwnProperty(key)) {
 				var verification = data.info.verification_names[key];
@@ -95,6 +93,22 @@ var IRMA = {
 						$("#IRMA_status_text").html("Apply your IRMA card to your phone");
 						$("#IRMA_button_verify").html("VERIFYING...");
 					} 
+					if (data.status === "issueready") {
+						$("#IRMA_status_icon").prop("src", "../../img/irma_icon_ok_520px.png");
+						$("#IRMA_status_text").html("Hit 'CONTINUE' to proceed to the issuing step");
+						$("#IRMA_button_verify").html("CONTINUE");
+						$("#IRMA_button_verify").addClass("enabled");
+						$("#IRMA_button_verify").button().on("click", function(event) {
+							startIssue(attributesurl);
+						});
+					}
+					if (data.status === "issuing") {
+						$("#IRMA_button_issue").html("ISSUING...");
+					}
+					if (data.status === "error") {
+						window.clearInterval(checkInterval);
+						IRMA.show_failure_credential_not_found();
+					}
 					if (data.status === "success") {
 						window.clearInterval(checkInterval);
 						IRMA.onVerifySucces();
@@ -125,6 +139,8 @@ var IRMA = {
 				for (var key in data.commandsSets) {
 					if(data.commandsSets.hasOwnProperty(key)) {
 						var commands = data.commandsSets[key];
+						// Very nasty bug-fix
+						SmartCardHandler.selectApplet(IRMA.irma_aid);
 						responses[key] = SmartCardHandler.transmitCommandSet(commands);
 					}
 				}
@@ -159,9 +175,72 @@ var IRMA = {
 				console.log(data);
 				if (data.status === 'success') {
 					IRMA.onVerifySucces(data);
+				} else if (data.status === 'issue') {
+					IRMA.onVerifySuccesIssue(data);
+				} else if (data.status === 'error') {
+					IRMA.show_failure(data.feedbackMessage, "FAILED");
 				} else {
 					IRMA.show_failure_credential_not_found();
 				}
+			}
+		});
+	},
+
+	start_issue: function(data) {
+		console.log("Starting IRMA issuance");
+		$("#IRMA_verify").fadeOut();
+		$("#IRMA_issue").fadeIn();
+		$.ajax({
+			url: nextAction.responseurl,
+			contentType: 'application/json',
+			data: JSON.stringify(response),
+			type: 'POST',
+			success: function(data) {
+				if( isError(data) ){
+					console.log(data);
+					showAlert('error', data.message);
+					return;
+				}
+				IRMA.show_attributes();
+				console.log(data);
+				nextAction = data;
+				SmartCardHandler.bind("cardInserted", function() {
+					SmartCardHandler.connectFirstCard();
+					if (SmartCardHandler.selectApplet('49524D4163617264')) {
+						enableIssue();
+					} else {
+						$("#IRMA_status_icon").prop("src", "../../img/irma_icon_warning_520px.png");
+						$("#IRMA_status_text").html("Inserted card is not an IRMA card");
+					}
+				});
+				SmartCardHandler.bind("cardRemoved", function() {
+					disableIssue();
+				});
+				if (SmartCardHandler.connectFirstCard() && SmartCardHandler.selectApplet('49524D4163617264')) {
+					enableIssue();
+				}
+			}
+		});
+	},
+
+	show_attributes: function(old_data) {
+		var attributesurl = old_data.responseurl.substring(0,old_data.responseurl.lastIndexOf("/")) + '/attributes';
+		$.ajax({
+			url: attributesurl,
+			contentType: 'application/json',
+			type: 'GET',
+			dataType: 'json',
+			success: function(data) {
+				if( isError(data) ){
+					console.log(data);
+					showAlert('error', data.message);
+					return;
+				}
+				$("#field-university").text(data.university);
+				$("#field-studentid").text(data.studentID);
+				$("#field-studentcardnr").text(data.studentCardNumber);
+				$("#field-level").text(data.level);
+				console.log(data);
 			}
 		});
 	},
@@ -184,7 +263,7 @@ var IRMA = {
 		$("#IRMA_button_verify").addClass("enabled");
 		$("#IRMA_button_verify").on("click", IRMA.verifyButtonClicked);
 	},
-	
+
 	onVerifySucces: function(data) {
 		$("#IRMA_status_icon").prop("src", "../../img/irma_icon_ok_520px.png");
 		$("#IRMA_status_text").html("Hit 'CONTINUE' to proceed to the website");
@@ -192,6 +271,16 @@ var IRMA = {
 		$("#IRMA_button_verify").addClass("enabled");
 		$("#IRMA_button_verify").on("click", function(event) {
 			window.location = data.result;
+		});
+	},
+
+	onVerifySuccesIssue: function(data) {
+		$("#IRMA_status_icon").prop("src", "../../img/irma_icon_ok_520px.png");
+		$("#IRMA_status_text").html("Hit 'CONTINUE' to proceed to the issuing step");
+		$("#IRMA_button_verify").html("CONTINUE");
+		$("#IRMA_button_verify").addClass("enabled");
+		$("#IRMA_button_verify").on("click", function(event) {
+			IRMA.start_issue();
 		});
 	},
 

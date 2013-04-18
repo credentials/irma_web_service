@@ -1,6 +1,7 @@
 var IRMA = {
 	base_url: "/irma_web_service/protocols/verification/SpuitenEnSlikken",
 	irma_html: "../../irma/",
+	irma_aid: '49524D4163617264',
 	
 	init: function() {
 		IRMA.load_extra_html(IRMA.irma_html + "issue.html");
@@ -33,7 +34,7 @@ var IRMA = {
 		// Setup handlers
 		SmartCardHandler.bind("cardInserted", function() {
 			SmartCardHandler.connectFirstCard();
-			if (SmartCardHandler.selectApplet('49524D4163617264')) {
+			if (SmartCardHandler.selectApplet(IRMA.irma_aid)) {
 				IRMA.enableVerify();
 			} else {
 				IRMA.show_warning("Inserted card is not an IRMA card");
@@ -47,7 +48,7 @@ var IRMA = {
 		//IRMA.setup_qr_code();
 
 		SmartCardHandler.connectFirstCard();
-		if (SmartCardHandler.connectFirstCard() && SmartCardHandler.selectApplet('49524D4163617264')) {
+		if (SmartCardHandler.connectFirstCard() && SmartCardHandler.selectApplet(IRMA.irma_aid)) {
 			IRMA.enableVerify();
 		};
 	},

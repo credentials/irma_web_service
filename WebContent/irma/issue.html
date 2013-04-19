@@ -1,3 +1,24 @@
+<script id="credAccordionTpl" type="text/template">
+	<div class="accordion-heading">
+		<a class="accordion-toggle" data-toggle="collapse"
+			data-parent="#IRMA_issue_credentials_list" href="#IRMA-collapse-{{key}}">
+				{{name}}
+		</a>
+	</div>
+	<div id ="IRMA-collapse-{{key}}" class="accordion-body collapse">
+		<div class="accordion-inner">
+			<table>
+				{{#attribute_array}}
+				<tr>
+					<td class="IRMA_content_attribute">{{name}}</td>
+					<td class="IRMA_content_value">{{value}}</td>
+				</tr>
+				{{/attribute_array}}
+			</table>
+		</div>
+	</div>
+</script>
+
 <div id="IRMA_issue" class="hide fade in">
 	<div class="IRMA_page">
 		<div class="IRMA_container">
@@ -9,27 +30,10 @@
 
 			<div class="IRMA_main_scherm">
 				<div class="IRMA_content_issue">
-					<table class="IRMA_content_table">
-						<tr>
-							<td class="IRMA_content_credential" colspan="2">Student</td>
-						</tr>
-						<tr>
-							<td class="IRMA_content_attribute">University</td>
-							<td class="IRMA_content_value" id="field-university"></td>
-						</tr>
-						<tr>
-							<td class="IRMA_content_attribute">Student ID</td>
-							<td class="IRMA_content_value" id="field-studentid"></td>
-						</tr>
-						<tr>
-							<td class="IRMA_content_attribute">Student Card</td>
-							<td class="IRMA_content_value" id="field-studentcardnr"></td>
-						</tr>
-						<tr>
-							<td class="IRMA_content_attribute">Level</td>
-							<td class="IRMA_content_value" id="field-level"></td>
-						</tr>
-					</table>
+					<div class="accordion" id="IRMA_issue_credentials_list">
+					<div class="accordion-group" id="IRMA_issue_credential_list_content">
+					</div>
+					</div>
 				</div>
 
 				<div class="IRMA_arrow">

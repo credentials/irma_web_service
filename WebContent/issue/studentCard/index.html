@@ -343,6 +343,8 @@ $(function() {
 	    console.log("Starting IRMA issuance");
 	    $("#IRMA_verify").fadeOut();
 	    $("#IRMA_issue").fadeIn();
+	    console.log("Querying: " + nextAction.responseurl);
+	    console.log(nextAction);
 	  	$.ajax({
 	  		url: nextAction.responseurl,
 	  		contentType: 'application/json',

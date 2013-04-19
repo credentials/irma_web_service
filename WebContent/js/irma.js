@@ -7,6 +7,8 @@ var IRMA = {
 	issue_url: '',
 	responseurl: '',
 
+	verification_names: {},
+
 	init: function() {
 		IRMA.load_extra_html(IRMA.irma_html + "issue.html");
 		IRMA.load_extra_html(IRMA.irma_html + "verify.html");
@@ -51,10 +53,9 @@ var IRMA = {
 			} else {
 				IRMA.show_warning("Inserted card is not an IRMA card");
 			}
-		});
-
-		SmartCardHandler.bind("cardRemoved", function() {
-			IRMA.disableVerify();
+			SmartCardHandler.bind("cardRemoved", function() {
+				IRMA.disableVerify();
+			});
 		});
 		
 		//IRMA.setup_qr_code();
@@ -81,9 +82,10 @@ var IRMA = {
 	},
 	
 	show_verifications: function(data) {
-		for(var key in data.info.verification_names) {
-			if(data.info.verification_names.hasOwnProperty(key)) {
-				var verification = data.info.verification_names[key];
+		IRMA.verification_names = data.info.verification_names;
+		for(var key in IRMA.verification_names) {
+			if(IRMA.verification_names.hasOwnProperty(key)) {
+				var verification = IRMA.verification_names[key];
 				console.log("Hello here: " + verification);
 				$(".IRMA_content_verify").prepend("<span class=\"IRMA_content_credential\">" + verification + "</span>");
 			}
@@ -139,6 +141,8 @@ var IRMA = {
 		$("#IRMA_button_verify").off("click");
 		$("#IRMA_button_verify").removeClass("enabled");
 		$("#IRMA_button_verify").html("VERIFYING...");
+
+		SmartCardHandler.bind("cardRemoved", function() {});
 		$.ajax({
 			url : lastData.responseurl,
 			contentType : 'application/json',
@@ -168,8 +172,7 @@ var IRMA = {
 			if(responses.hasOwnProperty(key)) {
 				var response = responses[key];
 				if(response.smartcardstatus === "failed") {
-					//TODO: This is not all that can go wrong!!
-					IRMA.show_error_connection_list();
+					IRMA.handle_verification_failure(key, response);
 					return;
 				}
 			}
@@ -186,6 +189,7 @@ var IRMA = {
 				if (data.status === 'success') {
 					IRMA.onVerifySuccess(data);
 				} else if (data.status === 'issue') {
+					// TODO: maybe this can go as well
 					IRMA.onVerifySuccessIssue(data);
 				} else if (data.status === 'error') {
 					IRMA.show_failure(data.feedbackMessage, "FAILED");
@@ -194,6 +198,24 @@ var IRMA = {
 				}
 			}
 		});
+	},
+
+	handle_verification_failure: function(key, response) {
+		console.log("Offending command: " + response['failed-key']);
+		var cred_name = IRMA.verification_names[key];
+		if(IRMA.is_communication_error(response)) {
+			// Lost contact with the card
+			IRMA.show_failure("Card Lost", "FAILED");
+		} else if (response['failed-key'] === "startprove" && response.startprove.apdu === "6A88") {
+			IRMA.show_failure("Credential for " + cred_name + " does not exists.", "FAILED");
+		} else {
+			IRMA.show_failure("Unknown error verifying " + cred_name, "FAILED");
+		}
+	},
+
+	is_communication_error: function(response) {
+		var key = response['failed-key'];
+		return response[key].apdu.indexOf("SCARD_E_NOT_TRANSACTED") != -1;
 	},
 
 	start_batch_issue: function(selection, issue_url) {
@@ -388,7 +410,7 @@ var IRMA = {
 		$("#IRMA_button_verify").html("CONTINUE");
 		$("#IRMA_button_verify").addClass("enabled");
 		$("#IRMA_button_verify").on("click", function(event) {
-			IRMA.start_issue();
+			alert("Not implemented!");
 		});
 	},
 

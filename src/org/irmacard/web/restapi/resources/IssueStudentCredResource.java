@@ -2,9 +2,9 @@ package org.irmacard.web.restapi.resources;
 
 import java.lang.reflect.Field;
 import java.math.BigInteger;
-import java.util.List;
 
 import net.sourceforge.scuba.smartcards.ProtocolCommand;
+import net.sourceforge.scuba.smartcards.ProtocolCommands;
 import net.sourceforge.scuba.smartcards.ProtocolResponse;
 import net.sourceforge.scuba.smartcards.ProtocolResponses;
 
@@ -94,7 +94,7 @@ public class IssueStudentCredResource  extends ProtocolBaseResource {
 		Issuer issuer = ici.getIssuer(attributes);
 
 		// Run part one of protocol
-		List<ProtocolCommand> commands;
+		ProtocolCommands commands;
 		try {
 			commands = ic.requestIssueRound1Commands(spec, attributes, issuer);
 		} catch (CredentialsException e) {
@@ -169,7 +169,7 @@ public class IssueStudentCredResource  extends ProtocolBaseResource {
 				ProtocolResponses.class);
 
 		// Run part one of protocol
-		List<ProtocolCommand> commands;
+		ProtocolCommands commands;
 		try {
 			// Run next part of protocol
 			commands = ic.requestIssueRound3Commands(spec, attributes, issuer, responses);

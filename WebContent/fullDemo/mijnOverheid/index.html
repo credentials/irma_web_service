@@ -70,13 +70,12 @@
 				IRMA.start_verify();
 			});
 			$("#btn_issue_all").on('click', function(event) {
-				console.log("Issuing all: " + all_credentials);
+				IRMA.start_batch_issue(all_credentials, issue_url);
 			});
 			$("#btn_issue_selected").on('click', function(event) {
 				var list = $("#credential_list").serializeArray();
 				if(list.length == 0) {
-					// TODO nicer warning about this
-					console.log("Not doing anything nothing selected")
+					alert("Please select at least one credential");
 				} else {
 					var issue_list = []
 					for(var i = 0; i < list.length; i++) {

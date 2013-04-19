@@ -239,10 +239,11 @@ var IRMA = {
 				$("#IRMA_status_icon").prop("src", "../../img/irma_icon_warning_520px.png");
 				$("#IRMA_status_text").html("Inserted card is not an IRMA card");
 			}
+			SmartCardHandler.bind("cardRemoved", function() {
+				IRMA.disable_issue();
+			});
 		});
-		SmartCardHandler.bind("cardRemoved", function() {
-			IRMA.disable_issue();
-		});
+
 		if (SmartCardHandler.connectFirstCard() && SmartCardHandler.selectApplet(IRMA.irma_aid)) {
 			IRMA.enable_issue();
 		}
@@ -253,6 +254,7 @@ var IRMA = {
 		$("#IRMA_button_issue").off("click");
 		$("#IRMA_button_issue").removeClass("enabled");
 		$("#IRMA_button_issue").html("ISSUING...");
+		SmartCardHandler.bind("cardRemoved", function() {});
 
 		IRMA.irma_issue_state = "issue";
 		IRMA.current_credential_idx = 0;
@@ -276,7 +278,12 @@ var IRMA = {
 
 				var response = SmartCardHandler.transmitCommandSet(data.commands);
 				console.log(response);
-				IRMA.issue_step_two(response);
+				if(response.smartcardstatus === "failed") {
+					IRMA.handle_issue_failure(response);
+					IRMA.issue_next_credential();
+				} else {
+					IRMA.issue_step_two(response);
+				}
 			}
 		});
 	},
@@ -296,7 +303,12 @@ var IRMA = {
 
 				var response = SmartCardHandler.transmitCommandSet(data.commands);
 				console.log(response);
-				IRMA.issue_step_three(response);
+				if(response.smartcardstatus === "failed") {
+					IRMA.handle_issue_failure(response);
+					IRMA.issue_next_credential();
+				} else {
+					IRMA.issue_step_three(response);
+				}
 			}
 		});
 	},
@@ -312,13 +324,13 @@ var IRMA = {
 				console.log('Completed issuance for ' + IRMA.current_credential);
 				console.log(data);
 
+				IRMA.issue_set_done(IRMA.current_credential);
 				IRMA.issue_next_credential();
 			}
 		});
 	},
 
 	issue_next_credential: function() {
-		IRMA.issue_set_done(IRMA.current_credential);
 		IRMA.current_credential_idx++;
 		if(IRMA.current_credential_idx < IRMA.selection.length) {
 			IRMA.current_credential = IRMA.selection[IRMA.current_credential_idx];
@@ -336,6 +348,22 @@ var IRMA = {
 		$("#IRMA_button_issue").button().on("click", function(event) {
 			window.location = "http://www.ru.nl/cybersecurity";
 		});
+	},
+
+	handle_issue_failure: function(response) {
+		console.log("Offending command: " + response['failed-key']);
+
+		if(IRMA.is_communication_error(response)) {
+			// Lost contact with the card
+			IRMA.issue_set_error(IRMA.current_credential, "Card Lost");
+
+			// Break the chain, no more attempts
+			current_credential_idx = IRMA.selection.length;
+		} else if (response['failed-key'] === "start_issuance" && response['start_issuance'].apdu === "6986") {
+			IRMA.issue_set_error(IRMA.current_credential, "Already issued");
+		} else {
+			IRMA.issue_set_error(IRMA.current_credential, "Unknown error");
+		}
 	},
 
 	display_issue_credentials: function(data) {

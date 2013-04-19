@@ -261,7 +261,7 @@ var IRMA = {
 
 	issue_step_two: function(response) {
 		IRMA.issue_set_status(IRMA.current_credential, "Issuing....");
-		console.log("Querying response url: " + IRMA.responseurl)
+		console.log("Querying response url: " + IRMA.responseurl);
 		$.ajax({
 			url: IRMA.responseurl,
 			contentType: 'application/json',
@@ -330,28 +330,6 @@ var IRMA = {
 		console.log(cred);
 		console.log(Mustache.to_html($("#credAccordionTpl").html(), cred));
 		$("#IRMA_issue_credential_list_content").append(Mustache.to_html($("#credAccordionTpl").html(), cred));
-	},
-
-	show_attributes: function(old_data) {
-		var attributesurl = old_data.responseurl.substring(0,old_data.responseurl.lastIndexOf("/")) + '/attributes';
-		$.ajax({
-			url: attributesurl,
-			contentType: 'application/json',
-			type: 'GET',
-			dataType: 'json',
-			success: function(data) {
-				if( isError(data) ){
-					console.log(data);
-					showAlert('error', data.message);
-					return;
-				}
-				$("#field-university").text(data.university);
-				$("#field-studentid").text(data.studentID);
-				$("#field-studentcardnr").text(data.studentCardNumber);
-				$("#field-level").text(data.level);
-				console.log(data);
-			}
-		});
 	},
 
 	//

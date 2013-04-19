@@ -57,7 +57,11 @@ public class VerificationProtocolResource extends ProtocolBaseResource {
 				Attributes attr = processVerificationResponse(id, vspec, value);
 				if (attr != null) {
 					ps.status = "success";
-					ps.result = "http://spuitenenslikken.bnn.nl";
+					if (verifier.equalsIgnoreCase("NYTimes")) {
+						ps.result = "http://www.nytimes.com";
+					} else {
+						ps.result = "http://spuitenenslikken.bnn.nl";
+					}
 					ProtocolState.putResult(id, ps.result);
 				}
 			} catch (CredentialsException e) {

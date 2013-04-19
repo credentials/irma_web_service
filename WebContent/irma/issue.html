@@ -1,8 +1,10 @@
 <script id="credAccordionTpl" type="text/template">
 	<div class="accordion-heading">
 		<a class="accordion-toggle" data-toggle="collapse"
-			data-parent="#IRMA_issue_credentials_list" href="#IRMA-collapse-{{key}}">
+			data-parent="#IRMA_issue_credentials_list" href="#IRMA-collapse-{{key}}"
+			id="IRMA-issue-heading-{{key}}">
 				{{name}}
+				<span id="IRMA-issue-status-{{key}}"></span>
 		</a>
 	</div>
 	<div id ="IRMA-collapse-{{key}}" class="accordion-body collapse">

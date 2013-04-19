@@ -241,6 +241,8 @@ var IRMA = {
 	},
 
 	issue_step_one: function() {
+		IRMA.issue_set_active(IRMA.current_credential);
+		IRMA.issue_set_status(IRMA.current_credential, "Issuing..");
 		$.ajax({
 			url: IRMA.issue_url + '/' + IRMA.current_credential + '/1',
 			contentType: 'application/json',
@@ -258,6 +260,7 @@ var IRMA = {
 	},
 
 	issue_step_two: function(response) {
+		IRMA.issue_set_status(IRMA.current_credential, "Issuing....");
 		console.log("Querying response url: " + IRMA.responseurl)
 		$.ajax({
 			url: IRMA.responseurl,
@@ -277,6 +280,7 @@ var IRMA = {
 	},
 
 	issue_step_three: function(response) {
+		IRMA.issue_set_status(IRMA.current_credential, "Issuing.......");
 		$.ajax({
 			url: IRMA.responseurl,
 			contentType: 'application/json',
@@ -292,6 +296,7 @@ var IRMA = {
 	},
 
 	issue_next_credential: function() {
+		IRMA.issue_set_done(IRMA.current_credential);
 		IRMA.current_credential_idx++;
 		if(IRMA.current_credential_idx < IRMA.selection.length) {
 			IRMA.current_credential = IRMA.selection[IRMA.current_credential_idx];
@@ -324,7 +329,7 @@ var IRMA = {
 		cred.key = cred_key;
 		console.log(cred);
 		console.log(Mustache.to_html($("#credAccordionTpl").html(), cred));
-		$("#IRMA_issue_credential_list_content").prepend(Mustache.to_html($("#credAccordionTpl").html(), cred));
+		$("#IRMA_issue_credential_list_content").append(Mustache.to_html($("#credAccordionTpl").html(), cred));
 	},
 
 	show_attributes: function(old_data) {
@@ -432,6 +437,37 @@ var IRMA = {
 		$("#IRMA_status_icon").prop("src", "../../img/irma_icon_missing_520px.png");
 		$("#IRMA_status_text").html(text);
 		$("#IRMA_button_verify").html(status);
+	},
+
+	issue_set_status: function(credential, text) {
+		$("#IRMA-issue-status-" + credential).html("(" + text + ")");
+	},
+
+	issue_set_error: function(credential, text) {
+		IRMA.issue_set_status(credential, text);
+		IRMA.issue_set_failed(credential);
+	},
+
+	issue_set_active: function(credential) {
+		var heading = $("#IRMA-issue-heading-" + credential);
+		heading.removeClass("btn-danger");
+		heading.removeClass("btn-success");
+		heading.addClass("btn-info");
+	},
+
+	issue_set_done: function(credential) {
+		IRMA.issue_set_status(credential, "Done");
+		var heading = $("#IRMA-issue-heading-" + credential);
+		heading.removeClass("btn-info");
+		heading.removeClass("btn-danger");
+		heading.addClass("btn-success");
+	},
+
+	issue_set_failed: function(credential) {
+		var heading = $("#IRMA-issue-heading-" + credential);
+		heading.removeClass("btn-info");
+		heading.removeClass("btn-success");
+		heading.addClass("btn-danger");
 	},
 
 	// Helpers

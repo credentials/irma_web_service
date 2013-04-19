@@ -3,6 +3,10 @@ var IRMA = {
 	irma_html: "../../irma/",
 	irma_aid: '49524D4163617264',
 	
+	irma_issue_state: 'idle',
+	issue_url: '',
+	responseurl: '',
+
 	init: function() {
 		IRMA.load_extra_html(IRMA.irma_html + "issue.html");
 		IRMA.load_extra_html(IRMA.irma_html + "verify.html");
@@ -19,16 +23,24 @@ var IRMA = {
 			}
 		});
 	},
-
 	
-	show: function() {
+	helper: function(url) {
+		$.ajax({
+			url: url,
+			type: 'POST',
+			async: false,
+			success: function(res) {
+				console.log(res);
+			}
+		});
+	},
+
+	start_verify: function() {
 		IRMA.disableVerify(); // Reset state
 		SmartCardHandler.init();
 		console.log("Starting IRMA verification");
-	    
-		// May need to refactor this a bit further
-		$("#IRMA_verify").fadeIn();
 		
+		IRMA.show_verify();
 		IRMA.retrieve_verifications();
 		
 		// Setup handlers
@@ -111,7 +123,7 @@ var IRMA = {
 					}
 					if (data.status === "success") {
 						window.clearInterval(checkInterval);
-						IRMA.onVerifySucces();
+						IRMA.onVerifySuccess();
 					}
 					if (data.status === "failure") {
 						window.clearInterval(checkInterval);
@@ -139,8 +151,6 @@ var IRMA = {
 				for (var key in data.commandsSets) {
 					if(data.commandsSets.hasOwnProperty(key)) {
 						var commands = data.commandsSets[key];
-						// Very nasty bug-fix
-						SmartCardHandler.selectApplet(IRMA.irma_aid);
 						responses[key] = SmartCardHandler.transmitCommandSet(commands);
 					}
 				}
@@ -174,9 +184,9 @@ var IRMA = {
 			success : function(data) {
 				console.log(data);
 				if (data.status === 'success') {
-					IRMA.onVerifySucces(data);
+					IRMA.onVerifySuccess(data);
 				} else if (data.status === 'issue') {
-					IRMA.onVerifySuccesIssue(data);
+					IRMA.onVerifySuccessIssue(data);
 				} else if (data.status === 'error') {
 					IRMA.show_failure(data.feedbackMessage, "FAILED");
 				} else {
@@ -186,41 +196,135 @@ var IRMA = {
 		});
 	},
 
-	start_issue: function(data) {
-		console.log("Starting IRMA issuance");
-		$("#IRMA_verify").fadeOut();
+	start_batch_issue: function(selection, issue_url) {
 		$("#IRMA_issue").fadeIn();
+		IRMA.selection = selection;
+		IRMA.issue_url = issue_url;
+
+		console.log("Contacting: " + issue_url);
 		$.ajax({
-			url: nextAction.responseurl,
+			url: issue_url,
+			type: "POST",
+			success: IRMA.display_issue_credentials,
+		});
+
+		// Handlers
+		SmartCardHandler.bind("cardInserted", function() {
+			SmartCardHandler.connectFirstCard();
+			if (SmartCardHandler.selectApplet(IRMA.irma_aid)) {
+				IRMA.enable_issue();
+			} else {
+				$("#IRMA_status_icon").prop("src", "../../img/irma_icon_warning_520px.png");
+				$("#IRMA_status_text").html("Inserted card is not an IRMA card");
+			}
+		});
+		SmartCardHandler.bind("cardRemoved", function() {
+			IRMA.disable_issue();
+		});
+		if (SmartCardHandler.connectFirstCard() && SmartCardHandler.selectApplet(IRMA.irma_aid)) {
+			IRMA.enable_issue();
+		}
+	},
+
+	issue_button_clicked: function(event) {
+		console.log("Issue button clicked");
+		$("#IRMA_button_issue").off("click");
+		$("#IRMA_button_issue").removeClass("enabled");
+		$("#IRMA_button_issue").html("ISSUING...");
+
+		IRMA.irma_issue_state = "issue";
+		IRMA.current_credential_idx = 0;
+		IRMA.current_credential = IRMA.selection[IRMA.current_credential_idx];
+
+		console.log(SmartCardHandler.applet.verifyPin());
+		IRMA.issue_step_one();
+	},
+
+	issue_step_one: function() {
+		$.ajax({
+			url: IRMA.issue_url + '/' + IRMA.current_credential + '/1',
+			contentType: 'application/json',
+			type: 'POST',
+			success: function(data) {
+				console.log('Got first batch of data for issuing ' + IRMA.current_credential);
+				console.log(data);
+				IRMA.responseurl = data.responseurl;
+
+				var response = SmartCardHandler.transmitCommandSet(data.commands);
+				console.log(response);
+				IRMA.issue_step_two(response);
+			}
+		});
+	},
+
+	issue_step_two: function(response) {
+		console.log("Querying response url: " + IRMA.responseurl)
+		$.ajax({
+			url: IRMA.responseurl,
 			contentType: 'application/json',
 			data: JSON.stringify(response),
 			type: 'POST',
 			success: function(data) {
-				if( isError(data) ){
-					console.log(data);
-					showAlert('error', data.message);
-					return;
-				}
-				IRMA.show_attributes();
+				console.log('Got second batch of data for issuing ' + IRMA.current_credential);
 				console.log(data);
-				nextAction = data;
-				SmartCardHandler.bind("cardInserted", function() {
-					SmartCardHandler.connectFirstCard();
-					if (SmartCardHandler.selectApplet('49524D4163617264')) {
-						enableIssue();
-					} else {
-						$("#IRMA_status_icon").prop("src", "../../img/irma_icon_warning_520px.png");
-						$("#IRMA_status_text").html("Inserted card is not an IRMA card");
-					}
-				});
-				SmartCardHandler.bind("cardRemoved", function() {
-					disableIssue();
-				});
-				if (SmartCardHandler.connectFirstCard() && SmartCardHandler.selectApplet('49524D4163617264')) {
-					enableIssue();
-				}
+				IRMA.responseurl = data.responseurl;
+
+				var response = SmartCardHandler.transmitCommandSet(data.commands);
+				console.log(response);
+				IRMA.issue_step_three(response);
 			}
 		});
+	},
+
+	issue_step_three: function(response) {
+		$.ajax({
+			url: IRMA.responseurl,
+			contentType: 'application/json',
+			data: JSON.stringify(response),
+			type: 'POST',
+			success: function(data) {
+				console.log('Completed issuance for ' + IRMA.current_credential);
+				console.log(data);
+
+				IRMA.issue_next_credential();
+			}
+		});
+	},
+
+	issue_next_credential: function() {
+		IRMA.current_credential_idx++;
+		if(IRMA.current_credential_idx < IRMA.selection.length) {
+			IRMA.current_credential = IRMA.selection[IRMA.current_credential_idx];
+			console.log("Now proceeding with credential " + IRMA.current_credential);
+			IRMA.issue_step_one();
+		} else {
+			console.log("Done issuing");
+			IRMA.finish_issuing();
+		}
+	},
+
+	finish_issuing: function() {
+		$("#IRMA_button_issue").html("DONE");
+		$("#IRMA_button_issue").addClass("enabled");
+		$("#IRMA_button_issue").button().on("click", function(event) {
+			window.location = "http://www.ru.nl/cybersecurity";
+		});
+	},
+
+	display_issue_credentials: function(data) {
+		console.log(data);
+		var credentials = data.info.issue_information;
+		for(var i = 0; i < IRMA.selection.length; i++) {
+			IRMA.display_issue_credential(credentials[IRMA.selection[i]], IRMA.selection[i]);
+		}
+	},
+
+	display_issue_credential: function(cred, cred_key) {
+		cred.attribute_array = IRMA.make_array_from_map(cred.attributes);
+		cred.key = cred_key;
+		console.log(cred);
+		console.log(Mustache.to_html($("#credAccordionTpl").html(), cred));
+		$("#IRMA_issue_credential_list_content").prepend(Mustache.to_html($("#credAccordionTpl").html(), cred));
 	},
 
 	show_attributes: function(old_data) {
@@ -248,6 +352,14 @@ var IRMA = {
 	//
 	// UI code goes here
 	//
+	show_verify: function() {
+		$("#IRMA_verify").fadeIn();
+	},
+
+	hide_verify: function() {
+		$("#IRMA_verify").fadeOut();
+	},
+
 	disableVerify: function () {
 		$("#IRMA_status_icon").prop("src", "../../img/irma_icon_waiting_520px.png");
 		$("#IRMA_status_text").html("Insert your IRMA card or use your phone");
@@ -264,7 +376,20 @@ var IRMA = {
 		$("#IRMA_button_verify").on("click", IRMA.verifyButtonClicked);
 	},
 
-	onVerifySucces: function(data) {
+	enable_issue: function() {
+		$("#IRMA_button_issue").addClass("enabled");
+		$("#IRMA_button_issue").html("ISSUE");
+		$("#IRMA_button_issue").on('click', IRMA.issue_button_clicked);
+	},
+
+	disable_issue: function() {
+		$("#IRMA_button_issue").off("click");
+		$("#IRMA_button_issue").removeClass("enabled");
+		$("#IRMA_button_issue").html("WAITING FOR CARD...");
+	},
+
+	onVerifySuccess: function(data) {
+		console.log("Internal on verify succes function called");
 		$("#IRMA_status_icon").prop("src", "../../img/irma_icon_ok_520px.png");
 		$("#IRMA_status_text").html("Hit 'CONTINUE' to proceed to the website");
 		$("#IRMA_button_verify").html("CONTINUE");
@@ -274,7 +399,7 @@ var IRMA = {
 		});
 	},
 
-	onVerifySuccesIssue: function(data) {
+	onVerifySuccessIssue: function(data) {
 		$("#IRMA_status_icon").prop("src", "../../img/irma_icon_ok_520px.png");
 		$("#IRMA_status_text").html("Hit 'CONTINUE' to proceed to the issuing step");
 		$("#IRMA_button_verify").html("CONTINUE");
@@ -308,6 +433,19 @@ var IRMA = {
 		$("#IRMA_status_text").html(text);
 		$("#IRMA_button_verify").html(status);
 	},
+
+	// Helpers
+	make_array_from_map: function(map) {
+		var array = [];
+		var i = 0;
+		for(var key in map) {
+			if(map.hasOwnProperty(key)) {
+				array[i] = {name: key, value: map[key]};
+				i += 1;
+			}
+		}
+		return array;
+	}
 };
 
 //$(function() {

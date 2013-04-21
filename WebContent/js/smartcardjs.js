@@ -53,6 +53,7 @@
 						  response.slice(-4) === "6985" /* FIXME: Workaround for broken signature verification on the card */)) {
 					  // Don't bother continuing when the response is not ok
 					  responses['smartcardstatus'] = 'failed';
+					  responses['failed-key'] = commands[i].key;
 					  break;
 				  }
 			  }

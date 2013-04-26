@@ -162,7 +162,8 @@ public abstract class ProtocolBaseResource extends ServerResource  {
 	 * @return
 	 */
 	public String getBaseURL() {
-		return getReference().getScheme() +"://" + getReference().getHostDomain() + ":" + getReference().getHostPort();
+		int port = getReference().getHostPort();		
+		return getReference().getScheme() +"://" + getReference().getHostDomain() + (port > 0 ? ":" + port : "");
 	}
 	
 	public String makeResponseURL(String id, int step) {

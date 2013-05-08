@@ -2,7 +2,6 @@ package org.irmacard.web.restapi.resources;
 
 import java.lang.reflect.Field;
 import java.math.BigInteger;
-import java.util.List;
 
 import net.sourceforge.scuba.smartcards.ProtocolCommand;
 import net.sourceforge.scuba.smartcards.ProtocolCommands;

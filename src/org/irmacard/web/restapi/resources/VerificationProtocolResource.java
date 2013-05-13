@@ -58,11 +58,22 @@ public class VerificationProtocolResource extends ProtocolBaseResource {
 				if (attr != null) {
 					ps.status = "success";
 					if (verifier.equalsIgnoreCase("NYTimes")) {
-						ps.result = "http://www.nytimes.com";
+						String age = new String(attr.get("over12"));
+						if (age.equalsIgnoreCase("yes")) {
+							ps.result = "http://www.nytimes.com";
+							ProtocolState.putResult(id, ps.result);
+						} else {
+							ps.status = "failure";
+						}
 					} else {
-						ps.result = "http://spuitenenslikken.bnn.nl";
+						String age = new String(attr.get("over16"));
+						if (age.equalsIgnoreCase("yes")) {
+							ps.result = "http://spuitenenslikken.bnn.nl";
+							ProtocolState.putResult(id, ps.result);
+						} else {
+							ps.status = "failure";
+						}
 					}
-					ProtocolState.putResult(id, ps.result);
 				}
 			} catch (CredentialsException e) {
 				e.printStackTrace();

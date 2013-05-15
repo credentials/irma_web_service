@@ -7,12 +7,23 @@ var IRMA = {
 	issue_url: '',
 	responseurl: '',
 
+	// Some state to keep track of what we are verifying now
+	current_verification_idx: 0,
+	verification_commands: {},
+	verification_responses: {},
+
 	verification_names: {},
+
+	Handler: ProxyReader,
 
 	init: function() {
 		IRMA.load_extra_html(IRMA.irma_html + "issue.html");
 		IRMA.load_extra_html(IRMA.irma_html + "verify.html");
 		IRMA.load_extra_html(IRMA.irma_html + "qr.html");
+
+		// Initialize readers
+		// FIXME: add SmartCardthis.Handler
+		ProxyReader.init();
 	},
 
 	load_extra_html: function(url) {
@@ -39,31 +50,32 @@ var IRMA = {
 
 	start_verify: function() {
 		IRMA.disableVerify(); // Reset state
-		SmartCardHandler.init();
 		console.log("Starting IRMA verification");
 		
 		IRMA.show_verify();
 		IRMA.retrieve_verifications();
 		
-		// Setup handlers
-		SmartCardHandler.bind("cardInserted", function() {
-			SmartCardHandler.connectFirstCard();
-			if (SmartCardHandler.selectApplet(IRMA.irma_aid)) {
-				IRMA.enableVerify();
-			} else {
-				IRMA.show_warning("Inserted card is not an IRMA card");
-			}
-			SmartCardHandler.bind("cardRemoved", function() {
+		// Temporary readerFound message
+		this.Handler.bind("cardReaderFound", function() {
+			$("#qr_overlay").hide();
+		});
+
+		// Setup this.Handlers
+		this.Handler.bind("cardInserted", function() {
+			// this.Handler.connectFirstCard();
+			IRMA.Handler.selectApplet(IRMA.irma_aid, IRMA.enableVerify,
+					function() { IRMA.show_warning("Inserted card is not an IRMA card"); });
+			IRMA.Handler.bind("cardRemoved", function() {
 				IRMA.disableVerify();
 			});
 		});
 		
 		//IRMA.setup_qr_code();
 
-		SmartCardHandler.connectFirstCard();
-		if (SmartCardHandler.connectFirstCard() && SmartCardHandler.selectApplet(IRMA.irma_aid)) {
-			IRMA.enableVerify();
-		};
+//		this.this.Handler.connectFirstCard();
+//		if (this.this.Handler.connectFirstCard() && this.this.Handler.selectApplet(IRMA.irma_aid)) {
+//			IRMA.enableVerify();
+//		};
 	},
 	
 	retrieve_verifications: function() {
@@ -142,26 +154,50 @@ var IRMA = {
 		$("#IRMA_button_verify").removeClass("enabled");
 		$("#IRMA_button_verify").html("VERIFYING...");
 
-		SmartCardHandler.bind("cardRemoved", function() {});
+		IRMA.Handler.bind("cardRemoved", function() {});
 		$.ajax({
 			url : lastData.responseurl,
 			contentType : 'application/json',
 			type : 'POST',
 			success: function(data) {
+				console.log("Starting verification");
 				console.log(data);
-				nextAction = data;
-				SmartCardHandler.connectFirstCard();
-				var responses = {};
-				for (var key in data.commandsSets) {
-					if(data.commandsSets.hasOwnProperty(key)) {
-						var commands = data.commandsSets[key];
-						responses[key] = SmartCardHandler.transmitCommandSet(commands);
-					}
-				}
-				console.log(responses);
-				IRMA.finishVerify(responses, data);
+				IRMA.verification_responses = {};
+				IRMA.verification_commands = IRMA.make_array_from_map(data.commandsSets);
+				console.log("Verification commands set to: ", IRMA.verification_commands);
+				IRMA.current_verification_idx = 0;
+				IRMA.responseurl = data.responseurl;
+
+				IRMA.verifyStepOne();
 			}
 		});
+	},
+
+	// Select next set of commands to send
+	verifyStepOne: function() {
+		if(IRMA.current_verification_idx >= IRMA.verification_commands.length) {
+			// We are done
+			console.log("We are done!");
+			console.log(IRMA.verification_responses);
+			IRMA.finishVerify(IRMA.verification_responses, IRMA.verification_data);
+			return;
+		}
+
+		console.log(IRMA.verification_commands);
+		var commands = IRMA.verification_commands[IRMA.current_verification_idx];
+		IRMA.Handler.transmitCommandSet(commands.value, IRMA.verifyStepTwo);
+	},
+
+	// Store the result
+	verifyStepTwo: function(responses) {
+		var commands = IRMA.verification_commands[IRMA.current_verification_idx];
+		console.log("This is what we had to do", commands);
+		console.log("This is what we got: ", responses);
+		IRMA.verification_responses[commands.name] = responses.arguments.responses;
+
+		// Goto next verification
+		IRMA.current_verification_idx++;
+		IRMA.verifyStepOne();
 	},
 	
 	finishVerify: function(responses, data) {
@@ -180,7 +216,7 @@ var IRMA = {
 		
 		// Send results to webserver
 		$.ajax({
-			url : data.responseurl,
+			url : this.responseurl,
 			contentType : 'application/json',
 			data : JSON.stringify(responses),
 			type : 'POST',
@@ -230,21 +266,21 @@ var IRMA = {
 			success: IRMA.display_issue_credentials,
 		});
 
-		// Handlers
-		SmartCardHandler.bind("cardInserted", function() {
-			SmartCardHandler.connectFirstCard();
-			if (SmartCardHandler.selectApplet(IRMA.irma_aid)) {
+		// this.Handlers
+		this.Handler.bind("cardInserted", function() {
+			this.Handler.connectFirstCard();
+			if (this.Handler.selectApplet(IRMA.irma_aid)) {
 				IRMA.enable_issue();
 			} else {
 				$("#IRMA_status_icon").prop("src", "../../img/irma_icon_warning_520px.png");
 				$("#IRMA_status_text").html("Inserted card is not an IRMA card");
 			}
-			SmartCardHandler.bind("cardRemoved", function() {
+			this.Handler.bind("cardRemoved", function() {
 				IRMA.disable_issue();
 			});
 		});
 
-		if (SmartCardHandler.connectFirstCard() && SmartCardHandler.selectApplet(IRMA.irma_aid)) {
+		if (this.Handler.connectFirstCard() && this.Handler.selectApplet(IRMA.irma_aid)) {
 			IRMA.enable_issue();
 		}
 	},
@@ -254,13 +290,13 @@ var IRMA = {
 		$("#IRMA_button_issue").off("click");
 		$("#IRMA_button_issue").removeClass("enabled");
 		$("#IRMA_button_issue").html("ISSUING...");
-		SmartCardHandler.bind("cardRemoved", function() {});
+		this.Handler.bind("cardRemoved", function() {});
 
 		IRMA.irma_issue_state = "issue";
 		IRMA.current_credential_idx = 0;
 		IRMA.current_credential = IRMA.selection[IRMA.current_credential_idx];
 
-		console.log(SmartCardHandler.applet.verifyPin());
+		console.log(this.Handler.applet.verifyPin());
 		IRMA.issue_step_one();
 	},
 
@@ -276,7 +312,7 @@ var IRMA = {
 				console.log(data);
 				IRMA.responseurl = data.responseurl;
 
-				var response = SmartCardHandler.transmitCommandSet(data.commands);
+				var response = this.Handler.transmitCommandSet(data.commands);
 				console.log(response);
 				if(response.smartcardstatus === "failed") {
 					IRMA.handle_issue_failure(response);
@@ -301,7 +337,7 @@ var IRMA = {
 				console.log(data);
 				IRMA.responseurl = data.responseurl;
 
-				var response = SmartCardHandler.transmitCommandSet(data.commands);
+				var response = this.Handler.transmitCommandSet(data.commands);
 				console.log(response);
 				if(response.smartcardstatus === "failed") {
 					IRMA.handle_issue_failure(response);

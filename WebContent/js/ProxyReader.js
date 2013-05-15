@@ -45,7 +45,6 @@ var ProxyReader = {
 			// The Proxy app needs to listen to
 			console.log("HELLO HELLO: ", ProxyReader.toProxy.qr_url);
 			$("#qr_image").attr("src", ProxyReader.toProxy.qr_url);
-			$("#qr_overlay").show();
 			
 			// Tell the proxy where to send its responses
 			ProxyReader.toProxy.send({write_url: ProxyReader.fromProxy.write_url});
@@ -93,6 +92,18 @@ var ProxyReader = {
 		cmd.arguments.commands = commands;
 		console.log(cmd);
 		
+		this.register_callback(cmd.id, callback);
+		this.toProxy.send(cmd);
+	},
+
+	verifyPin: function(callback) {
+		var cmd = {};
+		cmd.type = "command";
+		cmd.name = "authorizeWithPin";
+		cmd.id = this.randomId();
+		cmd.arguments = {};
+		console.log(cmd);
+
 		this.register_callback(cmd.id, callback);
 		this.toProxy.send(cmd);
 	},

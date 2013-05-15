@@ -51,7 +51,8 @@ var IRMA = {
 	start_verify: function() {
 		IRMA.disableVerify(); // Reset state
 		console.log("Starting IRMA verification");
-		
+
+		IRMA.setup_qr();
 		IRMA.show_verify();
 		IRMA.retrieve_verifications();
 		
@@ -69,8 +70,6 @@ var IRMA = {
 				IRMA.disableVerify();
 			});
 		});
-		
-		//IRMA.setup_qr_code();
 
 //		this.this.Handler.connectFirstCard();
 //		if (this.this.Handler.connectFirstCard() && this.this.Handler.selectApplet(IRMA.irma_aid)) {
@@ -105,49 +104,11 @@ var IRMA = {
 	    $(".IRMA_content_credential").html(data.info.verification_names['800']);
 	},
 	
-	// This still needs some cleaning up!
-	setup_qr_code: function() {
+	setup_qr: function() {
 		$("#IRMA_button_usephone").on("click",function(event) {
-			$("#qr_image").attr("src", data.info.qr_url);
 			$("#qr_overlay").show();
-			checkInterval = window.setInterval(function(){
-				var url = data.info.qr_url.substring(0, data.info.qr_url.lastIndexOf("/")) + '/status';
-				$.get(url,function(data) {
-					if (data.status !== "start") {
-						$("#qr_overlay").hide();
-						$("#IRMA_status_icon").prop("src", "../../img/irma_icon_ready_520px.png");
-						$("#IRMA_status_text").html("Apply your IRMA card to your phone");
-						$("#IRMA_button_verify").html("VERIFYING...");
-					} 
-					if (data.status === "issueready") {
-						$("#IRMA_status_icon").prop("src", "../../img/irma_icon_ok_520px.png");
-						$("#IRMA_status_text").html("Hit 'CONTINUE' to proceed to the issuing step");
-						$("#IRMA_button_verify").html("CONTINUE");
-						$("#IRMA_button_verify").addClass("enabled");
-						$("#IRMA_button_verify").button().on("click", function(event) {
-							startIssue(attributesurl);
-						});
-					}
-					if (data.status === "issuing") {
-						$("#IRMA_button_issue").html("ISSUING...");
-					}
-					if (data.status === "error") {
-						window.clearInterval(checkInterval);
-						IRMA.show_failure_credential_not_found();
-					}
-					if (data.status === "success") {
-						window.clearInterval(checkInterval);
-						IRMA.onVerifySuccess();
-					}
-					if (data.status === "failure") {
-						window.clearInterval(checkInterval);
-						IRMA.show_failure_credential_not_found();
-					}
-				}, "json");
-			},500);
 		});
 	},
-
 	
 	verifyButtonClicked: function(event) {
 		$("#IRMA_button_verify").off("click");
@@ -267,6 +228,7 @@ var IRMA = {
 		});
 
 		// this.Handlers
+		// FIXME: how to handle this in case of cardProxy?
 		this.Handler.bind("cardInserted", function() {
 			this.Handler.connectFirstCard();
 			if (this.Handler.selectApplet(IRMA.irma_aid)) {
@@ -280,9 +242,10 @@ var IRMA = {
 			});
 		});
 
-		if (this.Handler.connectFirstCard() && this.Handler.selectApplet(IRMA.irma_aid)) {
+		// fix this as well.
+		//if (this.Handler.connectFirstCard() && this.Handler.selectApplet(IRMA.irma_aid)) {
 			IRMA.enable_issue();
-		}
+		//}
 	},
 
 	issue_button_clicked: function(event) {
@@ -290,14 +253,23 @@ var IRMA = {
 		$("#IRMA_button_issue").off("click");
 		$("#IRMA_button_issue").removeClass("enabled");
 		$("#IRMA_button_issue").html("ISSUING...");
-		this.Handler.bind("cardRemoved", function() {});
+		IRMA.Handler.bind("cardRemoved", function() {});
 
 		IRMA.irma_issue_state = "issue";
 		IRMA.current_credential_idx = 0;
 		IRMA.current_credential = IRMA.selection[IRMA.current_credential_idx];
 
-		console.log(this.Handler.applet.verifyPin());
-		IRMA.issue_step_one();
+		IRMA.Handler.verifyPin(IRMA.issue_start);
+	},
+
+	issue_start: function(response) {
+		console.log("Pin verified", response);
+		if(response.arguments.result === "success") {
+			IRMA.issue_step_one();
+		} else {
+			// FIXME Do some error handling
+			// TODO test blocking pin and feedback for that
+		}
 	},
 
 	issue_step_one: function() {
@@ -312,16 +284,20 @@ var IRMA = {
 				console.log(data);
 				IRMA.responseurl = data.responseurl;
 
-				var response = this.Handler.transmitCommandSet(data.commands);
-				console.log(response);
-				if(response.smartcardstatus === "failed") {
-					IRMA.handle_issue_failure(response);
-					IRMA.issue_next_credential();
-				} else {
-					IRMA.issue_step_two(response);
-				}
+				IRMA.Handler.transmitCommandSet(data.commands, IRMA.issue_step_one_process);
 			}
 		});
+	},
+
+	issue_step_one_process: function(data) {
+		var response = data.arguments.responses;
+		console.log(response);
+		if(response.smartcardstatus === "failed") {
+			IRMA.handle_issue_failure(response);
+			IRMA.issue_next_credential();
+		} else {
+			IRMA.issue_step_two(response);
+		}
 	},
 
 	issue_step_two: function(response) {
@@ -337,16 +313,20 @@ var IRMA = {
 				console.log(data);
 				IRMA.responseurl = data.responseurl;
 
-				var response = this.Handler.transmitCommandSet(data.commands);
-				console.log(response);
-				if(response.smartcardstatus === "failed") {
-					IRMA.handle_issue_failure(response);
-					IRMA.issue_next_credential();
-				} else {
-					IRMA.issue_step_three(response);
-				}
+				IRMA.Handler.transmitCommandSet(data.commands, IRMA.issue_step_two_process);
 			}
 		});
+	},
+
+	issue_step_two_process: function(data) {
+		var response = data.arguments.responses;
+		console.log(response);
+		if(response.smartcardstatus === "failed") {
+			IRMA.handle_issue_failure(response);
+			IRMA.issue_next_credential();
+		} else {
+			IRMA.issue_step_three(response);
+		}
 	},
 
 	issue_step_three: function(response) {

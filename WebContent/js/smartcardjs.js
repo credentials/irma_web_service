@@ -35,16 +35,20 @@
 			  console.log("Connecting");
 			  return this.applet.connectFirstCard();
 		  },
-		  selectApplet: function(aid) {
+		  selectApplet: function(aid, success, failure) {
 			  var hexlength = (aid.length/2).toString(16),
 			  	  selectAPDU = '00A40400' + (hexlength.length == 1 ? '0' : '') + hexlength + aid + '00';
-			  return this.transmit(selectAPDU).slice(-4) === '9000';
+			  if(this.transmit(selectAPDU).slice(-4) === '9000') {
+				  success();
+			  } else {
+				  failure();
+			  };
 		  },
 		  transmit: function(command) {
 			  console.log("Transmit: " + command);
 			  return this.applet.transmitString(command);
 		  },
-		  transmitCommandSet: function(commands) {
+		  transmitCommandSet: function(commands, callback) {
 			  var responses = {};
 			  for(var i=0, len=commands.length; i < len; i++) {
 				  response = this.transmit(commands[i].command);
@@ -57,7 +61,31 @@
 					  break;
 				  }
 			  }
-			  return responses;
+
+			  // Construct well-formed result
+			  var result = {};
+			  result.type = "response";
+			  result.name = "transmitCommandSet";
+			  result.arguments = {"responses": responses};
+			  callback(result);
+		  },
+		  verifyPin: function(callback) {
+			  tries = 3;
+			  while(tries > 0 && tries < 10) {
+				  // Repeat since pin incorrect
+				  // FIXME: need better feedback for this but that needs to go into applet.
+				  tries = this.applet.verifyPin();
+				  console.log("Pin Incorrect, tries left: " + tries);
+			  }
+
+			  var response = {type: "response", name: "authorizeWithPin", arguments: {}};
+
+			  if(tries == 0) {
+				  response.arguments.result = "failure";
+			  } else {
+				  response.arguments.result = "success";
+			  }
+			  callback(response);
 		  },
 		  // Merge above two at one time
 		  transmitCommandSetWithCB: function(commands, callback) {

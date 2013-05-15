@@ -7,6 +7,8 @@ var IRMA = {
 	issue_url: '',
 	responseurl: '',
 
+	card_connected: false,
+
 	// Some state to keep track of what we are verifying now
 	current_verification_idx: 0,
 	verification_commands: {},
@@ -15,6 +17,9 @@ var IRMA = {
 	verification_names: {},
 
 	Handler: ProxyReader,
+	cardInsertedCallback: function(data, handler) {},
+	cardRemovedCallback: function(data) {},
+	readerFoundCallback: function(data, handler) {},
 
 	init: function() {
 		IRMA.load_extra_html(IRMA.irma_html + "issue.html");
@@ -22,8 +27,30 @@ var IRMA = {
 		IRMA.load_extra_html(IRMA.irma_html + "qr.html");
 
 		// Initialize readers
-		// FIXME: add SmartCardthis.Handler
 		ProxyReader.init();
+		SmartCardHandler.init();
+
+		// Setup callbacks for readers
+		IRMA.bindCallback("cardInserted", IRMA.cardInsertedInternal);
+		IRMA.bindCallback("cardRemoved", IRMA.cardRemovedCallback);
+		IRMA.bindCallback("cardReaderFound", IRMA.processCardReader);
+	},
+
+	bindCallback: function(event, fct) {
+		ProxyReader.bind(event, function(data) {fct(data, ProxyReader);});
+		SmartCardHandler.bind(event, function(data) {fct(data, SmartCardHandler);});
+	},
+
+	cardInsertedInternal: function(data, handler) {
+		IRMA.Handler = handler;
+		if(handler === SmartCardHandler) {
+			// Card inserted into SmartCardHandler, connect to it
+			// FIXME: this would be the place to final fix this
+			console.log("Connecting to card for applet");
+			SmartCardHandler.connectFirstCard();
+		}
+		IRMA.card_connected = true;
+		IRMA.cardInsertedCallback(data);
 	},
 
 	load_extra_html: function(url) {
@@ -56,25 +83,19 @@ var IRMA = {
 		IRMA.show_verify();
 		IRMA.retrieve_verifications();
 		
-		// Temporary readerFound message
-		this.Handler.bind("cardReaderFound", function() {
+		this.cardReaderFound = function(data, handler) {
+			// FIXME: test if we got the phone as handler
 			$("#qr_overlay").hide();
-		});
+		};
 
 		// Setup this.Handlers
-		this.Handler.bind("cardInserted", function() {
-			// this.Handler.connectFirstCard();
+		IRMA.cardInsertedCallback = function() {
 			IRMA.Handler.selectApplet(IRMA.irma_aid, IRMA.enableVerify,
 					function() { IRMA.show_warning("Inserted card is not an IRMA card"); });
-			IRMA.Handler.bind("cardRemoved", function() {
+			IRMA.cardRemovedCallback = function() {
 				IRMA.disableVerify();
-			});
-		});
-
-//		this.this.Handler.connectFirstCard();
-//		if (this.this.Handler.connectFirstCard() && this.this.Handler.selectApplet(IRMA.irma_aid)) {
-//			IRMA.enableVerify();
-//		};
+			};
+		};
 	},
 	
 	retrieve_verifications: function() {
@@ -86,7 +107,7 @@ var IRMA = {
 			success: function(data) {
 				console.log("Got data for step 0");
 				console.log(data);
-				lastData = data;
+				IRMA.responseurl = data.responseurl;
 				IRMA.show_verifications(data);
 			}
 		});
@@ -117,7 +138,7 @@ var IRMA = {
 
 		IRMA.Handler.bind("cardRemoved", function() {});
 		$.ajax({
-			url : lastData.responseurl,
+			url : IRMA.responseurl,
 			contentType : 'application/json',
 			type : 'POST',
 			success: function(data) {
@@ -227,25 +248,18 @@ var IRMA = {
 			success: IRMA.display_issue_credentials,
 		});
 
-		// this.Handlers
-		// FIXME: how to handle this in case of cardProxy?
-		this.Handler.bind("cardInserted", function() {
-			this.Handler.connectFirstCard();
-			if (this.Handler.selectApplet(IRMA.irma_aid)) {
-				IRMA.enable_issue();
-			} else {
+		IRMA.cardInsertedCallback = function() {
+			IRMA.Handler.selectApplet(IRMA.irma_aid, IRMA.enable_issue, function() {
 				$("#IRMA_status_icon").prop("src", "../../img/irma_icon_warning_520px.png");
 				$("#IRMA_status_text").html("Inserted card is not an IRMA card");
-			}
-			this.Handler.bind("cardRemoved", function() {
-				IRMA.disable_issue();
 			});
-		});
+			IRMA.cardRemovedCallback = function() {IRMA.disable_issue();};
+		};
 
-		// fix this as well.
-		//if (this.Handler.connectFirstCard() && this.Handler.selectApplet(IRMA.irma_aid)) {
+		if(IRMA.card_connected) {
 			IRMA.enable_issue();
-		//}
+			IRMA.cardRemovedCallback = function() {IRMA.disable_issue();};
+		}
 	},
 
 	issue_button_clicked: function(event) {

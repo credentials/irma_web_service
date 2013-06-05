@@ -92,7 +92,24 @@ var ProxyReader = {
 		cmd.arguments.commands = commands;
 		console.log(cmd);
 		
-		this.register_callback(cmd.id, callback);
+		// Check whether one of the commands failed
+		var wrapper_fct = function(data) {
+			var responses = data.arguments.responses;
+			for(var key in responses) {
+				if(responses.hasOwnProperty(key)) {
+					var response = responses[key];
+					if(!(response.apdu.slice(-4) === "9000" ||
+						response.apdu.slice(-4) === "6985" /* FIXME: Workaround for broken signature verification on the card */)) {
+						responses["smartcardstatus"] = "failed";
+						responses["failed-key"] = key;
+					}
+				}
+			}
+			data.arguments.responses = responses;
+			callback(data);
+		};
+
+		this.register_callback(cmd.id, wrapper_fct);
 		this.toProxy.send(cmd);
 	},
 

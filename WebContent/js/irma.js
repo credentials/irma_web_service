@@ -17,9 +17,6 @@ var IRMA = {
 	verification_names: {},
 
 	Handler: ProxyReader,
-	cardInsertedCallback: function(data, handler) {},
-	cardRemovedCallback: function(data) {},
-	readerFoundCallback: function(data, handler) {},
 
 	init: function() {
 		IRMA.load_extra_html(IRMA.irma_html + "issue.html");
@@ -29,11 +26,6 @@ var IRMA = {
 		// Initialize readers
 		ProxyReader.init();
 		SmartCardHandler.init();
-
-		// Setup callbacks for readers
-		IRMA.bindCallback("cardInserted", IRMA.cardInsertedInternal);
-		IRMA.bindCallback("cardRemoved", IRMA.cardRemovedCallback);
-		IRMA.bindCallback("cardReaderFound", IRMA.processCardReader);
 	},
 
 	bindCallback: function(event, fct) {
@@ -41,16 +33,18 @@ var IRMA = {
 		SmartCardHandler.bind(event, function(data) {fct(data, SmartCardHandler);});
 	},
 
-	cardInsertedInternal: function(data, handler) {
-		IRMA.Handler = handler;
-		if(handler === SmartCardHandler) {
-			// Card inserted into SmartCardHandler, connect to it
-			// FIXME: this would be the place to final fix this
-			console.log("Connecting to card for applet");
-			SmartCardHandler.connectFirstCard();
-		}
-		IRMA.card_connected = true;
-		IRMA.cardInsertedCallback(data);
+	createCardInsertedCallback: function(callback) {
+		return function(data, handler) {
+			IRMA.Handler = handler;
+			if(handler === SmartCardHandler) {
+				// Card inserted into SmartCardHandler, connect to it
+				// FIXME: this would be the place to final fix this
+				console.log("Connecting to card for applet");
+				SmartCardHandler.connectFirstCard();
+			}
+			IRMA.card_connected = true;
+			callback(data);
+		};
 	},
 
 	load_extra_html: function(url) {
@@ -83,19 +77,19 @@ var IRMA = {
 		IRMA.show_verify();
 		IRMA.retrieve_verifications();
 		
-		this.cardReaderFound = function(data, handler) {
-			// FIXME: test if we got the phone as handler
+		console.log("Overriding readerfoundCallback");
+		IRMA.bindCallback("cardReaderFound", function() {
 			$("#qr_overlay").hide();
-		};
+		});
 
 		// Setup this.Handlers
-		IRMA.cardInsertedCallback = function() {
+		IRMA.bindCallback("cardInserted", IRMA.createCardInsertedCallback(function() {
 			IRMA.Handler.selectApplet(IRMA.irma_aid, IRMA.enableVerify,
 					function() { IRMA.show_warning("Inserted card is not an IRMA card"); });
-			IRMA.cardRemovedCallback = function() {
+			IRMA.bindCallback("cardRemoved", function() {
 				IRMA.disableVerify();
-			};
-		};
+			});
+		}));
 	},
 	
 	retrieve_verifications: function() {
@@ -248,17 +242,17 @@ var IRMA = {
 			success: IRMA.display_issue_credentials,
 		});
 
-		IRMA.cardInsertedCallback = function() {
+		IRMA.bindCallback("cardInserted", IRMA.createCardInsertedCallback(function() {
 			IRMA.Handler.selectApplet(IRMA.irma_aid, IRMA.enable_issue, function() {
 				$("#IRMA_status_icon").prop("src", "../../img/irma_icon_warning_520px.png");
 				$("#IRMA_status_text").html("Inserted card is not an IRMA card");
 			});
-			IRMA.cardRemovedCallback = function() {IRMA.disable_issue();};
-		};
+			IRMA.bindCallback("cardRemoved", function() {IRMA.disable_issue();});
+		}));
 
 		if(IRMA.card_connected) {
 			IRMA.enable_issue();
-			IRMA.cardRemovedCallback = function() {IRMA.disable_issue();};
+			IRMA.bindCallback("cardRemoved", function() {IRMA.disable_issue();});
 		}
 	},
 

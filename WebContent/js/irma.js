@@ -161,6 +161,8 @@ var IRMA = {
 
 		console.log(IRMA.verification_commands);
 		var commands = IRMA.verification_commands[IRMA.current_verification_idx];
+		IRMA.Handler.sendFeedback("Verifying "
+				+ IRMA.verification_names[commands.name], "none");
 		IRMA.Handler.transmitCommandSet(commands.value, IRMA.verifyStepTwo);
 	},
 
@@ -189,7 +191,9 @@ var IRMA = {
 				}
 			}
 		}
-		
+
+		IRMA.Handler.sendFeedback("Done", "none");
+
 		// Send results to webserver
 		$.ajax({
 			url : this.responseurl,
@@ -283,6 +287,8 @@ var IRMA = {
 	issue_step_one: function() {
 		IRMA.issue_set_active(IRMA.current_credential);
 		IRMA.issue_set_status(IRMA.current_credential, "Issuing..");
+		IRMA.Handler.sendFeedback("Issueing " + IRMA.current_credential, "none");
+
 		$.ajax({
 			url: IRMA.issue_url + '/' + IRMA.current_credential + '/1',
 			contentType: 'application/json',
@@ -469,6 +475,7 @@ var IRMA = {
 	show_warning: function(text) {
         $("#IRMA_status_icon").prop("src", "../../img/irma_icon_warning_520px.png");
         $("#IRMA_status_text").html(text);
+        IRMA.Handler.sendFeedback(text, "warning");
 	},
 	
 	show_failure_credential_not_found: function() {
@@ -483,21 +490,26 @@ var IRMA = {
 		$("#IRMA_status_icon").prop("src", "../../img/irma_icon_warning_520px.png");
 		$("#IRMA_status_text").html(text);
 		$("#IRMA_button_verify").html(status);
+		IRMA.Handler.sendFeedback(text, "failure");
 	},
 	
 	show_failure: function(text, status) {
 		$("#IRMA_status_icon").prop("src", "../../img/irma_icon_missing_520px.png");
 		$("#IRMA_status_text").html(text);
+		IRMA.Handler.sendFeedback(text, "failure");
 		$("#IRMA_button_verify").html(status);
 	},
 
 	issue_set_status: function(credential, text) {
+		IRMA.Handler.sendFeedback(text, "none");
 		$("#IRMA-issue-status-" + credential).html("(" + text + ")");
 	},
 
 	issue_set_error: function(credential, text) {
 		IRMA.issue_set_status(credential, text);
 		IRMA.issue_set_failed(credential);
+		console.log(credential);
+		IRMA.Handler.sendFeedback(text, "failure");
 	},
 
 	issue_set_active: function(credential) {

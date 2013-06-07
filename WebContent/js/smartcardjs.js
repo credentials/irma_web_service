@@ -48,6 +48,10 @@
 			  console.log("Transmit: " + command);
 			  return this.applet.transmitString(command);
 		  },
+		  sendFeedback: function(message, state) {
+			// Not possible on normal cardreaders
+			  console.log("CardReader feedback: " + message);
+		  },
 		  transmitCommandSet: function(commands, callback) {
 			  var responses = {};
 			  for(var i=0, len=commands.length; i < len; i++) {

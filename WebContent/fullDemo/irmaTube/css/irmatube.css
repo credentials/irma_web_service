@@ -1,0 +1,17 @@
+#movies {
+	padding: 10px;
+}
+
+#arrow {
+	margin-left: 75px;
+	width: 50px;
+	height: 50px;
+}
+
+.video-overlay {
+	position: absolute; left: 20%; top: 20%; display: block;
+	border: 0px; width: 700px; height: 450px;
+	text-align: center; vertical-align: middle;
+	background: lightgray; z-index: 10;
+	display: none;
+}

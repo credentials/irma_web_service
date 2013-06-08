@@ -11,28 +11,12 @@
  <link href="../../css/irma.css" rel="stylesheet" type="text/css" />
  <link href="../../css/mosaic.css" rel="stylesheet" type="text/css" />
  <link href="../../css/bootstrap.css" rel="stylesheet" type="text/css" />
- <style type="text/css">
-  #movies {
-  	width: 100%;
-  	padding: 10px;
-  }
-  #arrow {
-  	margin-left: 75px;
-  	width: 50px;
-  	height: 50px;
-  }
-  .video-overlay {
-    position: absolute; left: 20%; top: 20%; display: block;
-    border: 0px; width: 700px; height: 450px;
-    text-align: center; vertical-align: middle;
-    background: lightgray; z-index: 10;
-    display: none;
-  }
- </style>
- 
+ <link href="css/irmatube.css" rel="stylesheet" type="text/css" />
 
  <script src="../../js/jquery-1.8.1.min.js" type="text/javascript"></script>
  <script src="../../js/mosaic.1.0.1.min.js" type="text/javascript"></script>
+ <script src="../../js/mustache.js" type="text/javascript"></script>
+
 <!--
  <script src="../../js/smartcardjs.js" type="text/javascript"></script>
  <script src="../../js/channel.js" type="text/javascript"></script>
@@ -40,14 +24,12 @@
  <script src="../../js/bootstrap.min.js" type="text/javascript"></script>
  <script src="../../js/irma.js" type="text/javascript"></script>
  -->
-
- <script src="../../js/mustache.js" type="text/javascript"></script>
-
  <script id="movieTpl" type="text/template">
    <div id="movie_{{number}}_wrapper">
      <div class="video-overlay" id="video_div_{{number}}">
        <video controls="controls" preload="true" id="video_{{number}}" height="400" width="700">
-	     <source src="content/movie_{{number}}.mp4" type="video/{{format}}">
+	     <source src="content/movie_{{number}}.webm" type="video/webm">
+         <source src="content/movie_{{number}}.mp4" type="video/mp4">
 	     Your browser does not support the video tag.
        </video>
        <button onclick="closeWindow({{number}})">Close</button>
@@ -73,35 +55,29 @@
 	
  <script type="text/javascript">
   function openWindow(videoNumber) {
-   video_div = "video_div_" + videoNumber;
-   video = "video_" + videoNumber;
-   document.getElementById(video_div).style.display = 'block';
-   document.getElementById(video).play();
+   $("#video_div_" + videoNumber).css("display", "block");
+   $("#video_" + videoNumber).get(0).play();
   }
 
   function closeWindow(videoNumber) {
-   video_div = "video_div_" + videoNumber;
-   video = "video_" + videoNumber;
-   document.getElementById(video_div).style.display = 'none';
-   document.getElementById(video).pause();
+   $("#video_div_" + videoNumber).css("display", "none");
+   $("#video_" + videoNumber).get(0).pause();
   }
   
  $( function() {
-    function addMovie(number, title, titleCode, ageLimit, format) {
-      movie = {number: number, title: title, titleCode: titleCode, ageLimit: ageLimit, format: format};
+    function addMovie(number, title, titleCode, ageLimit) {
+      movie = {number: number, title: title, titleCode: titleCode, ageLimit: ageLimit};
       console.log(movie);
       
       var template = $("#movieTpl").html();
-      console.log("Template", template);
-      console.log(Mustache.to_html(template, movie));
       $("#movies").append(Mustache.to_html(template, movie));
       $("#movie_" + number).mosaic({animation: 'slide'});
     };
-    
-    addMovie(500, "Django", "django", 18, "mp4");
-    addMovie(501, "Oblivion", "oblivion", 12, "mp4");
-    addMovie(502, "Oz the Great and Powerful", "oz-the-great-and-powerful", 0, "mp4");
-    addMovie(503, "Olympus Has Fallen", "olympus-has-fallen", 16, "mp4");
+
+    addMovie(500, "Django", "django", 18);
+    addMovie(501, "Oblivion", "oblivion", 12);
+    addMovie(502, "Oz the Great and Powerful", "oz-the-great-and-powerful", 0);
+    addMovie(503, "Olympus Has Fallen", "olympus-has-fallen", 16);
     addMovie(504, "Up", "up", 0, "mp4");
   });
 

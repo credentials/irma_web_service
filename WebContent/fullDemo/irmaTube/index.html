@@ -16,6 +16,7 @@
  <script src="../../js/jquery-1.8.1.min.js" type="text/javascript"></script>
  <script src="../../js/mosaic.1.0.1.min.js" type="text/javascript"></script>
  <script src="../../js/mustache.js" type="text/javascript"></script>
+ <script src="content/movies.js" type="text/javascript"></script>
 
 <!--
  <script src="../../js/smartcardjs.js" type="text/javascript"></script>
@@ -26,17 +27,17 @@
  -->
  <script id="movieTpl" type="text/template">
    <div id="movie_{{number}}_wrapper">
-     <div class="video-overlay" id="video_div_{{number}}">
-       <video controls="controls" preload="true" id="video_{{number}}" height="400" width="700">
-	     <source src="content/movie_{{number}}.webm" type="video/webm">
-         <source src="content/movie_{{number}}.mp4" type="video/mp4">
+     <div class="video-overlay" id="video_div_{{id}}">
+       <video controls="controls" preload="true" id="video_{{id}}" height="400" width="700">
+	     <source src="content/{{id}}.webm" type="video/webm">
+         <source src="content/{{id}}.mp4" type="video/mp4">
 	     Your browser does not support the video tag.
        </video>
-       <button onclick="closeWindow({{number}})">Close</button>
+       <button onclick="closeMovie('{{id}}')">Close</button>
      </div>
 
-     <div class="mosaic-block bar" id="movie_{{number}}">
-	   <span href="#" onclick="openWindow({{number}});" class="mosaic-overlay">
+     <div class="mosaic-block bar" id="movie_{{id}}">
+	   <span href="#" onclick="openMovie('{{id}}');" class="mosaic-overlay">
         <h4>{{title}}
         {{#ageLimit}}
         <a target='_blank' href='IRMA-age-reference.html'>
@@ -47,38 +48,32 @@
        </span>
 
        <div class="mosaic-backdrop">
-        <img alt="{{title}}" src="content/{{number}}-{{titleCode}}.jpg">
+        <img alt="{{title}}" src="content/{{id}}.jpg">
        </div>
      </div>
    </div>
  </script>
 	
  <script type="text/javascript">
-  function openWindow(videoNumber) {
+  function openMovie(videoNumber) {
    $("#video_div_" + videoNumber).css("display", "block");
    $("#video_" + videoNumber).get(0).play();
   }
 
-  function closeWindow(videoNumber) {
+  function closeMovie(videoNumber) {
    $("#video_div_" + videoNumber).css("display", "none");
    $("#video_" + videoNumber).get(0).pause();
   }
   
  $( function() {
-    function addMovie(number, title, titleCode, ageLimit) {
-      movie = {number: number, title: title, titleCode: titleCode, ageLimit: ageLimit};
-      console.log(movie);
-      
-      var template = $("#movieTpl").html();
-      $("#movies").append(Mustache.to_html(template, movie));
-      $("#movie_" + number).mosaic({animation: 'slide'});
-    };
-
-    addMovie(500, "Django", "django", 18);
-    addMovie(501, "Oblivion", "oblivion", 12);
-    addMovie(502, "Oz the Great and Powerful", "oz-the-great-and-powerful", 0);
-    addMovie(503, "Olympus Has Fallen", "olympus-has-fallen", 16);
-    addMovie(504, "Up", "up", 0, "mp4");
+	var template = $("#movieTpl").html();
+	console.log(IRMATubeMovies);
+    for(var i=0; i < IRMATubeMovies.length; i++) {
+        movie = IRMATubeMovies[i];
+        console.log(movie);
+        $("#movies").append(Mustache.to_html(template, movie));
+        $("#movie_" + movie.id).mosaic({animation: 'slide'});
+    }
   });
 
  </script>

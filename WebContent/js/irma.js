@@ -109,14 +109,14 @@ var IRMA = {
 	
 	show_verifications: function(data) {
 		IRMA.verification_names = data.info.verification_names;
+		$(".IRMA_content_verify_credentials").html("");
 		for(var key in IRMA.verification_names) {
 			if(IRMA.verification_names.hasOwnProperty(key)) {
 				var verification = IRMA.verification_names[key];
 				console.log("Hello here: " + verification);
-				$(".IRMA_content_verify").prepend("<span class=\"IRMA_content_credential\">" + verification + "</span>");
+				$(".IRMA_content_verify_credentials").append("<span class=\"IRMA_content_credential\">" + verification + "</span>");
 			}
 		}
-	    $(".IRMA_content_credential").html(data.info.verification_names['800']);
 	},
 	
 	setup_qr: function() {

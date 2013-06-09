@@ -27,7 +27,7 @@ public class MijnOverheidVerificationResource extends
 	}
 
 	@Override
-	public ProtocolStep onSuccess(Map<String, Attributes> attrMap) {
+	public ProtocolStep onSuccess(String id, Map<String, Attributes> attrMap) {
 		ProtocolStep ps = new ProtocolStep();
 
 		Attributes bsn = attrMap.get("rootAll");
@@ -51,7 +51,7 @@ public class MijnOverheidVerificationResource extends
 	}
 
 	@Override
-	public List<VerificationDescription> getVerifications() {
+	public List<VerificationDescription> getVerifications(String id) {
 		List<VerificationDescription> result = new ArrayList<VerificationDescription>();
 		result.add(bsnDesc);
 		return result;

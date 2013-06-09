@@ -22,6 +22,9 @@ public class ProtocolState {
 	private static Map<String,String> stateMap = new HashMap<String, String>();
 	private static Map<String,String> resultMap = new HashMap<String, String>();
 	
+	// State for IRMATube, we store the age that we are verifying
+	private static Map<String, String> irmaTubeAgeMap = new HashMap<String, String>();
+	
 	public static BigInteger getNonce(String id) {
 		return nonceMap.get(id);
 	}
@@ -63,5 +66,12 @@ public class ProtocolState {
 	}
 	public static void putResult(String id, String state) {
 		resultMap.put(id, state);
+	}
+	
+	public static void putIRMATubeAge(String id, String age) {
+		irmaTubeAgeMap.put(id, age);
+	}
+	public static String getIRMATubeAge(String id) {
+		return irmaTubeAgeMap.get(id);
 	}
 }

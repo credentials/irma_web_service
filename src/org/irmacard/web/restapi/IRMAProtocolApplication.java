@@ -38,15 +38,11 @@ public class IRMAProtocolApplication extends Application {
 		CredentialInformation.setCoreLocation(CORE_LOCATION);
 		DescriptionStore.setCoreLocation(CORE_LOCATION);
 
-
-		router.attach("/verification/{verifier}/{specname}", VerificationProtocolResource.class);
-		router.attach("/verification/{verifier}/{specname}/{id}/{step}", VerificationProtocolResource.class);
-		
 		router.attach("/verification/SpuitenEnSlikken", SpuitenEnSlikkenVerificationResource.class);
 		router.attach("/verification/SpuitenEnSlikken/{id}/{step}", SpuitenEnSlikkenVerificationResource.class);
 
-		router.attach("/verification/IRMATube", IRMATubeVerificationResource.class);
-		router.attach("/verification/IRMATube/{id}/{step}", IRMATubeVerificationResource.class);
+		router.attach("/verification/IRMATube/{age}", IRMATubeVerificationResource.class);
+		router.attach("/verification/IRMATube/{age}/{id}/{step}", IRMATubeVerificationResource.class);
 
 		router.attach("/verification/MijnOverheid", MijnOverheidVerificationResource.class);
 		router.attach("/verification/MijnOverheid/{id}/{step}", MijnOverheidVerificationResource.class);
@@ -55,6 +51,9 @@ public class IRMAProtocolApplication extends Application {
 
 		router.attach("/issue/studentCred", IssueStudentCredResource.class);
 		router.attach("/issue/studentCred/{id}/{step}", IssueStudentCredResource.class);
+		
+		router.attach("/verification/{verifier}/{specname}", VerificationProtocolResource.class);
+		router.attach("/verification/{verifier}/{specname}/{id}/{step}", VerificationProtocolResource.class);
 
 		return router;
 	}   

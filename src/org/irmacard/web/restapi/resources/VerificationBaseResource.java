@@ -50,17 +50,17 @@ public abstract class VerificationBaseResource extends ProtocolBaseResource {
 			ps.info.status_url = getReference().getPath() + "/" + id + "/status";
 			ps.info.verification_names = new HashMap<Short, String>();
 			ps.responseurl = makeResponseURL(id, step+1);
-			for(VerificationDescription vd : getVerifications()) {
+			for(VerificationDescription vd : getVerifications(id)) {
 				ps.info.verification_names.put(vd.getID(), vd.getName());
 			}
 			break;
 		case 1:
-			ps = createVerificationProtocolStep(id, getVerifications());
+			ps = createVerificationProtocolStep(id, getVerifications(id));
 			ps.responseurl = makeResponseURL(id, step+1);
 			ProtocolState.putStatus(id, "step1");
 			break;
 		case 2:
-			ps = onSuccess(processVerificationResponse(id, getVerifications(), value));
+			ps = onSuccess(id, processVerificationResponse(id, getVerifications(id), value));
 			ProtocolState.putResult(id, ps.result);
 			break;
 		default:
@@ -70,10 +70,10 @@ public abstract class VerificationBaseResource extends ProtocolBaseResource {
 		System.out.println(gson.toJson(ps));
 		return gson.toJson(ps);
 	}
-
-	public abstract List<VerificationDescription> getVerifications();
 	
-	public abstract ProtocolStep onSuccess(Map<String,Attributes> attrMap);
+	public abstract List<VerificationDescription> getVerifications(String id);
+	
+	public abstract ProtocolStep onSuccess(String id, Map<String,Attributes> attrMap);
 	
 	public static ProtocolStep createVerificationProtocolStep(String id, List<VerificationDescription> specs) {
 		ProtocolStep ps = new ProtocolStep();

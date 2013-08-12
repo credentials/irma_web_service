@@ -53,11 +53,16 @@ var Channel = function() {
 				type : 'POST',
 				cache : false,
 				success : function(data) {
-					var c = new ChannelProto();
-					c.read_url = data.read_url;
-					c.write_url = data.write_url;
-					c.qr_url = data.qr_url;
-					onSucces(c);
+					var toProxy = new ChannelProto();
+					toProxy.read_url = data.side_b_read_url;
+					toProxy.write_url = data.side_a_write_url;
+					toProxy.qr_url = data.qr_url;
+
+					var fromProxy = new ChannelProto();
+					fromProxy.read_url = data.side_a_read_url;
+					fromProxy.write_url = data.side_b_write_url;
+
+					onSucces(toProxy, fromProxy);
 				},
 				error : function(data) {
 					console.log("Error creating channel");

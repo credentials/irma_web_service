@@ -1,6 +1,6 @@
 var ProxyReader = {
 	// Some local variables
-	channelBaseURL: "/cardproxy_web_relay/w",
+	channelBaseURL: "/cardproxy_web_relay/create",
 	
 	// Channels
 	toProxy: null,
@@ -15,32 +15,22 @@ var ProxyReader = {
 	callbacks: {},
 		
 	init: function(url) {
-		ProxyReader.setup_from_proxy();
+		ProxyReader.setup_channels();
 	},
 	
-	setup_from_proxy: function() {
-		// Dirty hack: add parameter to channelBaseURL so that this POST request and
-		// the next for the to proxy channel will not be merged
-		Channel.setup(ProxyReader.channelBaseURL + "?q", function(channel) {
-			console.log("Created from proxy channel", channel);
+	setup_channels: function() {
+		Channel.setup(ProxyReader.channelBaseURL, function(toProxy, fromProxy) {
+			console.log("Created to proxy channel", toProxy);
+			console.log("Created from proxy channel", fromProxy);
 			
-			// Store channel
-			ProxyReader.fromProxy = channel;
+			// Store channels
+			ProxyReader.toProxy = toProxy;
+			ProxyReader.fromProxy = fromProxy;
 			
 			// Bind listen to this
 			ProxyReader.fromProxy.listen( function(msg) {
 				ProxyReader.handle_message(msg);
 			});
-			
-			ProxyReader.setup_to_proxy();
-		});
-	},
-	
-	setup_to_proxy: function() {
-		// Run from within setup_from_proxy()
-		Channel.setup(ProxyReader.channelBaseURL, function(channel) {
-			console.log("Created to proxy channel ", channel);
-			ProxyReader.toProxy = channel;
 			
 			// The Proxy app needs to listen to
 			console.log("HELLO HELLO: ", ProxyReader.toProxy.qr_url);
@@ -48,9 +38,13 @@ var ProxyReader = {
 			
 			// Tell the proxy where to send its responses
 			ProxyReader.toProxy.send({write_url: ProxyReader.fromProxy.write_url});
+		}, function() {
+			//FIXME: handle this in a proper way
+			console.log("Failed to setup from proxy channel");
+			ProxyReader.fromProxy = null;
 		});
 	},
-	
+
 	handle_message: function(msg) {
 		data = JSON.parse(msg);
 		console.log("Got data", data);

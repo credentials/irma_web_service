@@ -90,6 +90,11 @@ var IRMA = {
 				IRMA.disableVerify();
 			});
 		}));
+
+		IRMA.bindCallback("timeout", function() {
+			// TODO not clear how to handle this in the UI
+			console.log("Connection timed out");
+		});
 	},
 	
 	retrieve_verifications: function() {

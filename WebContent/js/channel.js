@@ -1,5 +1,6 @@
 var Channel = function() {
 	var ChannelProto = function() {
+		this.active = true;
 		this.listen = function(dataReceivedCallback) {
 			var thisReadURL = this.read_url;
 			var that = this;
@@ -19,7 +20,9 @@ var Channel = function() {
 						if (data !== "") {
 							dataReceivedCallback(data);
 						}
-						setTimeout(that.waitForMessage, 200); // Wait for 200ms and request next message
+						if(that.active) {
+							setTimeout(that.waitForMessage, 200); // Wait for 200ms and request next message
+						}
 					},
 					error : function(XMLHttpRequest, textStatus, errorThrown) {
 						console.log("onReceive error: ",textStatus, errorThrown);
@@ -42,6 +45,10 @@ var Channel = function() {
 					console.log("Sent something to ", that.write_url);
 				}
 			});
+		};
+		this.close = function() {
+			that = this;
+			that.active = false;
 		};
 	};
 	return {

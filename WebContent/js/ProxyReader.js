@@ -50,6 +50,11 @@ var ProxyReader = {
 		console.log("Got data", data);
 		if(data.type === "event") {
 			console.log("Processing event: ", data.name);
+			if(data.name === "timeout") {
+				// Got a timeout, close the channels
+				this.fromProxy.close();
+			}
+
 			if(this.callbacks[data.name] != undefined) {
 				this.callbacks[data.name]();
 			} else {

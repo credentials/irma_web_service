@@ -52,6 +52,10 @@
 			// Not possible on normal cardreaders
 			  console.log("CardReader feedback: " + message);
 		  },
+		  close: function() {
+			  // TODO: still need to implement this somehow
+			  console.log("Closing connection not implemented for smartcard");
+		  },
 		  transmitCommandSet: function(commands, callback) {
 			  var responses = {};
 			  for(var i=0, len=commands.length; i < len; i++) {

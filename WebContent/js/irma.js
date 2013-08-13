@@ -197,7 +197,8 @@ var IRMA = {
 			}
 		}
 
-		IRMA.Handler.sendFeedback("Done", "none");
+		console.log("Sending handler feedback success");
+		IRMA.Handler.sendFeedback("Done", "success");
 
 		// Send results to webserver
 		$.ajax({
@@ -208,6 +209,7 @@ var IRMA = {
 			success : function(data) {
 				console.log(data);
 				if (data.status === 'success') {
+					IRMA.Handler.close();
 					IRMA.onVerifySuccess(data);
 				} else if (data.status === 'issue') {
 					// TODO: maybe this can go as well

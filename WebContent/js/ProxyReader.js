@@ -140,6 +140,16 @@ var ProxyReader = {
 		this.toProxy.send(cmd);
 	},
 
+	close: function() {
+		var cmd = {};
+		cmd.type = "event";
+		cmd.name = "done";
+		cmd.id = this.randomId();
+
+		this.toProxy.send(cmd);
+		this.fromProxy.close();
+	},
+
 	bind: function(eventName, callback) {
 		this.callbacks[eventName] = callback;
 		console.log("Bound ", eventName, this.callbacks);

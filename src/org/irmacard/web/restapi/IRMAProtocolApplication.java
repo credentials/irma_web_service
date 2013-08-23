@@ -30,7 +30,7 @@ public class IRMAProtocolApplication extends Application {
 		URI CORE_LOCATION;
 		try {
 			CORE_LOCATION = IRMAProtocolApplication.class.getClassLoader()
-					.getResource("/resources/").toURI();
+					.getResource("/resources/irma_configuration/").toURI();
 		} catch (URISyntaxException e) {
 			e.printStackTrace();
 			throw new RuntimeException(e.toString());

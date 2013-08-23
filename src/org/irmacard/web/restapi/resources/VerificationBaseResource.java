@@ -108,6 +108,9 @@ public abstract class VerificationBaseResource extends ProtocolBaseResource {
 		Map<String, ProtocolResponses> responsesMap = gson.fromJson(value, protocolResponsesType);
 		IdemixCredentials ic = new IdemixCredentials(null);
 		
+		// TODO: this crashes if IRMATube credential is not present,
+		// responseMap is never checked for non-null.
+
 		Map<String, Attributes> attributesMap = new HashMap<String, Attributes>();
 		for (VerificationDescription vd : specs) {
 			ProtocolResponses responses = responsesMap.get(Short.toString(vd.getID()));

@@ -1,8 +1,10 @@
 package org.irmacard.web.restapi.resources;
 
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import javax.servlet.ServletContext;
 
 import org.irmacard.credentials.Attributes;
 import org.irmacard.credentials.info.DescriptionStore;
@@ -14,6 +16,8 @@ import org.irmacard.web.restapi.util.ProtocolStep;
 public class IRMATubeVerificationResource extends
 		VerificationBaseResource {
 	final static String VERIFIER = "IRMATube";
+	public static final String AGE_STORE_NAME = "IRMATube.Age.Store";
+	public static final int NO_AGE_VERIFIED = 0;
 	VerificationDescription memberDescription;
 
 	public IRMATubeVerificationResource() {
@@ -55,12 +59,22 @@ public class IRMATubeVerificationResource extends
 			if (!(new String(age.get("over" + age_str))).equals("yes")) {
 				return ProtocolStep.newError("You need to be over " + age_str
 						+ " to view this content");
+			} else {
+				// Verification successful
+				System.out.println("Added something tot the age-store");
+				getAgeStore().put(id, Integer.valueOf(age_str));
 			}
+		} else {
+			System.out.println("No age necessary");
+			getAgeStore().put(id, NO_AGE_VERIFIED);
 		}
+
+		String servletURL = getRootRef().getPath();
+		String serviceURL = servletURL.substring(0,servletURL.lastIndexOf('/'));
 
 		ps.protocolDone = true;
 		ps.status = "success";
-		ps.result = "http://spuitenenslikken.bnn.nl";
+		ps.result = getBaseURL() + serviceURL + "/resources/" + id;
 		return ps;
 	}
 
@@ -99,5 +113,47 @@ public class IRMATubeVerificationResource extends
 			e.printStackTrace();
 		}
 		return null;
+	}
+
+	/**
+	 * After verification of age, the verified age is stored in this servlet
+	 * so that it can be accessed by the FileServlet to verify whether it is
+	 * allowed to serve this file.
+	 */
+	@SuppressWarnings("unchecked")
+	private Map<String, Integer> getAgeStore() {
+		Map<String, Integer> store = null;
+		ServletContext ctxt = null;
+		ServletContext other_ctxt = null;
+
+		try {
+			ctxt = (ServletContext) getContext().getServerDispatcher().getContext().getAttributes().get("org.restlet.ext.servlet.ServletContext");
+		} catch (ClassCastException e) {
+			e.printStackTrace();
+		}
+		try {
+			other_ctxt = (ServletContext) getContext().getAttributes().get("org.restlet.ext.servlet.ServletContext");
+		} catch (ClassCastException e) {
+			e.printStackTrace();
+		}
+
+		// Try first context
+		if(ctxt != null) {
+			store = (Map<String, Integer>) ctxt.getAttribute(AGE_STORE_NAME);
+		}
+
+		// Try second context
+		if(store == null && other_ctxt != null) {
+			store = (Map<String, Integer>) other_ctxt.getAttribute(AGE_STORE_NAME);
+		}
+
+		// Still no store found, create it and put it in first context.
+		if( store == null) {
+			System.out.println("Store not found, generating new store");
+			store = new HashMap<String, Integer>();
+			ctxt.setAttribute(AGE_STORE_NAME, store);
+		}
+
+		return store;
 	}
 }

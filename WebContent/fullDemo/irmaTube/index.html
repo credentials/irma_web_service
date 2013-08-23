@@ -25,16 +25,19 @@
 	<script src="../../js/bootstrap.min.js" type="text/javascript"></script>
 	<script src="../../js/irma.js" type="text/javascript"></script>
 
-	<script id="movieTpl" type="text/template">
-		<div id="movie_{{number}}_wrapper">
+	<script id="moviePlayerTpl" type="text/template">
 		<div class="video-overlay" id="video_div_{{id}}">
-			<video controls="controls" preload="true" id="video_{{id}}" height="400" width="700">
-				<source src="content/{{id}}.webm" type="video/webm">
-				<source src="content/{{id}}.mp4" type="video/mp4">
+			<video controls="controls" preload="none" id="video_{{id}}" height="400" width="700">
+				<source src="{{url}}/{{id}}.webm" type="video/webm">
+				<source src="{{url}}/{{id}}.mp4" type="video/mp4">
 				Your browser does not support the video tag.
 			</video>
 			<button onclick="closeMovie('{{id}}')">Close</button>
 		</div>
+    </script>
+	<script id="movieTpl" type="text/template">
+		<div id="movie_{{id}}_wrapper">
+		<!-- moviePlayer template goes here -->
 		<div class="mosaic-block bar" id="movie_{{id}}">
 			<span href="#" onclick="openMovie('{{id}}', '{{ageLimit}}');" class="mosaic-overlay">
 				<h4>{{title}}
@@ -61,15 +64,16 @@
 			IRMA.onVerifySuccess = function(data) {
 				IRMA.hide_verify();
 				console.log(data);
-				issue_url = data.result;
-				$.ajax({
-					url: data.result,
-					type: 'POST',
-					success: function() {},
-				});
 
 				$("#irmaTube").fadeIn();
+
+				var data = {id: videoNumber,
+							url: data.result};
+				var video_template = $("#moviePlayerTpl").html();
+				$("#movie_" + videoNumber + "_wrapper").prepend(Mustache.to_html(video_template, data));
+
 				$("#video_div_" + videoNumber).css("display", "block");
+				$("#video_" + videoNumber).get(0).load();
 				$("#video_" + videoNumber).get(0).play();
 			}
 
@@ -79,6 +83,7 @@
 		function closeMovie(videoNumber) {
 			$("#video_div_" + videoNumber).css("display", "none");
 			$("#video_" + videoNumber).get(0).pause();
+			$("#video_div_" + videoNumber).remove();
 		}
 
 		$(function() {

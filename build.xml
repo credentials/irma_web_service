@@ -43,7 +43,7 @@
 
   <target name="service" depends="compile">
     <copy todir="${bin.dir}/resources/">
-      <fileset dir="${conf.dir}"/>
+      <fileset dir="${data.dir}"/>
     </copy>
 
     <war destfile="${deploy.file}" webxml="${web.dir}/WEB-INF/web.xml" update="true">

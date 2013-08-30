@@ -16,6 +16,8 @@ import org.irmacard.web.restapi.util.ProtocolStep;
 public class IRMATubeVerificationResource extends
 		VerificationBaseResource {
 	final static String VERIFIER = "IRMATube";
+	final static String VERIFICATIONID = "memberType";
+
 	public static final String AGE_STORE_NAME = "IRMATube.Age.Store";
 	public static final int NO_AGE_VERIFIED = 0;
 	VerificationDescription memberDescription;
@@ -24,7 +26,7 @@ public class IRMATubeVerificationResource extends
 		try {
 			
 			memberDescription = DescriptionStore.getInstance()
-					.getVerificationDescriptionByName(VERIFIER, "memberType");
+					.getVerificationDescriptionByName(VERIFIER, VERIFICATIONID);
 		} catch (InfoException e) {
 			e.printStackTrace();
 		}
@@ -36,7 +38,7 @@ public class IRMATubeVerificationResource extends
 		ProtocolStep ps = new ProtocolStep();
 		String age_str = ProtocolState.getIRMATubeAge(id);
 
-		Attributes memberType = attrMap.get("memberType");
+		Attributes memberType = attrMap.get(VERIFICATIONID);
 
 		if (memberType == null) {
 			return ProtocolStep.newError(memberDescription.getName()

@@ -30,7 +30,7 @@ public class SpuitenEnSlikkenVerificationResource extends
 	public ProtocolStep onSuccess(String id, Map<String, Attributes> attrMap) {
 		ProtocolStep ps = new ProtocolStep();
 
-		Attributes age = attrMap.get("ageLowerOver16");
+		Attributes age = attrMap.get(VERIFICATIONID);
 
 		if (age == null) {
 			return ProtocolStep.newError(ageDescription.getName()

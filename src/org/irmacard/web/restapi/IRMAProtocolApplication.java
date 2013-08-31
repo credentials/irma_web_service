@@ -6,7 +6,6 @@ import java.net.URISyntaxException;
 import org.irmacard.credentials.idemix.util.CredentialInformation;
 import org.irmacard.credentials.info.DescriptionStore;
 import org.irmacard.web.restapi.resources.IRMATubeVerificationResource;
-import org.irmacard.web.restapi.resources.IssueStudentCredResource;
 import org.irmacard.web.restapi.resources.MijnOverheidIssueResource;
 import org.irmacard.web.restapi.resources.MijnOverheidVerificationResource;
 import org.irmacard.web.restapi.resources.SpuitenEnSlikkenVerificationResource;
@@ -55,9 +54,6 @@ public class IRMAProtocolApplication extends Application {
 		router.attach("/verification/StudentCard/{id}/{step}", StudentCardVerificationResource.class);
 		router.attach("/issue/StudentCard/{id}", StudentCardIssueResource.class);
 		router.attach("/issue/StudentCard/{id}/{cred}/{step}", StudentCardIssueResource.class);
-
-		router.attach("/issue/studentCred", IssueStudentCredResource.class);
-		router.attach("/issue/studentCred/{id}/{step}", IssueStudentCredResource.class);
 		
 		router.attach("/verification/{verifier}/{specname}", VerificationProtocolResource.class);
 		router.attach("/verification/{verifier}/{specname}/{id}/{step}", VerificationProtocolResource.class);

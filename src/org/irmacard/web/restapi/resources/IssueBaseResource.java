@@ -2,8 +2,6 @@ package org.irmacard.web.restapi.resources;
 
 import java.lang.reflect.Field;
 import java.math.BigInteger;
-import java.util.HashMap;
-import java.util.List;
 import java.util.Map;
 
 import net.sourceforge.scuba.smartcards.ProtocolCommand;
@@ -15,10 +13,7 @@ import org.irmacard.credentials.Attributes;
 import org.irmacard.credentials.CredentialsException;
 import org.irmacard.credentials.idemix.IdemixCredentials;
 import org.irmacard.credentials.idemix.spec.IdemixIssueSpecification;
-import org.irmacard.credentials.idemix.spec.IdemixVerifySpecification;
-import org.irmacard.credentials.idemix.util.VerifyCredentialInformation;
 import org.irmacard.credentials.idemix.util.IssueCredentialInformation;
-import org.irmacard.credentials.info.VerificationDescription;
 import org.irmacard.web.restapi.ProtocolState;
 import org.irmacard.web.restapi.util.IssueCredentialInfo;
 import org.irmacard.web.restapi.util.ProtocolCommandSerializer;

@@ -3,7 +3,6 @@ package org.irmacard.web.restapi.resources;
 import java.util.HashMap;
 import java.util.Map;
 
-import org.irmacard.credentials.Attributes;
 import org.irmacard.credentials.idemix.util.IssueCredentialInformation;
 import org.irmacard.web.restapi.util.IssueCredentialInfo;
 

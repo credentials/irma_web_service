@@ -10,6 +10,8 @@ import org.irmacard.web.restapi.resources.IssueStudentCredResource;
 import org.irmacard.web.restapi.resources.MijnOverheidIssueResource;
 import org.irmacard.web.restapi.resources.MijnOverheidVerificationResource;
 import org.irmacard.web.restapi.resources.SpuitenEnSlikkenVerificationResource;
+import org.irmacard.web.restapi.resources.StudentCardIssueResource;
+import org.irmacard.web.restapi.resources.StudentCardVerificationResource;
 import org.irmacard.web.restapi.resources.VerificationProtocolResource;
 import org.restlet.Application;
 import org.restlet.Restlet;
@@ -48,6 +50,11 @@ public class IRMAProtocolApplication extends Application {
 		router.attach("/verification/MijnOverheid/{id}/{step}", MijnOverheidVerificationResource.class);
 		router.attach("/issue/MijnOverheid/{id}", MijnOverheidIssueResource.class);
 		router.attach("/issue/MijnOverheid/{id}/{cred}/{step}", MijnOverheidIssueResource.class);
+
+		router.attach("/verification/StudentCard", StudentCardVerificationResource.class);
+		router.attach("/verification/StudentCard/{id}/{step}", StudentCardVerificationResource.class);
+		router.attach("/issue/StudentCard/{id}", StudentCardIssueResource.class);
+		router.attach("/issue/StudentCard/{id}/{cred}/{step}", StudentCardIssueResource.class);
 
 		router.attach("/issue/studentCred", IssueStudentCredResource.class);
 		router.attach("/issue/studentCred/{id}/{step}", IssueStudentCredResource.class);

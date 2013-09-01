@@ -23,5 +23,20 @@ IRMATubeMovies = [
 		title: "Up",
 		id: "up",
 		ageLimit: 0,
-	}
+	},
+	{
+		title: "ELYSIUM",
+		id: "elysium",
+		ageLimit: 16,
+	},
+	{
+		title: "We're the millers",
+		id: "were-the-millers",
+		ageLimit: 12,
+	},
+	{
+		title: "Planes",
+		id: "planes",
+		ageLimit: 0,
+	},
 ];

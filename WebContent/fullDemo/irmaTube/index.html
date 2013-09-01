@@ -96,6 +96,7 @@
 			IRMA.init();
 
 			var template = $("#movieTpl").html();
+			IRMATubeMovies.sort(function() { return 0.5 - Math.random();});
 			console.log(IRMATubeMovies);
 			for ( var i = 0; i < IRMATubeMovies.length; i++) {
 				movie = IRMATubeMovies[i];

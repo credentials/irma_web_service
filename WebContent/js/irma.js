@@ -23,6 +23,9 @@ var IRMA = {
 
 	Handler: ProxyReader,
 
+	// Can be overridden by implementing pages
+	onBackButtonPressed: function() {},
+
 	init: function() {
 		IRMA.load_extra_html(IRMA.irma_html + "issue.html");
 		IRMA.load_extra_html(IRMA.irma_html + "verify.html");
@@ -249,7 +252,7 @@ var IRMA = {
 
 	start_batch_issue: function(selection, issue_url) {
 		$("#IRMA_issuer_logo_img").prop("src", IRMA.issuer_logo);
-		$("#IRMA_issue").fadeIn();
+		IRMA.show_issue();
 		IRMA.selection = selection;
 		IRMA.issue_url = issue_url;
 
@@ -412,6 +415,10 @@ var IRMA = {
 
 	display_issue_credentials: function(data) {
 		console.log(data);
+
+		// First clear display
+		$("#IRMA_issue_credential_list_content").empty();
+
 		var credentials = data.info.issue_information;
 		for(var i = 0; i < IRMA.selection.length; i++) {
 			IRMA.display_issue_credential(credentials[IRMA.selection[i]], IRMA.selection[i]);
@@ -431,6 +438,10 @@ var IRMA = {
 	//
 	show_verify: function() {
 		$("#IRMA_verify").fadeIn();
+		$("#IRMA_button_back_verify").on("click", function() {
+			// You can handle some internal stuff here if necessary
+			IRMA.onBackButtonPressed();
+		});
 	},
 
 	hide_verify: function() {
@@ -451,6 +462,18 @@ var IRMA = {
 		$("#IRMA_button_verify").html("VERIFY");
 		$("#IRMA_button_verify").addClass("enabled");
 		$("#IRMA_button_verify").on("click", IRMA.verifyButtonClicked);
+	},
+
+	show_issue: function() {
+		$("#IRMA_issue").fadeIn();
+		$("#IRMA_button_back_issue").on("click", function() {
+			// You can handle some internal stuff here if necessary
+			IRMA.onBackButtonPressed();
+		});
+	},
+
+	hide_issue: function() {
+		$("#IRMA_issue").fadeOut();
 	},
 
 	enable_issue: function() {

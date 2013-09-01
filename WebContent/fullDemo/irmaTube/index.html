@@ -77,6 +77,12 @@
 				$("#video_" + videoNumber).get(0).play();
 			}
 
+			IRMA.onBackButtonPressed = function(data) {
+				IRMA.hide_verify();
+				IRMA.hide_issue();
+				$("#irmaTube").show();
+			}
+
 			IRMA.start_verify();
 		}
 

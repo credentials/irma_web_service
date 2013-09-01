@@ -59,6 +59,7 @@
 	<script type="text/javascript">
 		function openMovie(videoNumber, ageLimit) {
 			IRMA.base_url = "/irma_web_service/protocols/verification/IRMATube/" + ageLimit;
+			IRMA.verifier_logo = "img/irmatube_verifier.png";
 			$("#irmaTube").hide();
 
 			IRMA.onVerifySuccess = function(data) {
@@ -79,7 +80,6 @@
 
 			IRMA.onBackButtonPressed = function(data) {
 				IRMA.hide_verify();
-				IRMA.hide_issue();
 				$("#irmaTube").show();
 			}
 

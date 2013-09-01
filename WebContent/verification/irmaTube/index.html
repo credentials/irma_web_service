@@ -14,7 +14,12 @@
 	<script>
 		$(function() {
 			IRMA.base_url = "/irma_web_service/protocols/verification/IRMATube/0";
+			IRMA.verifier_logo = "../../fullDemo/irmaTube/img/irmatube_verifier.png";
 			IRMA.init();
+			IRMA.onBackButtonPressed = function(data) {
+				IRMA.hide_verify();
+				$("#irmaTube").show();
+			}
 			IRMA.start_verify();
 		});
 	</script>

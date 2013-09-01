@@ -16,6 +16,8 @@
 	<script>
 		$(function() {
 			IRMA.base_url = "/irma_web_service/protocols/verification/StudentCard";
+			IRMA.verifier_logo = "../../img/RU_logo_verifier.png";
+			IRMA.issuer_logo = "../../img/RU_logo_issuer.png";
 			IRMA.init();
 			var issue_url;
 
@@ -36,6 +38,13 @@
 					success: start_issuance,
 				});
 			}
+
+			IRMA.onBackButtonPressed = function(data) {
+				IRMA.hide_verify();
+				IRMA.hide_issue();
+				$("#RU_welcome").show();
+			}
+
 			$("#load_credentials").on('click', function(event) {
 				$("#RU_welcome").hide();
 				IRMA.start_verify();

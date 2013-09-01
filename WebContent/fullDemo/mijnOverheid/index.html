@@ -33,6 +33,13 @@
 	<script>
 		$(function() {
 			IRMA.base_url = "/irma_web_service/protocols/verification/MijnOverheid";
+			IRMA.verifier_logo = "../../img/mijnoverheid_logo_verifier.png";
+			IRMA.issuer_logo = "../../img/mijnoverheid_logo_issuer.png";
+			IRMA.init();
+			IRMA.onBackButtonPressed = function(data) {
+				IRMA.hide_verify();
+				$("#mijnOverheidIRMAVerify").show();
+			}
 			IRMA.init();
 			var all_credentials = [];
 			var issue_url;
@@ -67,6 +74,10 @@
 					success: show_store_credentials,
 				});
 				$("#mijnOverheidIRMAIssue").fadeIn();
+				IRMA.onBackButtonPressed = function(data) {
+					IRMA.hide_issue();
+					$("#mijnOverheidIRMAIssue").show();
+				}
 			}
 			$("#verifyBSN").on('click', function(event) {
 				$("#mijnOverheidIRMAVerify").hide();
@@ -104,7 +115,7 @@
 			To do so we first need to verify that that your IRMA card belongs
 			to this account.</p>
 			<p><strong>Please do not remove your IRMA card after verification!</strong></p>
-			<p><img id="verifyBSN" src="../../img/verify16.png"/></p>
+			<p><button id="verifyBSN" class="btn btn-primary">Start!</button></p>
 		</div>
 	</div>
 	

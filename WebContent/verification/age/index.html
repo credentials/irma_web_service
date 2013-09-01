@@ -18,7 +18,12 @@
 	<script>
 		$(function() {
 			IRMA.base_url = "/irma_web_service/protocols/verification/SpuitenEnSlikken";
+			IRMA.verifier_logo = "../../img/SnS_logo.png";
 			IRMA.init();
+			IRMA.onBackButtonPressed = function(data) {
+				IRMA.hide_verify();
+				$("#RU_welcome").show();
+			}
 			$("#verify").on('click', function(event) {
 				$("SnS_welcome").hide();
 				IRMA.start_verify();

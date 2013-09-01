@@ -5,13 +5,15 @@ import java.net.URISyntaxException;
 
 import org.irmacard.credentials.idemix.util.CredentialInformation;
 import org.irmacard.credentials.info.DescriptionStore;
-import org.irmacard.web.restapi.resources.IRMATubeVerificationResource;
 import org.irmacard.web.restapi.resources.MijnOverheidIssueResource;
 import org.irmacard.web.restapi.resources.MijnOverheidVerificationResource;
 import org.irmacard.web.restapi.resources.SpuitenEnSlikkenVerificationResource;
 import org.irmacard.web.restapi.resources.StudentCardIssueResource;
 import org.irmacard.web.restapi.resources.StudentCardVerificationResource;
 import org.irmacard.web.restapi.resources.VerificationProtocolResource;
+import org.irmacard.web.restapi.resources.irmaTube.IRMATubeRegistrationIssueResource;
+import org.irmacard.web.restapi.resources.irmaTube.IRMATubeRegistrationVerificationResource;
+import org.irmacard.web.restapi.resources.irmaTube.IRMATubeVerificationResource;
 import org.restlet.Application;
 import org.restlet.Restlet;
 import org.restlet.routing.Router;
@@ -54,7 +56,12 @@ public class IRMAProtocolApplication extends Application {
 		router.attach("/verification/StudentCard/{id}/{step}", StudentCardVerificationResource.class);
 		router.attach("/issue/StudentCard/{id}", StudentCardIssueResource.class);
 		router.attach("/issue/StudentCard/{id}/{cred}/{step}", StudentCardIssueResource.class);
-		
+
+		router.attach("/verification/IRMATubeRegistration", IRMATubeRegistrationVerificationResource.class);
+		router.attach("/verification/IRMATubeRegistration/{id}/{step}", IRMATubeRegistrationVerificationResource.class);
+		router.attach("/issue/IRMATubeRegistration/{id}", IRMATubeRegistrationIssueResource.class);
+		router.attach("/issue/IRMATubeRegistration/{id}/{cred}/{step}", IRMATubeRegistrationIssueResource.class);
+
 		router.attach("/verification/{verifier}/{specname}", VerificationProtocolResource.class);
 		router.attach("/verification/{verifier}/{specname}/{id}/{step}", VerificationProtocolResource.class);
 

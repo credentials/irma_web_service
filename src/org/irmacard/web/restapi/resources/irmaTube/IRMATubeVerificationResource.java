@@ -1,4 +1,4 @@
-package org.irmacard.web.restapi.resources;
+package org.irmacard.web.restapi.resources.irmaTube;
 
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -11,6 +11,7 @@ import org.irmacard.credentials.info.DescriptionStore;
 import org.irmacard.credentials.info.InfoException;
 import org.irmacard.credentials.info.VerificationDescription;
 import org.irmacard.web.restapi.ProtocolState;
+import org.irmacard.web.restapi.resources.VerificationBaseResource;
 import org.irmacard.web.restapi.util.ProtocolStep;
 
 public class IRMATubeVerificationResource extends

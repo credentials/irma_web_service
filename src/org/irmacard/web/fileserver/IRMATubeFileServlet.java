@@ -47,7 +47,7 @@ import javax.servlet.http.HttpServlet;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
-import org.irmacard.web.restapi.resources.IRMATubeVerificationResource;
+import org.irmacard.web.restapi.resources.irmaTube.IRMATubeVerificationResource;
 
 /**
  * A file servlet supporting resume of downloads and client-side caching and GZIP of text content.

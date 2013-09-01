@@ -3,6 +3,11 @@ var IRMA = {
 	irma_html: "../../irma/",
 	irma_aid: '49524D4163617264',
 	
+	// Target to go to after issuing is done
+	after_issue_target: "http://www.ru.nl/cybersecurity",
+	issuer_logo: "../../img/RU_logo_issuer.png",
+	verifier_logo: "../../img/RU_logo_verifier.png",
+
 	irma_issue_state: 'idle',
 	issue_url: '',
 	responseurl: '',
@@ -74,6 +79,7 @@ var IRMA = {
 		console.log("Starting IRMA verification");
 
 		IRMA.setup_qr();
+		$("#IRMA_verifier_logo_img").prop("src", IRMA.verifier_logo);
 		IRMA.show_verify();
 		IRMA.retrieve_verifications();
 		
@@ -242,6 +248,7 @@ var IRMA = {
 	},
 
 	start_batch_issue: function(selection, issue_url) {
+		$("#IRMA_issuer_logo_img").prop("src", IRMA.issuer_logo);
 		$("#IRMA_issue").fadeIn();
 		IRMA.selection = selection;
 		IRMA.issue_url = issue_url;
@@ -383,7 +390,7 @@ var IRMA = {
 		$("#IRMA_button_issue").html("DONE");
 		$("#IRMA_button_issue").addClass("enabled");
 		$("#IRMA_button_issue").button().on("click", function(event) {
-			window.location = "http://www.ru.nl/cybersecurity";
+			window.location = IRMA.after_issue_target;
 		});
 	},
 

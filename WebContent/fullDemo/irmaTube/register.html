@@ -27,12 +27,13 @@
 		$(function() {
 			IRMA.init();
 			IRMA.base_url = "/irma_web_service/protocols/verification/IRMATubeRegistration";
+			IRMA.verifier_logo = "img/irmatube_verifier.png";
+			IRMA.issuer_logo = "img/irmatube_issuer.png";
 
 			var path = document.location.pathname;
 			var rootpath = path.substring(0, path.lastIndexOf('/'))
 			IRMA.after_issue_target = rootpath;
 
-			alert("New javascript in register (3)");
 			$("#register-btn").on('click', function(event) {
 				$("#irmaTube").hide();
 				IRMA.start_verify();

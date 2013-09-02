@@ -7,6 +7,7 @@ import org.irmacard.credentials.idemix.util.CredentialInformation;
 import org.irmacard.credentials.info.DescriptionStore;
 import org.irmacard.web.restapi.resources.MijnOverheidIssueResource;
 import org.irmacard.web.restapi.resources.MijnOverheidVerificationResource;
+import org.irmacard.web.restapi.resources.NYTimesVerificationResource;
 import org.irmacard.web.restapi.resources.SpuitenEnSlikkenVerificationResource;
 import org.irmacard.web.restapi.resources.StudentCardIssueResource;
 import org.irmacard.web.restapi.resources.StudentCardVerificationResource;
@@ -44,6 +45,9 @@ public class IRMAProtocolApplication extends Application {
 		router.attach("/verification/SpuitenEnSlikken", SpuitenEnSlikkenVerificationResource.class);
 		router.attach("/verification/SpuitenEnSlikken/{id}/{step}", SpuitenEnSlikkenVerificationResource.class);
 
+		router.attach("/verification/NYTimes", NYTimesVerificationResource.class);
+		router.attach("/verification/NYTimes/{id}/{step}", NYTimesVerificationResource.class);
+
 		router.attach("/verification/IRMATube/{age}", IRMATubeVerificationResource.class);
 		router.attach("/verification/IRMATube/{age}/{id}/{step}", IRMATubeVerificationResource.class);
 
@@ -61,9 +65,6 @@ public class IRMAProtocolApplication extends Application {
 		router.attach("/verification/IRMATubeRegistration/{id}/{step}", IRMATubeRegistrationVerificationResource.class);
 		router.attach("/issue/IRMATubeRegistration/{id}", IRMATubeRegistrationIssueResource.class);
 		router.attach("/issue/IRMATubeRegistration/{id}/{cred}/{step}", IRMATubeRegistrationIssueResource.class);
-
-		router.attach("/verification/{verifier}/{specname}", VerificationProtocolResource.class);
-		router.attach("/verification/{verifier}/{specname}/{id}/{step}", VerificationProtocolResource.class);
 
 		return router;
 	}   

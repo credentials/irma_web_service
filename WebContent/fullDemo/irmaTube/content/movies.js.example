@@ -1,0 +1,16 @@
+IRMATubeMovies = [
+	// Per movie need the following files:
+	//  * Cover image: mov1.jpg
+	//  * Movie in mp4: mov1.mp4
+	//  * Movie in webm: mov1.webm
+	{
+		title: "Movie 1",
+		id: "mov1",
+		ageLimit: 18,
+	},
+	{
+		title: "Movie 2",
+		id: "mov2",
+		ageLimit: 0, // No age limit
+	},
+];

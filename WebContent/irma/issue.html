@@ -1,0 +1,59 @@
+<script id="credAccordionTpl" type="text/template">
+	<div class="accordion-heading">
+		<a class="accordion-toggle" data-toggle="collapse"
+			data-parent="#IRMA_issue_credentials_list" href="#IRMA-collapse-{{key}}"
+			id="IRMA-issue-heading-{{key}}">
+				{{name}}
+				<span id="IRMA-issue-status-{{key}}"></span>
+		</a>
+	</div>
+	<div id ="IRMA-collapse-{{key}}" class="accordion-body collapse">
+		<div class="accordion-inner">
+			<table>
+				{{#attribute_array}}
+				<tr>
+					<td class="IRMA_content_attribute">{{name}}</td>
+					<td class="IRMA_content_value">{{value}}</td>
+				</tr>
+				{{/attribute_array}}
+			</table>
+		</div>
+	</div>
+</script>
+
+<div id="IRMA_issue" class="hide fade in">
+	<div class="IRMA_page">
+		<div class="IRMA_container">
+			<div class="IRMA_title">LOADING CREDENTIAL(S)</div>
+
+			<div class="IRMA_issuer_logo">
+				<img src="" id="IRMA_issuer_logo_img" height="110"/>
+			</div>
+
+			<div class="IRMA_main_scherm">
+				<div class="IRMA_content_issue">
+					<div class="accordion" id="IRMA_issue_credentials_list">
+					<div class="accordion-group" id="IRMA_issue_credential_list_content">
+					</div>
+					</div>
+				</div>
+
+				<div class="IRMA_arrow">
+					<img src="../../img/irma_arrow_white_312px.png" width="78"
+						height="78">
+				</div>
+				<div class="IRMA_logo_bottom">
+					<img src="../../img/irma_logo_1024px.png" alt="IRMA" width="186"
+						height="149" />
+				</div>
+
+				<div class="IRMA_buttons">
+					<button id="IRMA_button_back_issue" class="IRMA_button_gray_issue">BACK</button>
+					<button class="IRMA_button_gray_issue">HELP</button>
+					<button class="IRMA_button_primary" id="IRMA_button_issue">WAITING
+						FOR CARD</button>
+				</div>
+			</div>
+		</div>
+	</div>
+</div>

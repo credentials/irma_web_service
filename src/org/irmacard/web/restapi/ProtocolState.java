@@ -16,16 +16,31 @@ import com.ibm.zurich.idmx.issuance.Issuer;
  */
 public class ProtocolState {
 	private static Map<String,BigInteger> nonceMap = new HashMap<String, BigInteger>();
+	private static Map<String,BigInteger> verificationNonceMap = new HashMap<String, BigInteger>();
 	private static Map<String,Attributes> attributesMap = new HashMap<String, Attributes>();
 	private static Map<String,Issuer> issuerMap = new HashMap<String, Issuer>();
 	private static Map<String,String> stateMap = new HashMap<String, String>();
 	private static Map<String,String> resultMap = new HashMap<String, String>();
-	
+
+	// State for IRMATube, we store the age that we are verifying
+	private static Map<String, String> irmaTubeAgeMap = new HashMap<String, String>();
+
+	// State for StudentCard issuing, keep track of the verified UUID
+	private static Map<String,String> studentCardUUIDMap = new HashMap<String, String>();
+
 	public static BigInteger getNonce(String id) {
 		return nonceMap.get(id);
 	}
 	public static void putNonce(String id, BigInteger nonce) {
 		nonceMap.put(id, nonce);
+	}
+	
+	public static BigInteger getVerificationNonce(String id, short vId) {
+		return verificationNonceMap.get(id + vId);
+	}
+	
+	public static void putVerificationNonce(String id, short vId, BigInteger nonce) {
+		verificationNonceMap.put(id + vId, nonce);
 	}
 	
 	public static Attributes getAttributes(String id) {
@@ -54,5 +69,19 @@ public class ProtocolState {
 	}
 	public static void putResult(String id, String state) {
 		resultMap.put(id, state);
+	}
+	
+	public static void putIRMATubeAge(String id, String age) {
+		irmaTubeAgeMap.put(id, age);
+	}
+	public static String getIRMATubeAge(String id) {
+		return irmaTubeAgeMap.get(id);
+	}
+
+	public static void putStudentCardUUID(String id, String uuid) {
+		studentCardUUIDMap.put(id, uuid);
+	}
+	public static String getStudentCardUUID(String id) {
+		return studentCardUUIDMap.get(id);
 	}
 }

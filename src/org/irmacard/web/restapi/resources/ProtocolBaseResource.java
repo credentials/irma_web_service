@@ -47,6 +47,10 @@ public abstract class ProtocolBaseResource extends ServerResource  {
 			}
 		}
 
+		if (step == null) {
+			step = "0";
+		}
+
 		int istep = Integer.parseInt(step);
 		return handleProtocolStep(id, istep, value);
 	}

@@ -178,7 +178,7 @@
 .IRMA_content_verify {
   position: absolute;
   left: 254px;
-  top: 135px;
+  top: 110px;
   width: 400px;
   height: auto;
 }
@@ -194,11 +194,13 @@
 .IRMA_content_credential {
   display: block;
   font-weight: 700;
+  margin-bottom: 5px;
 }
 	
 .IRMA_content_status {
   display: block;
   font-weight: 300;
+  margin-top: 20px;
 }
 
 .IRMA_content_icon {
@@ -223,4 +225,52 @@
 .IRMA_content_value {
   font-weight: 300;
   color: #888888;
+}
+
+body { background-color: #ffffff; }
+div.huge {font-size: 300px; line-height: 1em;}
+#verify {cursor: pointer; }
+#qr_overlay {
+  position: absolute;
+  text-align: center;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  z-index: 10000;
+}
+#qr_overlay_background {
+	position: absolute;
+	text-align: center;
+	top: 0;
+	left: 0;
+	width: 100%;
+	height: 100%;
+	background-color: #000;
+	-moz-opacity: 0.7;
+	-khtml-opacity: 0.7;
+	opacity: 0.7;
+	z-index: 10000;
+}
+
+#IRMA_qr_main {
+	position: absolute;
+	text-align: center;
+	top: 0;
+	left: 0;
+	-moz-opacity: 1.0;
+	-khtml-opacity: 1.0;
+	opacity: 1.0;
+	width: 40%;
+	height: 400px;
+	margin-left: 30%;
+	margin-right: 30%;
+	margin-top: 10%;
+	background: white;
+	z-index: 10001;
+	-moz-border-radius: 12px;
+	border-radius: 12px;
+	padding-top: 20px;
+	padding-left: 20px;
+	padding-right: 20px;
 }

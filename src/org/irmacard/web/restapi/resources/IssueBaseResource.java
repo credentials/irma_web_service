@@ -2,9 +2,10 @@ package org.irmacard.web.restapi.resources;
 
 import java.lang.reflect.Field;
 import java.math.BigInteger;
-import java.util.List;
+import java.util.Map;
 
 import net.sourceforge.scuba.smartcards.ProtocolCommand;
+import net.sourceforge.scuba.smartcards.ProtocolCommands;
 import net.sourceforge.scuba.smartcards.ProtocolResponse;
 import net.sourceforge.scuba.smartcards.ProtocolResponses;
 
@@ -12,11 +13,11 @@ import org.irmacard.credentials.Attributes;
 import org.irmacard.credentials.CredentialsException;
 import org.irmacard.credentials.idemix.IdemixCredentials;
 import org.irmacard.credentials.idemix.spec.IdemixIssueSpecification;
-import org.irmacard.credentials.idemix.spec.IdemixVerifySpecification;
-import org.irmacard.credentials.idemix.util.VerifyCredentialInformation;
 import org.irmacard.credentials.idemix.util.IssueCredentialInformation;
 import org.irmacard.web.restapi.ProtocolState;
+import org.irmacard.web.restapi.util.IssueCredentialInfo;
 import org.irmacard.web.restapi.util.ProtocolCommandSerializer;
+import org.irmacard.web.restapi.util.ProtocolInfo;
 import org.irmacard.web.restapi.util.ProtocolResponseDeserializer;
 import org.irmacard.web.restapi.util.ProtocolStep;
 
@@ -24,81 +25,70 @@ import com.google.gson.Gson;
 import com.google.gson.GsonBuilder;
 import com.ibm.zurich.idmx.issuance.Issuer;
 
-public class IssueStudentCredResource  extends ProtocolBaseResource {
-	private VerifyCredentialInformation vci = new VerifyCredentialInformation("Surfnet", "root", "RU", "rootID");
-	
+public abstract class IssueBaseResource  extends ProtocolBaseResource {	
 	@Override
 	public String handleProtocolStep(String id, int step, String value) {
+		System.out.println("Handle post called!!!");
 		Gson gson = new GsonBuilder()
 			.setPrettyPrinting()
 			.registerTypeAdapter(ProtocolCommand.class,
 					new ProtocolCommandSerializer()).create();
 		
 		ProtocolStep ps = null;
-		IdemixVerifySpecification vspec = vci.getIdemixVerifySpecification();
-		
+		String cred = (String) getRequestAttributes().get("cred");
+
 		switch (step) {
 		case 0:
-			ps = VerificationProtocolResource.createVerificationProtocolStep(id, vspec);
-			ps.responseurl = makeResponseURL(id, step+1);
-			ProtocolState.putStatus(id, "step1");
+			// Send overview of what can be issued
+			ps = new ProtocolStep();
+			ps.info = new ProtocolInfo();
+			ps.info.issue_information = getIssueCredentialInfos(id); 
 			break;
 		case 1:
-			ps = createIssuanceProtocolStep1(id, value);
-			ps.responseurl = makeResponseURL(id, step + 1);
+			// Send first step of issuance commands, for specific credential
+			ps = createIssuanceProtocolStep1(id, cred, value);
+			ps.responseurl = makeIssueResponseURL(id, cred, step + 1);
 			break;
 		case 2:
-			ps = createIssuanceProtocolStep2(id, value);
-			ps.responseurl = makeResponseURL(id, step + 1);
+			// Send second step of issuance commands, for specific credential
+			ps = createIssuanceProtocolStep2(id, cred, value);
+			ps.responseurl = makeIssueResponseURL(id, cred, step + 1);
 			break;
 		case 3:
+			// If necessary final step
 			ps = createIssuanceProtocolStepEnd(id, value);
-			break;			
-		default:
 			break;
 		}
+		
 		return gson.toJson(ps);
 	}
 	
-	private ProtocolStep createIssuanceProtocolStep1(String id, String value) {
-		IdemixVerifySpecification vspec = vci.getIdemixVerifySpecification();
-		Attributes attr;
-		try {
-			attr = VerificationProtocolResource.processVerificationResponse(id, vspec, value);
-		} catch (CredentialsException e) {
-			e.printStackTrace();
-			return ProtocolStep.newError("Invalid root credential (exception).");
-		}
-		if (attr == null) {
-			return ProtocolStep.newError("Invalid root credential (attributes null).");
-		}
-		
-		String userID = new String(attr.get("userID"));
-		
+	private ProtocolStep createIssuanceProtocolStep1(String id, String cred, String value) {
 		// Check if eligible
-		if(! eligibleForIssuance(userID)){
-			return ProtocolStep.newError("ID " + userID + " is not eligible");
+		Map<String, IssueCredentialInfo> issuer_info = getIssueCredentialInfos(id);
+		if(!issuer_info.containsKey(cred)) {
+			return ProtocolStep.newError("You are not allowed to be issued " + cred);
 		}
 
-		
-		// FIXME: retrieve proper attributes
-		Attributes attributes = getIssuanceAttributes(userID);
+		Attributes attributes = makeAttributes(issuer_info.get(cred).attributes);
+
+		// FIXME: should not really do this here.
+		attributes.setExpiryAttribute(null);
 		
 		ProtocolState.putStatus(id, "issueready");
 		
 		IdemixCredentials ic = new IdemixCredentials(null);
-		IssueCredentialInformation ici = new IssueCredentialInformation("RU", "studentCard");
+		IssueCredentialInformation ici = getIssueCredentialInformation(cred);
 		IdemixIssueSpecification spec = ici.getIdemixIssueSpecification();
 
 		// Initialize the issuer
 		Issuer issuer = ici.getIssuer(attributes);
 
 		// Run part one of protocol
-		List<ProtocolCommand> commands;
+		ProtocolCommands commands;
 		try {
 			commands = ic.requestIssueRound1Commands(spec, attributes, issuer);
 		} catch (CredentialsException e) {
-			// TODO Auto-generated catch block
 			e.printStackTrace();
 			return ProtocolStep.newError("Error while issuing.");
 		}
@@ -129,22 +119,21 @@ public class IssueStudentCredResource  extends ProtocolBaseResource {
 		
 	}
 
-	private ProtocolStep createIssuanceProtocolStep2(String id, String value) {
+	private ProtocolStep createIssuanceProtocolStep2(String id, String cred, String value) {
 		Gson gson = new GsonBuilder()
 			.setPrettyPrinting()
 			.registerTypeAdapter(ProtocolCommand.class,
 					new ProtocolCommandSerializer())
-					.registerTypeAdapter(ProtocolResponse.class,
-							new ProtocolResponseDeserializer()).create();
+			.registerTypeAdapter(ProtocolResponse.class,
+					new ProtocolResponseDeserializer()).create();
 
 		// FIXME: setup the actual idemix issue specification
 		System.out.println("==== Setting up credential infromation ===");
 		IdemixCredentials ic = new IdemixCredentials(null);
-		IssueCredentialInformation ici = new IssueCredentialInformation("RU", "studentCard");
+		IssueCredentialInformation ici = getIssueCredentialInformation(cred);
 
 		System.out.println("=== Getting issuance information ===");
 		IdemixIssueSpecification spec = ici.getIdemixIssueSpecification();
-
 
 		BigInteger nonce1 = ProtocolState.getNonce(id);
 		Attributes attributes = ProtocolState.getAttributes(id);
@@ -169,18 +158,23 @@ public class IssueStudentCredResource  extends ProtocolBaseResource {
 				ProtocolResponses.class);
 
 		// Run part one of protocol
-		List<ProtocolCommand> commands;
+		ProtocolCommands commands;
 		try {
 			// Run next part of protocol
 			commands = ic.requestIssueRound3Commands(spec, attributes, issuer, responses);
 		} catch (CredentialsException e) {
 			e.printStackTrace();
 			return ProtocolStep.newError("Error while issuing.");
+		} catch (NullPointerException e) {
+			// This appears to be thrown here if some verification fails
+			e.printStackTrace();
+			return ProtocolStep.newError("Error while issuing (null-pointer).");
 		}
 
 		ProtocolState.putStatus(id, "issuing");
 
 		ProtocolStep ps = new ProtocolStep();
+		// FIXME
 		ps.commands = commands;
 		ps.protocolDone = false;
 		ps.feedbackMessage = "Issuing credential (2)";
@@ -198,43 +192,23 @@ public class IssueStudentCredResource  extends ProtocolBaseResource {
 		return ps;
 	}
 	
-    private Attributes getIssuanceAttributes(String id) {
-        // Return the attributes that have been revealed during the proof
-        Attributes attributes = new Attributes();
-        
-        if(id.equals("s112233@ru.nl")) {
-    		attributes.add("university", "Radboud University".getBytes());
-    		attributes.add("studentCardNumber", "081122337".getBytes());
-    		attributes.add("studentID", "s112233".getBytes());
-    		attributes.add("level", "PhD".getBytes());
-    		attributes.add("expiry", "halfyear".getBytes());
-        } else if(id.toLowerCase().equals("u012147@ru.nl")) {
-        	attributes.add("university", "Radboud University".getBytes());
-    		attributes.add("studentCardNumber", "081122336".getBytes());
-    		attributes.add("studentID", "u012147".getBytes());
-    		attributes.add("level", "PhD".getBytes());
-    		attributes.add("expiry", "halfyear".getBytes());
-        } else if(id.toLowerCase().equals("u921154@ru.nl")) {
-        	attributes.add("university", "Radboud University".getBytes());
-    		attributes.add("studentCardNumber", "2300921154".getBytes());
-    		attributes.add("studentID", "u921154".getBytes());
-    		attributes.add("level", "PhD".getBytes());
-    		attributes.add("expiry", "halfyear".getBytes());
-        } else {
-			attributes.add("university", "Radboud University".getBytes());
-			attributes.add("studentCardNumber", "0813371337".getBytes());
-			attributes.add("studentID", "s1234567".getBytes());
-			attributes.add("level", "PhD".getBytes());
-    		attributes.add("expiry", "halfyear".getBytes());
-        }
-		
-		return attributes;
+	public abstract Map<String,IssueCredentialInfo> getIssueCredentialInfos(String id);
+	public abstract IssueCredentialInformation getIssueCredentialInformation(String cred);
+	
+	protected String makeIssueResponseURL(String id, String cred, int step) {
+		String path = getReference().getPath();
+		String reqID = (String) getRequestAttributes().get("id");
+		if (reqID == null) {
+			return getBaseURL() + path + '/' + id + '/' + cred + '/' + Integer.toString(step);
+		}
+		return getBaseURL() + path.substring(0, path.lastIndexOf('/')+1) + Integer.toString(step);
 	}
 	
-    private boolean eligibleForIssuance(String id) {
-    	return id.toLowerCase().substring(0, 1).equals("s") ||
-    			id.toLowerCase().equals("u012147@ru.nl") ||
-    			id.toLowerCase().equals("u921154@ru.nl");
-    }
-
+	protected Attributes makeAttributes(Map<String,String> map) {
+		Attributes attributes = new Attributes();
+		for(String key : map.keySet()) {
+			attributes.add(key, map.get(key).getBytes());
+		}
+		return attributes;
+	}
 }

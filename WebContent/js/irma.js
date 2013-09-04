@@ -218,11 +218,7 @@ var IRMA = {
 			success : function(data) {
 				console.log(data);
 				if (data.status === 'success') {
-					IRMA.Handler.close();
 					IRMA.onVerifySuccess(data);
-				} else if (data.status === 'issue') {
-					// TODO: maybe this can go as well
-					IRMA.onVerifySuccessIssue(data);
 				} else if (data.status === 'error') {
 					IRMA.show_failure(data.feedbackMessage, "FAILED");
 				} else {
@@ -393,6 +389,7 @@ var IRMA = {
 		$("#IRMA_button_issue").html("DONE");
 		$("#IRMA_button_issue").addClass("enabled");
 		$("#IRMA_button_issue").button().on("click", function(event) {
+			IRMA.Handler.close();
 			window.location = IRMA.after_issue_target;
 		});
 	},
@@ -495,17 +492,8 @@ var IRMA = {
 		$("#IRMA_button_verify").html("CONTINUE");
 		$("#IRMA_button_verify").addClass("enabled");
 		$("#IRMA_button_verify").on("click", function(event) {
+			IRMA.Handler.close();
 			window.location = data.result;
-		});
-	},
-
-	onVerifySuccessIssue: function(data) {
-		$("#IRMA_status_icon").prop("src", "../../img/irma_icon_ok_520px.png");
-		$("#IRMA_status_text").html("Hit 'CONTINUE' to proceed to the issuing step");
-		$("#IRMA_button_verify").html("CONTINUE");
-		$("#IRMA_button_verify").addClass("enabled");
-		$("#IRMA_button_verify").on("click", function(event) {
-			alert("Not implemented!");
 		});
 	},
 

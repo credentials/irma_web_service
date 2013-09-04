@@ -33,17 +33,19 @@ var Channel = function() {
 			};
 			that.waitForMessage();
 		};
-		this.send = function(sendData) {
+		this.send = function(sendData, async) {
 			that = this;
+			async = typeof sync !== "undefined" ? async : true;
 			$.ajax({
 				url : that.write_url,
 				contentType : 'application/json',
 				type : 'POST',
+				async: async,
 				data : JSON.stringify(sendData),
 				success : function(data) {
 					// nothing for now, maybe add callback in future?
 					console.log("Sent something to ", that.write_url);
-				}
+				},
 			});
 		};
 		this.close = function() {

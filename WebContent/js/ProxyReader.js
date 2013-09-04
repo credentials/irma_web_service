@@ -141,12 +141,13 @@ var ProxyReader = {
 	},
 
 	close: function() {
+		console.log("Closing connection");
 		var cmd = {};
 		cmd.type = "event";
 		cmd.name = "done";
 		cmd.id = this.randomId();
 
-		this.toProxy.send(cmd);
+		this.toProxy.send(cmd, false);
 		this.fromProxy.close();
 	},
 

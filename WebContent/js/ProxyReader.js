@@ -1,6 +1,6 @@
 var ProxyReader = {
 	// Some local variables
-	channelBaseURL: "/cardproxy_web_relay/create",
+	channelBaseURL: "/irma_web_relay/create",
 	
 	// Channels
 	toProxy: null,

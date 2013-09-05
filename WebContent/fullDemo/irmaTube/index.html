@@ -66,6 +66,7 @@
 
 			IRMA.onVerifySuccess = function(data) {
 				IRMA.hide_verify();
+				IRMA.done();
 				console.log(data);
 
 				$("#irmaTube").fadeIn();

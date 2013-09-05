@@ -388,10 +388,14 @@ var IRMA = {
 	finish_issuing: function() {
 		$("#IRMA_button_issue").html("DONE");
 		$("#IRMA_button_issue").addClass("enabled");
+		IRMA.done();
 		$("#IRMA_button_issue").button().on("click", function(event) {
-			IRMA.Handler.close();
 			window.location = IRMA.after_issue_target;
 		});
+	},
+
+	done: function() {
+		IRMA.Handler.close();
 	},
 
 	handle_issue_failure: function(response) {

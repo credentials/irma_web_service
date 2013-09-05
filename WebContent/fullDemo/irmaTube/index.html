@@ -1,5 +1,5 @@
 <!DOCTYPE html>
-<html xmlns="http://www.w3.org/1999/xhtml" xml:lang="en" lang="en">
+<html lang="en">
 
 <head>
 	<meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
@@ -41,14 +41,13 @@
 		<div id="movie_{{id}}_wrapper">
 		<!-- moviePlayer template goes here -->
 		<div class="mosaic-block bar" id="movie_{{id}}">
-			<span href="#" onclick="openMovie('{{id}}', '{{ageLimit}}');" class="mosaic-overlay">
-				<h4>{{title}}
+			<span href="#"  class="mosaic-overlay">
+				<h4 onclick="openMovie('{{id}}', '{{ageLimit}}');">{{title}}</h4>
 				{{#ageLimit}}
-				<a target='_blank' href='IRMA-age-reference.html'>
+				<a href='#ageModal' onclick="showAgeModal()">
 					<img src='img/movieage-{{ageLimit}}.png' />
 				</a>
 				{{/ageLimit}}
-				</h4>
 			</span>
 
 			<div class="mosaic-backdrop">
@@ -59,6 +58,9 @@
 	</script>
 
 	<script type="text/javascript">
+		function showAgeModal() {
+			$("#ageModal").modal();
+		};
 		function openMovie(videoNumber, ageLimit) {
 			IRMA.base_url = "/irma_web_service/protocols/verification/IRMATube/" + ageLimit;
 			IRMA.verifier_logo = "img/irmatube_verifier.png";
@@ -116,6 +118,51 @@
 <body>
 	<div id="irmaTube">
 	<br>
+	<div id="ageModal" class="modal hide" tabindex="-1" role="dialog"
+		aria-labelledby="ageModal" aria-hidden="true">
+		<div class="modal-header">
+			<button type="button" class="close" data-dismiss="modal"
+				aria-hidden="true">×</button>
+			<h3 id="ageModal">Age references</h3>
+		</div>
+			<div class="modal-body">
+				<p>To watch movie trailers, you need to prove membership of the
+					IRMA Tube club. Having your IRMA card at hand, you can do this
+					easily. Please use your card reader or your NFC-enabled mobile
+					phone.</p>
+
+				<p>Don't forget that the IRMA technology is secure and respects
+					your privacy. Neither central authorities nor the IRMA Tube service
+					provider knows who you are, nobody can trace what movies you watch
+					and you are interested in.</p>
+
+				<table class="table">
+					<tr>
+						<td></td>
+						<td>If the movie is not age restricted, you only need to show
+							that you are a member.</td>
+					</tr>
+					<tr>
+						<td><img src="img/movieage-12.png" /></td>
+						<td>You need to show your 'Over 12' attribute and that you
+							are a member</td>
+					</tr>
+					<tr>
+						<td><img src="img/movieage-16.png" /></td>
+						<td>You need to show your 'Over 16' attribute and that you
+							are a member</td>
+					</tr>
+					<tr>
+						<td><img src="img/movieage-18.png" /></td>
+						<td>You need to show your 'Over 18' attribute and that you
+							are a member</td>
+					</tr>
+				</table>
+			</div>
+			<div class="modal-footer">
+			<button class="btn" data-dismiss="modal" aria-hidden="true">Close</button>
+		</div>
+	</div>
 
 	<div id="irmaTubeHeading" class="row">
 	<div class="span10">

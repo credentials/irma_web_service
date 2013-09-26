@@ -11,10 +11,12 @@ import org.irmacard.web.restapi.resources.NYTimesVerificationResource;
 import org.irmacard.web.restapi.resources.SpuitenEnSlikkenVerificationResource;
 import org.irmacard.web.restapi.resources.StudentCardIssueResource;
 import org.irmacard.web.restapi.resources.StudentCardVerificationResource;
-import org.irmacard.web.restapi.resources.VerificationProtocolResource;
 import org.irmacard.web.restapi.resources.irmaTube.IRMATubeRegistrationIssueResource;
 import org.irmacard.web.restapi.resources.irmaTube.IRMATubeRegistrationVerificationResource;
 import org.irmacard.web.restapi.resources.irmaTube.IRMATubeVerificationResource;
+import org.irmacard.web.restapi.resources.irmaWiki.IRMAWikiRegistrationIssueResource;
+import org.irmacard.web.restapi.resources.irmaWiki.IRMAWikiRegistrationVerificationResource;
+import org.irmacard.web.restapi.resources.irmaWiki.IRMAWikiVerificationResource;
 import org.restlet.Application;
 import org.restlet.Restlet;
 import org.restlet.routing.Router;
@@ -50,6 +52,13 @@ public class IRMAProtocolApplication extends Application {
 
 		router.attach("/verification/IRMATube/{age}", IRMATubeVerificationResource.class);
 		router.attach("/verification/IRMATube/{age}/{id}/{step}", IRMATubeVerificationResource.class);
+
+		router.attach("/verification/IRMAWiki", IRMAWikiVerificationResource.class);
+		router.attach("/verification/IRMAWiki/{id}/{step}", IRMAWikiVerificationResource.class);
+		router.attach("/verification/IRMAWikiRegistration", IRMAWikiRegistrationVerificationResource.class);
+		router.attach("/verification/IRMAWikiRegistration/{id}/{step}", IRMAWikiRegistrationVerificationResource.class);
+		router.attach("/issue/IRMAWikiRegistration/{id}", IRMAWikiRegistrationIssueResource.class);
+		router.attach("/issue/IRMAWikiRegistration/{id}/{cred}/{step}", IRMAWikiRegistrationIssueResource.class);
 
 		router.attach("/verification/MijnOverheid", MijnOverheidVerificationResource.class);
 		router.attach("/verification/MijnOverheid/{id}/{step}", MijnOverheidVerificationResource.class);

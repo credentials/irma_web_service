@@ -20,7 +20,6 @@ public class IRMAWikiVerificationResource extends
 
 	public IRMAWikiVerificationResource() {
 		try {
-			
 			memberDescription = DescriptionStore.getInstance()
 					.getVerificationDescriptionByName(VERIFIER, VERIFICATIONID);
 		} catch (InfoException e) {

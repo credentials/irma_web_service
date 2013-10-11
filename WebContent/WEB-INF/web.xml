@@ -25,10 +25,18 @@
     <servlet-name>fileServlet</servlet-name>
     <servlet-class>org.irmacard.web.fileserver.IRMATubeFileServlet</servlet-class>
   </servlet>
-
+  <servlet>
+    <servlet-name>attributeStoreServlet</servlet-name>
+    <servlet-class>org.irmacard.web.irmaWiki.IRMAWikiAttributeStoreServlet</servlet-class>
+  </servlet>
+  
   <servlet-mapping>
     <servlet-name>fileServlet</servlet-name>
     <url-pattern>/resources/*</url-pattern>
+  </servlet-mapping>
+  <servlet-mapping>
+    <servlet-name>attributeStoreServlet</servlet-name>
+    <url-pattern>/attributeStore/*</url-pattern>
   </servlet-mapping>
   <mime-mapping>
     <extension>mp4</extension>

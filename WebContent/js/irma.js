@@ -1,7 +1,8 @@
 var IRMA = {
 	base_url: "/irma_web_service/protocols/verification/SpuitenEnSlikken",
 	irma_html: "../../irma/",
-	irma_aid: '49524D4163617264',
+	irma_aid: 'F849524D4163617264',
+	irma_aid_0_7: '49524D4163617264',
 	
 	// Target to go to after issuing is done
 	after_issue_target: "http://www.ru.nl/cybersecurity",
@@ -94,7 +95,8 @@ var IRMA = {
 		// Setup this.Handlers
 		IRMA.bindCallback("cardInserted", IRMA.createCardInsertedCallback(function() {
 			IRMA.Handler.selectApplet(IRMA.irma_aid, IRMA.enableVerify,
-					function() { IRMA.show_warning("Inserted card is not an IRMA card"); });
+					function() { IRMA.Handler.selectApplet(IRMA.irma_aid_0_7, IRMA.enableVerify,
+							function() { IRMA.show_warning("Inserted card is not an IRMA card"); }); });
 			IRMA.bindCallback("cardRemoved", function() {
 				IRMA.disableVerify();
 			});
@@ -261,8 +263,10 @@ var IRMA = {
 
 		IRMA.bindCallback("cardInserted", IRMA.createCardInsertedCallback(function() {
 			IRMA.Handler.selectApplet(IRMA.irma_aid, IRMA.enable_issue, function() {
-				$("#IRMA_status_icon").prop("src", "../../img/irma_icon_warning_520px.png");
-				$("#IRMA_status_text").html("Inserted card is not an IRMA card");
+				IRMA.Handler.selectApplet(IRMA.irma_aid_0_7, IRMA.enable_issue, function() {
+					$("#IRMA_status_icon").prop("src", "../../img/irma_icon_warning_520px.png");
+					$("#IRMA_status_text").html("Inserted card is not an IRMA card");
+				});
 			});
 			IRMA.bindCallback("cardRemoved", function() {IRMA.disable_issue();});
 		}));

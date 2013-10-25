@@ -151,6 +151,7 @@ var IRMA = {
 			url : IRMA.responseurl,
 			contentType : 'application/json',
 			type : 'POST',
+			data: { 'cardVersion' : IRMA.Handler.cardVersion },
 			success: function(data) {
 				console.log("Starting verification");
 				console.log(data);
@@ -310,6 +311,7 @@ var IRMA = {
 			url: IRMA.issue_url + '/' + IRMA.current_credential + '/1',
 			contentType: 'application/json',
 			type: 'POST',
+			data: { 'cardVersion' : IRMA.Handler.cardVersion },
 			success: function(data) {
 				console.log('Got first batch of data for issuing ' + IRMA.current_credential);
 				console.log(data);

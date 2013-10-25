@@ -1,41 +1,42 @@
 var ProxyReader = {
 	// Some local variables
 	channelBaseURL: "/irma_web_relay/create",
-	
+	cardVersion: "",
+
 	// Channels
 	toProxy: null,
 	fromProxy: null,
-	
+
 	// Callbacks
 	cardFoundCallback: function() {},
 	cardLostCallback: function() {},
 	readerFoundCallback: function() {},
-	
+
 	response_callbacks: {},
 	callbacks: {},
-		
+
 	init: function(url) {
 		ProxyReader.setup_channels();
 	},
-	
+
 	setup_channels: function() {
 		Channel.setup(ProxyReader.channelBaseURL, function(toProxy, fromProxy) {
 			console.log("Created to proxy channel", toProxy);
 			console.log("Created from proxy channel", fromProxy);
-			
+
 			// Store channels
 			ProxyReader.toProxy = toProxy;
 			ProxyReader.fromProxy = fromProxy;
-			
+
 			// Bind listen to this
 			ProxyReader.fromProxy.listen( function(msg) {
 				ProxyReader.handle_message(msg);
 			});
-			
+
 			// The Proxy app needs to listen to
 			console.log("HELLO HELLO: ", ProxyReader.toProxy.qr_url);
 			$("#qr_image").attr("src", ProxyReader.toProxy.qr_url);
-			
+
 			// Tell the proxy where to send its responses
 			ProxyReader.toProxy.send({write_url: ProxyReader.fromProxy.write_url});
 		}, function() {
@@ -66,22 +67,24 @@ var ProxyReader = {
 			delete this.response_callbacks[data.id];
 		}
 	},
-	
+
 	selectApplet: function(aid, success, failure) {
 		var hexlength = (aid.length/2).toString(16);
 		var selectAPDU = '00A40400' + (hexlength.length == 1 ? '0' : '') + hexlength + aid + '00';
 		var commands = [{key: "select_aid", command: selectAPDU}];
-		
+
 		ProxyReader.transmitCommandSet(commands, function(response) {
 			console.log(response);
-			if( response.arguments.responses["select_aid"].apdu.slice(-4) === '9000' ) {
+			rapdu = response.arguments.responses["select_aid"].apdu;
+			if( rapdu.slice(-4) === '9000' ) {
+				ProxyReader.cardVersion = rapdu.slice(0, rapdu.length - 4);
 				success();
 			} else {
 				failure();
 			}
 		});
 	},
-	
+
 	transmitCommandSet: function(commands, callback) {
 		var cmd = {};
 		cmd.type = "command";
@@ -90,7 +93,7 @@ var ProxyReader = {
 		cmd.arguments = {};
 		cmd.arguments.commands = commands;
 		console.log(cmd);
-		
+
 		// Check whether one of the commands failed
 		var wrapper_fct = function(data) {
 			var responses = data.arguments.responses;
@@ -123,7 +126,7 @@ var ProxyReader = {
 		this.register_callback(cmd.id, callback);
 		this.toProxy.send(cmd);
 	},
-	
+
 	sendFeedback: function(feedback, state) {
 		var cmd = {};
 		cmd.type = "event";
@@ -155,12 +158,12 @@ var ProxyReader = {
 		this.callbacks[eventName] = callback;
 		console.log("Bound ", eventName, this.callbacks);
 	},
-	
+
 	randomId: function() {
 		return Math.floor((1 + Math.random()) * 0x100000000)
 			.toString(16).substring(1);
 	},
-	
+
 	register_callback: function(id, callback) {
 		this.response_callbacks[id] = callback;
 	},

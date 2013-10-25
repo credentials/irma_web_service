@@ -18,7 +18,9 @@ import org.irmacard.credentials.idemix.spec.IdemixVerifySpecification;
 import org.irmacard.credentials.idemix.util.VerifyCredentialInformation;
 import org.irmacard.credentials.info.InfoException;
 import org.irmacard.credentials.info.VerificationDescription;
+import org.irmacard.idemix.util.CardVersion;
 import org.irmacard.web.restapi.ProtocolState;
+import org.irmacard.web.restapi.util.CardVersionDeserializer;
 import org.irmacard.web.restapi.util.ProtocolCommandSerializer;
 import org.irmacard.web.restapi.util.ProtocolInfo;
 import org.irmacard.web.restapi.util.ProtocolResponseDeserializer;
@@ -46,8 +48,8 @@ public abstract class VerificationBaseResource extends ProtocolBaseResource {
 		case 0:
 			ps = new ProtocolStep();
 			ps.info = new ProtocolInfo();
-			ps.info.qr_url = getReference().getPath() + "/" + id + "/qr";
-			ps.info.status_url = getReference().getPath() + "/" + id + "/status";
+			ps.info.qr_url = getBaseURL() + getBasePath() + "/" + id + "/qr";
+			ps.info.status_url = getBaseURL() + getBasePath() + "/" + id + "/status";
 			ps.info.verification_names = new HashMap<Short, String>();
 			ps.responseurl = makeResponseURL(id, step+1);
 			for(VerificationDescription vd : getVerifications(id)) {
@@ -55,7 +57,7 @@ public abstract class VerificationBaseResource extends ProtocolBaseResource {
 			}
 			break;
 		case 1:
-			ps = createVerificationProtocolStep(id, getVerifications(id));
+			ps = createVerificationProtocolStep(id, getVerifications(id), value);
 			ps.responseurl = makeResponseURL(id, step+1);
 			ProtocolState.putStatus(id, "step1");
 			break;
@@ -75,8 +77,15 @@ public abstract class VerificationBaseResource extends ProtocolBaseResource {
 	
 	public abstract ProtocolStep onSuccess(String id, Map<String,Attributes> attrMap);
 	
-	public static ProtocolStep createVerificationProtocolStep(String id, List<VerificationDescription> specs) {
+	public static ProtocolStep createVerificationProtocolStep(String id, List<VerificationDescription> specs, String value) {
 		ProtocolStep ps = new ProtocolStep();
+
+		Gson gson = new GsonBuilder()
+		.setPrettyPrinting()
+		.registerTypeAdapter(CardVersion.class,
+				new CardVersionDeserializer()).create();
+
+		CardVersion cv = gson.fromJson(value, CardVersion.class);
 
 		IdemixCredentials ic = new IdemixCredentials(null);
 		ps.commandsSets = new HashMap< Short, List<ProtocolCommand> >();
@@ -85,6 +94,7 @@ public abstract class VerificationBaseResource extends ProtocolBaseResource {
 			try {
 				vci = new VerifyCredentialInformation(vd.getVerifierID(), vd.getVerificationID());
 				IdemixVerifySpecification vspec = vci.getIdemixVerifySpecification();
+				vspec.setCardVersion(cv);
 				Nonce nonce = ic.generateNonce(vspec);
 				ProtocolState.putVerificationNonce(id, vd.getID(), ((IdemixNonce) nonce).getNonce());
 				ps.commandsSets.put(vd.getID(), ic.requestProofCommands(vspec, nonce));

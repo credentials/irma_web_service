@@ -25,13 +25,11 @@ public class IRMATubeVerificationResource extends
 
 	public IRMATubeVerificationResource() {
 		try {
-			
 			memberDescription = DescriptionStore.getInstance()
 					.getVerificationDescriptionByName(VERIFIER, VERIFICATIONID);
 		} catch (InfoException e) {
 			e.printStackTrace();
 		}
-
 	}
 
 	@Override

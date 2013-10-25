@@ -34,7 +34,7 @@ public class IRMAWikiRegistrationVerificationResource extends
 
 		ps.protocolDone = true;
 		ps.status = "success";
-		ps.result = getBaseURL() + "/irma_web_service/protocols/issue/IRMAWikiRegistration/" + id;
+		ps.result = getBaseURL() + "/protocols/issue/IRMAWikiRegistration/" + id;
 		return ps;
 	}
 

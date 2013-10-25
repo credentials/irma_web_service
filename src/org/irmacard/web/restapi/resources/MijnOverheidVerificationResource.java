@@ -45,7 +45,7 @@ public class MijnOverheidVerificationResource extends
 
 		ps.protocolDone = true;
 		ps.status = "success";
-		ps.result = getBaseURL() + "/irma_web_service/protocols/issue/MijnOverheid/" + (String) getRequestAttributes().get("id");
+		ps.result = getBaseURL() + "/protocols/issue/MijnOverheid/" + (String) getRequestAttributes().get("id");
 		//ps.result = makeResponseURL((String) getRequestAttributes().get("id"), 0);
 		return ps;
 	}

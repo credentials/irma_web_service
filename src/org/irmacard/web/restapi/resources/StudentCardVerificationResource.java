@@ -49,7 +49,7 @@ public class StudentCardVerificationResource extends
 
 		ps.protocolDone = true;
 		ps.status = "success";
-		ps.result = getBaseURL() + "/irma_web_service/protocols/issue/StudentCard/" + id;
+		ps.result = getBaseURL() + "/protocols/issue/StudentCard/" + id;
 		return ps;
 	}
 

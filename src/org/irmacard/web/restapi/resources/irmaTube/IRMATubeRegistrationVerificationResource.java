@@ -44,7 +44,7 @@ public class IRMATubeRegistrationVerificationResource extends
 
 		ps.protocolDone = true;
 		ps.status = "success";
-		ps.result = getBaseURL() + "/irma_web_service/protocols/issue/IRMATubeRegistration/" + id;
+		ps.result = getBaseURL() + "/protocols/issue/IRMATubeRegistration/" + id;
 		return ps;
 	}
 

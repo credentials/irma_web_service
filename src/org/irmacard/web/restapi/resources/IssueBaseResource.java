@@ -208,12 +208,10 @@ public abstract class IssueBaseResource  extends ProtocolBaseResource {
 	public abstract IssueCredentialInformation getIssueCredentialInformation(String cred);
 	
 	protected String makeIssueResponseURL(String id, String cred, int step) {
-		String path = getReference().getPath();
-		String reqID = (String) getRequestAttributes().get("id");
-		if (reqID == null) {
-			return getBaseURL() + path + '/' + id + '/' + cred + '/' + Integer.toString(step);
+		if (getRequestAttributes().get("id") == null) {
+			return getBaseURL() + getBasePath() + '/' + id + '/' + cred + '/' + Integer.toString(step);
 		}
-		return getBaseURL() + path.substring(0, path.lastIndexOf('/')+1) + Integer.toString(step);
+		return getBaseURL() + getBasePath().substring(0, getBasePath().lastIndexOf('/')+1) + Integer.toString(step);
 	}
 	
 	protected Attributes makeAttributes(Map<String,String> map) {

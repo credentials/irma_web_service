@@ -14,7 +14,9 @@ import org.irmacard.credentials.CredentialsException;
 import org.irmacard.credentials.idemix.IdemixCredentials;
 import org.irmacard.credentials.idemix.spec.IdemixIssueSpecification;
 import org.irmacard.credentials.idemix.util.IssueCredentialInformation;
+import org.irmacard.idemix.util.CardVersion;
 import org.irmacard.web.restapi.ProtocolState;
+import org.irmacard.web.restapi.util.CardVersionDeserializer;
 import org.irmacard.web.restapi.util.IssueCredentialInfo;
 import org.irmacard.web.restapi.util.ProtocolCommandSerializer;
 import org.irmacard.web.restapi.util.ProtocolInfo;
@@ -64,11 +66,18 @@ public abstract class IssueBaseResource  extends ProtocolBaseResource {
 	}
 	
 	private ProtocolStep createIssuanceProtocolStep1(String id, String cred, String value) {
+		Gson gson = new GsonBuilder()
+		.setPrettyPrinting()
+		.registerTypeAdapter(CardVersion.class,
+				new CardVersionDeserializer()).create();
+
 		// Check if eligible
 		Map<String, IssueCredentialInfo> issuer_info = getIssueCredentialInfos(id);
 		if(!issuer_info.containsKey(cred)) {
 			return ProtocolStep.newError("You are not allowed to be issued " + cred);
 		}
+
+		CardVersion cv = gson.fromJson(value, CardVersion.class);
 
 		Attributes attributes = makeAttributes(issuer_info.get(cred).attributes);
 
@@ -80,6 +89,7 @@ public abstract class IssueBaseResource  extends ProtocolBaseResource {
 		IdemixCredentials ic = new IdemixCredentials(null);
 		IssueCredentialInformation ici = getIssueCredentialInformation(cred);
 		IdemixIssueSpecification spec = ici.getIdemixIssueSpecification();
+		spec.setCardVersion(cv);
 
 		// Initialize the issuer
 		Issuer issuer = ici.getIssuer(attributes);
@@ -106,6 +116,7 @@ public abstract class IssueBaseResource  extends ProtocolBaseResource {
 		ProtocolState.putIssuer(id, issuer);
 		ProtocolState.putNonce(id, nonce1);
 		ProtocolState.putAttributes(id, attributes);
+		ProtocolState.putCardVersion(id, cv);
 		
 		ProtocolStep ps = new ProtocolStep();
 		ps.commands = commands;
@@ -134,6 +145,7 @@ public abstract class IssueBaseResource  extends ProtocolBaseResource {
 
 		System.out.println("=== Getting issuance information ===");
 		IdemixIssueSpecification spec = ici.getIdemixIssueSpecification();
+		spec.setCardVersion(ProtocolState.getCardVersion(id));
 
 		BigInteger nonce1 = ProtocolState.getNonce(id);
 		Attributes attributes = ProtocolState.getAttributes(id);

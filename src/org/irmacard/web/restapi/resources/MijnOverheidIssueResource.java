@@ -10,7 +10,7 @@ public class MijnOverheidIssueResource extends IssueBaseResource {
 	final String ISSUER = "MijnOverheid";
 
 	@Override
-	public Map<String, IssueCredentialInfo> getIssueCredentialInfos(String id) {
+	public Map<String, IssueCredentialInfo> getIssueCredentialInfos(String id, String value) {
 		Map<String, IssueCredentialInfo> map = new HashMap<String, IssueCredentialInfo>();
 		Map<String, String> attr1 = new HashMap<String, String>();
 		Map<String, String> attr2 = new HashMap<String, String>();

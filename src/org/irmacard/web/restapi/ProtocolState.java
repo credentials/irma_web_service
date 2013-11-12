@@ -6,6 +6,7 @@ import java.util.Map;
 
 import org.irmacard.credentials.Attributes;
 import org.irmacard.idemix.util.CardVersion;
+import org.irmacard.web.restapi.resources.irmaWiki.data.IRMAWikiIssuanceData;
 
 import com.ibm.zurich.idmx.issuance.Issuer;
 
@@ -30,9 +31,13 @@ public class ProtocolState {
 	// State for StudentCard issuing, keep track of the verified UUID
 	private static Map<String,String> studentCardUUIDMap = new HashMap<String, String>();
 
+	// State for IRMAWiki issuance.
+	private static Map<String, IRMAWikiIssuanceData> irmaWikiMap = new HashMap<String, IRMAWikiIssuanceData>();
+
 	public static BigInteger getNonce(String id) {
 		return nonceMap.get(id);
 	}
+
 	public static void putNonce(String id, BigInteger nonce) {
 		nonceMap.put(id, nonce);
 	}
@@ -57,6 +62,7 @@ public class ProtocolState {
 	public static Attributes getAttributes(String id) {
 		return attributesMap.get(id);
 	}
+
 	public static void putAttributes(String id, Attributes attributes) {
 		attributesMap.put(id, attributes);
 	}
@@ -64,6 +70,7 @@ public class ProtocolState {
 	public static Issuer getIssuer(String id) {
 		return issuerMap.get(id);
 	}
+
 	public static void putIssuer(String id, Issuer issuer) {
 		issuerMap.put(id, issuer);
 	}
@@ -71,6 +78,7 @@ public class ProtocolState {
 	public static String getStatus(String id) {
 		return stateMap.get(id);
 	}
+
 	public static void putStatus(String id, String state) {
 		stateMap.put(id, state);
 	}
@@ -85,6 +93,7 @@ public class ProtocolState {
 	public static void putIRMATubeAge(String id, String age) {
 		irmaTubeAgeMap.put(id, age);
 	}
+
 	public static String getIRMATubeAge(String id) {
 		return irmaTubeAgeMap.get(id);
 	}
@@ -92,7 +101,16 @@ public class ProtocolState {
 	public static void putStudentCardUUID(String id, String uuid) {
 		studentCardUUIDMap.put(id, uuid);
 	}
+
 	public static String getStudentCardUUID(String id) {
 		return studentCardUUIDMap.get(id);
+	}
+
+	public static void putIRMAWikiData(String id, IRMAWikiIssuanceData data) {
+		irmaWikiMap.put(id, data);
+	}
+
+	public static IRMAWikiIssuanceData getIRMAWikiData(String id) {
+		return irmaWikiMap.get(id);
 	}
 }

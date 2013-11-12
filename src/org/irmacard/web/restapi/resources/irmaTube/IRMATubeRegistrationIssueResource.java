@@ -15,7 +15,7 @@ public class IRMATubeRegistrationIssueResource extends IssueBaseResource {
 	private static final long ID_SIZE = 10000000000l;
 
 	@Override
-	public Map<String, IssueCredentialInfo> getIssueCredentialInfos(String id) {
+	public Map<String, IssueCredentialInfo> getIssueCredentialInfos(String id, String value) {
 		String age = ProtocolState.getIRMATubeAge(id);
 		String userID = (new Long((long) (Math.random()*ID_SIZE))).toString();
 		System.out.println("Some randomness: " + Math.random() + " " + Math.random());

@@ -12,7 +12,7 @@ public class StudentCardIssueResource extends IssueBaseResource {
 	final String CREDENTIAL = "studentCard";
 
 	@Override
-	public Map<String, IssueCredentialInfo> getIssueCredentialInfos(String id) {
+	public Map<String, IssueCredentialInfo> getIssueCredentialInfos(String id, String value) {
 		String userID = ProtocolState.getStudentCardUUID(id);
 
 		Map<String, IssueCredentialInfo> map = new HashMap<String, IssueCredentialInfo>();

@@ -2,9 +2,7 @@ package org.irmacard.web.irmaWiki;
 
 import java.io.IOException;
 import java.util.HashMap;
-import java.util.Iterator;
 import java.util.Map;
-import java.util.jar.Attributes;
 
 import javax.servlet.ServletContext;
 import javax.servlet.ServletException;
@@ -12,7 +10,12 @@ import javax.servlet.http.HttpServlet;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
+import org.irmacard.credentials.Attributes;
 import org.irmacard.web.restapi.resources.irmaWiki.IRMAWikiVerificationResource;
+import org.irmacard.web.restapi.resources.irmaWiki.data.IRMAWikiVerificationData;
+
+import com.google.gson.Gson;
+import com.google.gson.GsonBuilder;
 
 public class IRMAWikiAttributeStoreServlet extends HttpServlet {
 	
@@ -54,7 +57,6 @@ public class IRMAWikiAttributeStoreServlet extends HttpServlet {
     {
         // Get requested id by path info. Also, strip leading '/'
         String id = request.getPathInfo().substring(1);
-
     	if (id == null) {
     		// If the "id" parameter is not present you are not allowed to access any attributes.
     		response.sendError(HttpServletResponse.SC_FORBIDDEN);
@@ -62,7 +64,6 @@ public class IRMAWikiAttributeStoreServlet extends HttpServlet {
     	}
 
     	Attributes attributes = getAttributeStore().get(id);
-
     	if (attributes == null) {
     		// User hasn't authenticated with IRMA, so not allowed to access attributes.
     		System.out.println("Attributes not registered: access prohibited");
@@ -70,12 +71,9 @@ public class IRMAWikiAttributeStoreServlet extends HttpServlet {
     		return;
     	}
 
-        String php = "<?php $iwAttributeStore = array(";        
-        for (Iterator<Object> i = attributes.keySet().iterator(); i.hasNext();) {
-        	String name = (String) i.next();
-        	php += "'" + name + "' => '" + attributes.getValue(name) + "'" + (i.hasNext() ? ", " : ");"); 
-        }
-        response.getWriter().write(php);
+        Gson gson = new GsonBuilder().setPrettyPrinting().create();
+        String json = gson.toJson(new IRMAWikiVerificationData(attributes));
+        response.getWriter().write(json);
     }
 
     private Map<String, Attributes> getAttributeStore() {

@@ -3,7 +3,7 @@ var IRMA = {
 	irma_html: "../../irma/",
 	irma_aid: 'F849524D4163617264',
 	irma_aid_0_7: '49524D4163617264',
-	
+
 	// Target to go to after issuing is done
 	after_issue_target: "http://www.ru.nl/cybersecurity",
 	issuer_logo: "../../img/RU_logo_issuer.png",
@@ -11,6 +11,7 @@ var IRMA = {
 
 	irma_issue_state: 'idle',
 	issue_url: '',
+	issue_data: '',
 	responseurl: '',
 
 	card_connected: false,
@@ -66,7 +67,7 @@ var IRMA = {
 			}
 		});
 	},
-	
+
 	helper: function(url) {
 		$.ajax({
 			url: url,
@@ -86,7 +87,7 @@ var IRMA = {
 		$("#IRMA_verifier_logo_img").prop("src", IRMA.verifier_logo);
 		IRMA.show_verify();
 		IRMA.retrieve_verifications();
-		
+
 		console.log("Overriding readerfoundCallback");
 		IRMA.bindCallback("cardReaderFound", function() {
 			$("#qr_overlay").hide();
@@ -107,7 +108,7 @@ var IRMA = {
 			console.log("Connection timed out");
 		});
 	},
-	
+
 	retrieve_verifications: function() {
 		console.log("Retrieving verification information");
 		$.ajax({
@@ -122,7 +123,7 @@ var IRMA = {
 			}
 		});
 	},
-	
+
 	show_verifications: function(data) {
 		IRMA.verification_names = data.info.verification_names;
 		$(".IRMA_content_verify_credentials").html("");
@@ -134,13 +135,13 @@ var IRMA = {
 			}
 		}
 	},
-	
+
 	setup_qr: function() {
 		$("#IRMA_button_usephone").on("click",function(event) {
 			$("#qr_overlay").show();
 		});
 	},
-	
+
 	verifyButtonClicked: function(event) {
 		$("#IRMA_button_verify").off("click");
 		$("#IRMA_button_verify").removeClass("enabled");
@@ -194,7 +195,7 @@ var IRMA = {
 		IRMA.current_verification_idx++;
 		IRMA.verifyStepOne();
 	},
-	
+
 	finishVerify: function(responses, data) {
 		console.log("Finished IRMA verification");
 
@@ -257,7 +258,12 @@ var IRMA = {
 
 		console.log("Contacting: " + issue_url);
 		$.ajax({
+		  headers: {
+        'Accept': 'application/json',
+        'Content-Type': 'application/json'
+      },
 			url: issue_url,
+			data: JSON.stringify(issue_data),
 			type: "POST",
 			success: IRMA.display_issue_credentials,
 		});
@@ -395,7 +401,7 @@ var IRMA = {
 		$("#IRMA_button_issue").html("DONE");
 		$("#IRMA_button_issue").addClass("enabled");
 		IRMA.done();
-		$("#IRMA_button_issue").button().on("click", function(event) {
+		$("#IRMA_button_issue").on("click", function(event) {
 			window.location = IRMA.after_issue_target;
 		});
 	},
@@ -462,7 +468,7 @@ var IRMA = {
 		$("#IRMA_button_verify").removeClass("enabled");
 		$("#IRMA_button_verify").html("WAITING FOR CARD...");
 	},
-	
+
 	enableVerify: function() {
 		$("#IRMA_status_icon").prop("src", "../../img/irma_icon_ready_520px.png");
 		$("#IRMA_status_text").html("Hit 'VERIFY' to check your credential");
@@ -512,22 +518,22 @@ var IRMA = {
         $("#IRMA_status_text").html(text);
         IRMA.Handler.sendFeedback(text, "warning");
 	},
-	
+
 	show_failure_credential_not_found: function() {
 		IRMA.show_failure("Credential not found", "NOT FOUND");
 	},
-	
+
 	show_error_connection_lost: function() {
 		IRMA.show_error("Connection lost", "COMMUNICATION ERROR");
 	},
-	
+
 	show_error: function(text, status) {
 		$("#IRMA_status_icon").prop("src", "../../img/irma_icon_warning_520px.png");
 		$("#IRMA_status_text").html(text);
 		$("#IRMA_button_verify").html(status);
 		IRMA.Handler.sendFeedback(text, "failure");
 	},
-	
+
 	show_failure: function(text, status) {
 		$("#IRMA_status_icon").prop("src", "../../img/irma_icon_missing_520px.png");
 		$("#IRMA_status_text").html(text);

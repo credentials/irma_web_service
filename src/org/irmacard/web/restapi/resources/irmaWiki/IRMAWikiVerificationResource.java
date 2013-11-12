@@ -16,8 +16,8 @@ import org.irmacard.web.restapi.util.ProtocolStep;
 
 public class IRMAWikiVerificationResource extends
 		VerificationBaseResource {
-	final static String VERIFIER = "IRMATube";
-	final static String VERIFICATIONID = "memberType";
+	final static String VERIFIER = "IRMAWiki";
+	final static String VERIFICATIONID = "memberAll";
 	public static final String ATTRIBUTE_STORE_NAME = "IRMAWiki.attribute.store";
 
 	VerificationDescription memberDescription;
@@ -49,7 +49,7 @@ public class IRMAWikiVerificationResource extends
 		System.err.println("refPath: " + getReference().getPath() + "\n refQuery: " + getReference().getQuery());
 		ps.protocolDone = true;
 		ps.status = "success";
-		ps.result = "http://localhost/mediawiki/index.php?Special:IRMALogin/" + id;
+		ps.result = "http://localhost/mediawiki/index.php?title=Special:IRMALogin/" + id;
 		return ps;
 	}
 

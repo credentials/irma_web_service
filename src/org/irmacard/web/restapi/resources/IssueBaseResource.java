@@ -44,7 +44,7 @@ public abstract class IssueBaseResource  extends ProtocolBaseResource {
 			// Send overview of what can be issued
 			ps = new ProtocolStep();
 			ps.info = new ProtocolInfo();
-			ps.info.issue_information = getIssueCredentialInfos(id); 
+			ps.info.issue_information = getIssueCredentialInfos(id, value);
 			break;
 		case 1:
 			// Send first step of issuance commands, for specific credential
@@ -72,7 +72,7 @@ public abstract class IssueBaseResource  extends ProtocolBaseResource {
 				new CardVersionDeserializer()).create();
 
 		// Check if eligible
-		Map<String, IssueCredentialInfo> issuer_info = getIssueCredentialInfos(id);
+		Map<String, IssueCredentialInfo> issuer_info = getIssueCredentialInfos(id, value);
 		if(!issuer_info.containsKey(cred)) {
 			return ProtocolStep.newError("You are not allowed to be issued " + cred);
 		}
@@ -204,7 +204,7 @@ public abstract class IssueBaseResource  extends ProtocolBaseResource {
 		return ps;
 	}
 	
-	public abstract Map<String,IssueCredentialInfo> getIssueCredentialInfos(String id);
+	public abstract Map<String,IssueCredentialInfo> getIssueCredentialInfos(String id, String value);
 	public abstract IssueCredentialInformation getIssueCredentialInformation(String cred);
 	
 	protected String makeIssueResponseURL(String id, String cred, int step) {

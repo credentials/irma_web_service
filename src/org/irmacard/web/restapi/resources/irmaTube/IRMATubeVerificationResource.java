@@ -70,12 +70,9 @@ public class IRMATubeVerificationResource extends
 			getAgeStore().put(id, NO_AGE_VERIFIED);
 		}
 
-		String servletURL = getRootRef().getPath();
-		String serviceURL = servletURL.substring(0,servletURL.lastIndexOf('/'));
-
 		ps.protocolDone = true;
 		ps.status = "success";
-		ps.result = getBaseURL() + serviceURL + "/resources/" + id;
+		ps.result = getBaseURL() + "/resources/" + id;
 		return ps;
 	}
 

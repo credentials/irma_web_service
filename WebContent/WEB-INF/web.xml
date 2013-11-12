@@ -46,4 +46,15 @@
     <extension>webm</extension>
     <mime-type>video/webm</mime-type>
   </mime-mapping>
+
+  <!-- Enable Cross-Origin Resource Sharing for this web service -->
+  <filter>
+    <filter-name>CometCorsFilter</filter-name>
+    <filter-class>org.irmacard.comet.filters.CometCorsFilter</filter-class>
+  </filter>
+  <filter-mapping>
+    <filter-name>CometCorsFilter</filter-name>
+    <url-pattern>/*</url-pattern>
+  </filter-mapping>
+
 </web-app>

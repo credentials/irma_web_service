@@ -14,7 +14,7 @@ import org.irmacard.web.restapi.util.ProtocolStep;
 public class IRMAWikiRegistrationVerificationResource extends
 		VerificationBaseResource {
 	final static String VERIFIER = "IRMAWiki";
-	final static String VERIFICATION_ID = "rootCredentialNone";
+	final static String VERIFICATION_ID = "surfnetRootNone";
 
 	VerificationDescription rootDesc;
 

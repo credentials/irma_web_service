@@ -148,6 +148,7 @@ var IRMA = {
 		$("#IRMA_button_verify").html("VERIFYING...");
 
 		IRMA.Handler.bind("cardRemoved", function() {});
+
 		$.ajax({
 			url : IRMA.responseurl,
 			contentType : 'application/json',
@@ -162,9 +163,19 @@ var IRMA = {
 				IRMA.current_verification_idx = 0;
 				IRMA.responseurl = data.responseurl;
 
-				IRMA.verifyStepOne();
+		    IRMA.Handler.verifyPin(IRMA.verify_start);
 			}
 		});
+	},
+
+	verify_start: function(response) {
+		console.log("Pin verified", response);
+		if(response.arguments.result === "success") {
+      IRMA.verifyStepOne();
+		} else {
+			// FIXME Do some error handling
+			// TODO test blocking pin and feedback for that
+		}
 	},
 
 	// Select next set of commands to send

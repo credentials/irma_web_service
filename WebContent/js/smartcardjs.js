@@ -51,7 +51,9 @@
 		  },
 		  transmit: function(command) {
 			  console.log("Transmit: " + command);
-			  return this.applet.transmitString(command);
+			  response = this.applet.transmitString(command);
+			  console.log("Response: " + response)
+			  return response;
 		  },
 		  sendFeedback: function(message, state) {
 			// Not possible on normal cardreaders

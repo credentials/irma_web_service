@@ -48,9 +48,18 @@
 		}
 		IRMA.onVerifySuccess = function(data) {
 			console.log(data);
+			var issueData = new Object();
+		    issueData.empty = true;
+    		console.log(issueData);
 			issue_url = data.result;
+			issue_data = issueData;
 			$.ajax({
+			  	headers: {
+	    	    	'Accept': 'application/json',
+        			'Content-Type': 'application/json'
+      		  	},
 				url: data.result,
+				data: JSON.stringify(issueData),
 				type: 'POST',
 				success: start_issuance,
 			});

@@ -2,188 +2,189 @@
 <html lang="en">
 
 <head>
-	<meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
-	<meta name="keywords" content="IRMA, IRMATube, film, privacy, security">
-	<meta name="description"
-		content="Experimental IRMATube video streaming service">
+  <meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
+  <meta name="keywords" content="IRMA, IRMATube, film, privacy, security">
+  <meta name="description"
+    content="Experimental IRMATube video streaming service">
 
-	<title>IRMATube - Watch movies without others noticing it!</title>
+  <title>IRMATube - Watch movies without others noticing it!</title>
 
-	<link href="../../css/irma.css" rel="stylesheet" type="text/css" />
-	<link href="../../css/mosaic.css" rel="stylesheet" type="text/css" />
-	<link href="../../css/bootstrap.css" rel="stylesheet" type="text/css" />
-	<meta name="viewport" content="width=device-width, initial-scale=1.0">
-	<link href="../../css/bootstrap-responsive.css" rel="stylesheet">
-	<link href="css/irmatube.css" rel="stylesheet" type="text/css" />
+  <link href="../../css/irma.css" rel="stylesheet" type="text/css" />
+  <link href="../../css/mosaic.css" rel="stylesheet" type="text/css" />
+  <link href="../../css/bootstrap.css" rel="stylesheet" type="text/css" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <link href="../../css/bootstrap-responsive.css" rel="stylesheet">
+  <link href="css/irmatube.css" rel="stylesheet" type="text/css" />
 
-	<script src="../../js/jquery-1.8.1.min.js" type="text/javascript"></script>
-	<script src="../../js/mosaic.1.0.1.min.js" type="text/javascript"></script>
-	<script src="../../js/mustache.js" type="text/javascript"></script>
-	<script src="content/movies.js" type="text/javascript"></script>
+  <script src="../../js/jquery-1.8.1.min.js" type="text/javascript"></script>
+  <script src="../../js/mosaic.1.0.1.min.js" type="text/javascript"></script>
+  <script src="../../js/mustache.js" type="text/javascript"></script>
+  <script src="content/movies.js" type="text/javascript"></script>
 
-	<script src="../../js/smartcardjs.js" type="text/javascript"></script>
-	<script src="../../js/channel.js" type="text/javascript"></script>
-	<script src="../../js/ProxyReader.js" type="text/javascript"></script>
-	<script src="../../js/bootstrap.min.js" type="text/javascript"></script>
-	<script src="../../js/irma.js" type="text/javascript"></script>
+  <script src="../../js/smartcardjs.js" type="text/javascript"></script>
+  <script src="../../js/channel.js" type="text/javascript"></script>
+  <script src="../../js/ProxyReader.js" type="text/javascript"></script>
+  <script src="../../js/bootstrap.min.js" type="text/javascript"></script>
+  <script src="../../js/irma.js" type="text/javascript"></script>
 
-	<script id="moviePlayerTpl" type="text/template">
-		<div class="video-overlay" id="video_div_{{id}}">
-			<video controls="controls" preload="none" id="video_{{id}}" height="400" width="700">
-				<source src="{{url}}/{{id}}.webm" type="video/webm">
-				<source src="{{url}}/{{id}}.mp4" type="video/mp4">
-				Your browser does not support the video tag.
-			</video>
-			<button onclick="closeMovie('{{id}}')">Close</button>
-		</div>
-    </script>
-	<script id="movieTpl" type="text/template">
-		<div id="movie_{{id}}_wrapper">
-		<!-- moviePlayer template goes here -->
-		<div class="mosaic-block bar" id="movie_{{id}}">
-			<span href="#"  class="mosaic-overlay">
-				<h4 onclick="openMovie('{{id}}', '{{ageLimit}}');">{{title}}</h4>
-				{{#ageLimit}}
-				<a href='#ageModal' onclick="showAgeModal()">
-					<img src='img/movieage-{{ageLimit}}.png' />
-				</a>
-				{{/ageLimit}}
-			</span>
+  <script id="moviePlayerTpl" type="text/template">
+    <div class="video-overlay" id="video_div_{{id}}">
+      <video controls="controls" preload="none" id="video_{{id}}" height="400" width="700">
+        <source src="{{url}}/{{id}}.webm" type="video/webm">
+        <source src="{{url}}/{{id}}.mp4" type="video/mp4">
+        Your browser does not support the video tag.
+      </video>
+      <button onclick="closeMovie('{{id}}')">Close</button>
+    </div>
+  </script>
+  <script id="movieTpl" type="text/template">
+    <div id="movie_{{id}}_wrapper">
+    <!-- moviePlayer template goes here -->
+    <div class="mosaic-block bar" id="movie_{{id}}">
+      <span href="#"  class="mosaic-overlay">
+        <h4 onclick="openMovie('{{id}}', '{{ageLimit}}');">{{title}}</h4>
+        {{#ageLimit}}
+        <a href='#ageModal' onclick="showAgeModal()">
+          <img src='img/movieage-{{ageLimit}}.png' />
+        </a>
+        {{/ageLimit}}
+      </span>
 
-			<div class="mosaic-backdrop">
-				<img alt="{{title}}" src="content/{{id}}.jpg">
-			</div>
-		</div>
-		</div>
-	</script>
+      <div class="mosaic-backdrop">
+        <img alt="{{title}}" src="content/{{id}}.jpg">
+      </div>
+    </div>
+    </div>
+  </script>
 
-	<script type="text/javascript">
-		function showAgeModal() {
-			$("#ageModal").modal();
-		};
-		function openMovie(videoNumber, ageLimit) {
-			IRMA.base_url = "/irma_web_service/protocols/verification/IRMATube/" + ageLimit;
-			IRMA.verifier_logo = "img/irmatube_verifier.png";
-			$("#irmaTube").hide();
+  <script type="text/javascript">
+    function showAgeModal() {
+      $("#ageModal").modal();
+    };
 
-			IRMA.onVerifySuccess = function(data) {
-				IRMA.hide_verify();
-				IRMA.done();
-				console.log(data);
+    function openMovie(videoNumber, ageLimit) {
+      IRMAURL.action = IRMAURL.base + "/protocols/verification/IRMATube/" + ageLimit;
+      $("#irmaTube").hide();
 
-				$("#irmaTube").fadeIn();
+      IRMA.onVerifySuccess = function(data) {
+        IRMA.hide_verify();
+        IRMA.done();
+        console.log(data);
 
-				var data = {id: videoNumber,
-							url: data.result};
-				var video_template = $("#moviePlayerTpl").html();
-				$("#movie_" + videoNumber + "_wrapper").prepend(Mustache.to_html(video_template, data));
+        $("#irmaTube").fadeIn();
 
-				$("#video_div_" + videoNumber).css("display", "block");
-				$("#video_" + videoNumber).get(0).load();
-				$("#video_" + videoNumber).get(0).play();
-			}
+        var data = {id: videoNumber, url: data.result};
+        var video_template = $("#moviePlayerTpl").html();
+        $("#movie_" + videoNumber + "_wrapper").prepend(Mustache.to_html(video_template, data));
 
-			IRMA.onBackButtonPressed = function(data) {
-				IRMA.hide_verify();
-				$("#irmaTube").show();
-			}
+        $("#video_div_" + videoNumber).css("display", "block");
+        $("#video_" + videoNumber).get(0).load();
+        $("#video_" + videoNumber).get(0).play();
+      }
 
-			IRMA.start_verify();
-		}
+      IRMA.onBackButtonPressed = function(data) {
+        IRMA.hide_verify();
+        $("#irmaTube").show();
+      }
 
-		function closeMovie(videoNumber) {
-			$("#video_div_" + videoNumber).css("display", "none");
-			$("#video_" + videoNumber).get(0).pause();
-			$("#video_div_" + videoNumber).remove();
-		}
+      IRMA.start_verify();
+    }
 
-		$(function() {
-			IRMA.init();
+    function closeMovie(videoNumber) {
+      $("#video_div_" + videoNumber).css("display", "none");
+      $("#video_" + videoNumber).get(0).pause();
+      $("#video_div_" + videoNumber).remove();
+    }
 
-			var template = $("#movieTpl").html();
-			IRMATubeMovies.sort(function() { return 0.5 - Math.random();});
-			console.log(IRMATubeMovies);
-			for ( var i = 0; i < IRMATubeMovies.length; i++) {
-				movie = IRMATubeMovies[i];
-				console.log(movie);
-				$("#movies").append(Mustache.to_html(template, movie));
-				$("#movie_" + movie.id).mosaic({
-					animation : 'slide'
-				});
-			}
-		});
-	</script>
+    $(function() {
+      IRMAURL.base = "/irma_web_service";
+      IRMAURL.verifierLogo = IRMAURL.base + "/img/irmatube_verifier.png";
+      IRMA.init();
+
+      var template = $("#movieTpl").html();
+      IRMATubeMovies.sort(function() { return 0.5 - Math.random();});
+      console.log(IRMATubeMovies);
+      for ( var i = 0; i < IRMATubeMovies.length; i++) {
+        movie = IRMATubeMovies[i];
+        console.log(movie);
+        $("#movies").append(Mustache.to_html(template, movie));
+        $("#movie_" + movie.id).mosaic({
+          animation : 'slide'
+        });
+      }
+    });
+  </script>
 </head>
 
 <body>
-	<div id="irmaTube">
-	<br>
-	<div id="ageModal" class="modal hide" tabindex="-1" role="dialog"
-		aria-labelledby="ageModal" aria-hidden="true">
-		<div class="modal-header">
-			<button type="button" class="close" data-dismiss="modal"
-				aria-hidden="true">×</button>
-			<h3 id="ageModal">Age references</h3>
-		</div>
-			<div class="modal-body">
-				<p>To watch movie trailers, you need to prove membership of the
-					IRMA Tube club. Having your IRMA card at hand, you can do this
-					easily. Please use your card reader or your NFC-enabled mobile
-					phone.</p>
+  <div id="irmaTube">
+  <br>
+  <div id="ageModal" class="modal hide" tabindex="-1" role="dialog"
+    aria-labelledby="ageModal" aria-hidden="true">
+    <div class="modal-header">
+      <button type="button" class="close" data-dismiss="modal"
+        aria-hidden="true">×</button>
+      <h3 id="ageModal">Age references</h3>
+    </div>
+      <div class="modal-body">
+        <p>To watch movie trailers, you need to prove membership of the
+          IRMA Tube club. Having your IRMA card at hand, you can do this
+          easily. Please use your card reader or your NFC-enabled mobile
+          phone.</p>
 
-				<p>Don't forget that the IRMA technology is secure and respects
-					your privacy. Neither central authorities nor the IRMA Tube service
-					provider knows who you are, nobody can trace what movies you watch
-					and you are interested in.</p>
+        <p>Don't forget that the IRMA technology is secure and respects
+          your privacy. Neither central authorities nor the IRMA Tube service
+          provider knows who you are, nobody can trace what movies you watch
+          and you are interested in.</p>
 
-				<table class="table">
-					<tr>
-						<td></td>
-						<td>If the movie is not age restricted, you only need to show
-							that you are a member.</td>
-					</tr>
-					<tr>
-						<td><img src="img/movieage-12.png" /></td>
-						<td>You need to show your 'Over 12' attribute and that you
-							are a member</td>
-					</tr>
-					<tr>
-						<td><img src="img/movieage-16.png" /></td>
-						<td>You need to show your 'Over 16' attribute and that you
-							are a member</td>
-					</tr>
-					<tr>
-						<td><img src="img/movieage-18.png" /></td>
-						<td>You need to show your 'Over 18' attribute and that you
-							are a member</td>
-					</tr>
-				</table>
-			</div>
-			<div class="modal-footer">
-			<button class="btn" data-dismiss="modal" aria-hidden="true">Close</button>
-		</div>
-	</div>
+        <table class="table">
+          <tr>
+            <td></td>
+            <td>If the movie is not age restricted, you only need to show
+              that you are a member.</td>
+          </tr>
+          <tr>
+            <td><img src="img/movieage-12.png" /></td>
+            <td>You need to show your 'Over 12' attribute and that you
+              are a member</td>
+          </tr>
+          <tr>
+            <td><img src="img/movieage-16.png" /></td>
+            <td>You need to show your 'Over 16' attribute and that you
+              are a member</td>
+          </tr>
+          <tr>
+            <td><img src="img/movieage-18.png" /></td>
+            <td>You need to show your 'Over 18' attribute and that you
+              are a member</td>
+          </tr>
+        </table>
+      </div>
+      <div class="modal-footer">
+      <button class="btn" data-dismiss="modal" aria-hidden="true">Close</button>
+    </div>
+  </div>
 
-	<div id="irmaTubeHeading" class="row">
-	<div class="span10">
-	<a href="http://www.irmacard.org/"><img src="img/IRMATube_logo.png"
-		width="200" /></a>
-	<div>
-		<img src="img/arrows_blue_animated.gif" id="arrow" />
-		IRMATube is the privacy-friendly video-streaming service
-	</div>
-	</div>
-	<div class="span2">
-		<a href="register.html" class="btn btn-primary pull-right">Register</a>
-	</div>
-	</div>
+  <div id="irmaTubeHeading" class="row">
+  <div class="span10">
+  <a href="http://www.irmacard.org/"><img src="img/IRMATube_logo.png"
+    width="200" /></a>
+  <div>
+    <img src="img/arrows_blue_animated.gif" id="arrow" />
+    IRMATube is the privacy-friendly video-streaming service
+  </div>
+  </div>
+  <div class="span2">
+    <a href="register.html" class="btn btn-primary pull-right">Register</a>
+  </div>
+  </div>
 
-	<div class="row">
-		<div id="movies" class="span12"></div>
-		</div>
-	</div>
+  <div class="row">
+    <div id="movies" class="span12"></div>
+    </div>
+  </div>
 
-	<object classid="clsid:8AD9C840-044E-11D1-B3E9-00805F499D93" height="10" width="10">
+  <object classid="clsid:8AD9C840-044E-11D1-B3E9-00805F499D93" height="10" width="10">
       <param name="code" value="org.irmacard.scjs.SmartCardJS.class" />
       <param name="archive" value="../../smartcardjs.jar" />
       <param name="type" value="application/x-java-applet;version=1.6" />

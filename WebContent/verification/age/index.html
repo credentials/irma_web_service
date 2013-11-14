@@ -1,57 +1,58 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-	<meta charset="utf-8">
-	<title>IRMA Age verification</title>
-	<link href="../../css/irma.css" rel="stylesheet" type="text/css" />
-	<link
-		href="http://fonts.googleapis.com/css?family=Ubuntu:regular,bold&subset=Latin"
-		rel="stylesheet" type="text/css" />
-	<link href="../../css/bootstrap.css" rel="stylesheet" type="text/css" />
-	
-	<script src="../../js/smartcardjs.js" type="text/javascript"></script>
-	<script src="../../js/channel.js" type="text/javascript"></script>
-	<script src="../../js/ProxyReader.js" type="text/javascript"></script>
-	<script src="../../js/jquery.js" type="text/javascript"></script>
-	<script src="../../js/irma.js" type="text/javascript"></script>
+  <meta charset="utf-8">
+  <title>IRMA Age verification</title>
+  <link href="../../css/irma.css" rel="stylesheet" type="text/css" />
+  <link
+    href="http://fonts.googleapis.com/css?family=Ubuntu:regular,bold&subset=Latin"
+    rel="stylesheet" type="text/css" />
+  <link href="../../css/bootstrap.css" rel="stylesheet" type="text/css" />
+  
+  <script src="../../js/smartcardjs.js" type="text/javascript"></script>
+  <script src="../../js/channel.js" type="text/javascript"></script>
+  <script src="../../js/ProxyReader.js" type="text/javascript"></script>
+  <script src="../../js/jquery.js" type="text/javascript"></script>
+  <script src="../../js/irma.js" type="text/javascript"></script>
 
-	<script>
-		$(function() {
-			IRMA.base_url = "/irma_web_service/protocols/verification/SpuitenEnSlikken";
-			IRMA.verifier_logo = "../../img/SnS_logo.png";
-			IRMA.init();
-			IRMA.onBackButtonPressed = function(data) {
-				IRMA.hide_verify();
-				$("#RU_welcome").show();
-			}
-			$("#verify").on('click', function(event) {
-				$("SnS_welcome").hide();
-				IRMA.start_verify();
-			});
-		});
-	</script>
+  <script>
+    $(function() {
+      IRMAURL.base = "/irma_web_service";
+      IRMAURL.action = IRMAURL.base + "/protocols/verification/SpuitenEnSlikken";
+      IRMAURL.verifierLogo = IRMAURL.base + "/img/SnS_logo.png";
+      IRMA.init();
+      IRMA.onBackButtonPressed = function(data) {
+        IRMA.hide_verify();
+        $("#RU_welcome").show();
+      }
+      $("#verify").on('click', function(event) {
+        $("SnS_welcome").hide();
+        IRMA.start_verify();
+      });
+    });
+  </script>
 </head>
 <body>
-	<div id="SnS_welcome" class="container">
-		<div class="page-header">    
-			<h1><img alt="Spuiten en Slikken" src="../../img/SnS_logo.png"> Age verification</h1>
-		</div>
-		<div class="row">
-			<p>The website you requested has age restrictions, you have to be <strong>at least 16 years old</strong>.</p>
-			<p><img id="verify" src="../../img/verify16.png"/></p>
-		</div>
-	</div>
+  <div id="SnS_welcome" class="container">
+    <div class="page-header">    
+      <h1><img alt="Spuiten en Slikken" src="../../img/SnS_logo.png"> Age verification</h1>
+    </div>
+    <div class="row">
+      <p>The website you requested has age restrictions, you have to be <strong>at least 16 years old</strong>.</p>
+      <p><img id="verify" src="../../img/verify16.png"/></p>
+    </div>
+  </div>
 
-	<object classid="clsid:8AD9C840-044E-11D1-B3E9-00805F499D93" height="10" width="10">
-		<param name="code" value="org.irmacard.scjs.SmartCardJS.class" />
-		<param name="archive" value="../../smartcardjs.jar" />
-		<param name="type" value="application/x-java-applet;version=1.6" />
-		<param name="scriptable" value="true" />
-		<param name="mayscript" value="true" />
-		<embed type="application/x-java-applet;version=1.6" hidden="true"
-			code="org.irmacard.scjs.SmartCardJS.class"
-			archive="../../smartcardjs.jar" scriptable="true" mayscript="true"
-			height="10" width="10" />
-	</object>
+  <object classid="clsid:8AD9C840-044E-11D1-B3E9-00805F499D93" height="10" width="10">
+    <param name="code" value="org.irmacard.scjs.SmartCardJS.class" />
+    <param name="archive" value="../../smartcardjs.jar" />
+    <param name="type" value="application/x-java-applet;version=1.6" />
+    <param name="scriptable" value="true" />
+    <param name="mayscript" value="true" />
+    <embed type="application/x-java-applet;version=1.6" hidden="true"
+      code="org.irmacard.scjs.SmartCardJS.class"
+      archive="../../smartcardjs.jar" scriptable="true" mayscript="true"
+      height="10" width="10" />
+  </object>
 </body>
 </html>

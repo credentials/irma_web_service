@@ -1,5 +1,7 @@
   var SmartCardHandler = {
-		  
+
+			cardVersion: "",
+
 		  init: function(applet) {
 			  this.waitTime = 100;
 			  this.applet = applet;
@@ -38,11 +40,14 @@
 		  selectApplet: function(aid, success, failure) {
 			  var hexlength = (aid.length/2).toString(16),
 			  	  selectAPDU = '00A40400' + (hexlength.length == 1 ? '0' : '') + hexlength + aid + '00';
-			  if(this.transmit(selectAPDU).slice(-4) === '9000') {
-				  success();
+			  rapdu = this.transmit(selectAPDU);
+              console.log("response: " + rapdu);
+			  if( rapdu.slice(-4) === '9000' ) {
+				SmartCardHandler.cardVersion = rapdu.slice(0, rapdu.length - 4);
+				success();
 			  } else {
-				  failure();
-			  };
+			  	failure();
+			  }
 		  },
 		  transmit: function(command) {
 			  console.log("Transmit: " + command);

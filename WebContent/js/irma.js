@@ -32,6 +32,10 @@ var IRMA = {
 	// Can be overridden by implementing pages
 	onBackButtonPressed: function() {},
 
+	onIssuanceFinished: function(event) {
+		window.location = IRMA.after_issue_target;
+	},
+
 	init: function() {
 		IRMA.load_extra_html(IRMAURL.html + "/issue.html");
 		IRMA.load_extra_html(IRMAURL.html + "/verify.html");
@@ -416,8 +420,8 @@ var IRMA = {
 		$("#IRMA_button_issue").html("DONE");
 		$("#IRMA_button_issue").addClass("enabled");
 		IRMA.done();
-		$("#IRMA_button_issue").on("click", function(event) {
-			window.location = IRMA.after_issue_target;
+		$("#IRMA_button_issue").on("click", function() {
+			IRMA.onIssuanceFinished();
 		});
 	},
 

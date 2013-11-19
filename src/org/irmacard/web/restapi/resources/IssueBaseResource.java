@@ -14,6 +14,7 @@ import org.irmacard.credentials.CredentialsException;
 import org.irmacard.credentials.idemix.IdemixCredentials;
 import org.irmacard.credentials.idemix.spec.IdemixIssueSpecification;
 import org.irmacard.credentials.idemix.util.IssueCredentialInformation;
+import org.irmacard.credentials.info.InfoException;
 import org.irmacard.idemix.util.CardVersion;
 import org.irmacard.web.restapi.ProtocolState;
 import org.irmacard.web.restapi.util.CardVersionDeserializer;
@@ -25,11 +26,12 @@ import org.irmacard.web.restapi.util.ProtocolStep;
 
 import com.google.gson.Gson;
 import com.google.gson.GsonBuilder;
+import com.google.gson.JsonSyntaxException;
 import com.ibm.zurich.idmx.issuance.Issuer;
 
 public abstract class IssueBaseResource  extends ProtocolBaseResource {	
 	@Override
-	public String handleProtocolStep(String id, int step, String value) {
+	public String handleProtocolStep(String id, int step, String value) throws InfoException {
 		System.out.println("Handle post called!!!");
 		Gson gson = new GsonBuilder()
 			.setPrettyPrinting()
@@ -65,7 +67,7 @@ public abstract class IssueBaseResource  extends ProtocolBaseResource {
 		return gson.toJson(ps);
 	}
 	
-	private ProtocolStep createIssuanceProtocolStep1(String id, String cred, String value) {
+	private ProtocolStep createIssuanceProtocolStep1(String id, String cred, String value) throws InfoException, JsonSyntaxException {
 		Gson gson = new GsonBuilder()
 		.setPrettyPrinting()
 		.registerTypeAdapter(CardVersion.class,
@@ -82,7 +84,7 @@ public abstract class IssueBaseResource  extends ProtocolBaseResource {
 		Attributes attributes = makeAttributes(issuer_info.get(cred).attributes);
 
 		// FIXME: should not really do this here.
-		attributes.setExpiryAttribute(null);
+		attributes.setExpireDate(null);
 		
 		ProtocolState.putStatus(id, "issueready");
 		
@@ -130,7 +132,7 @@ public abstract class IssueBaseResource  extends ProtocolBaseResource {
 		
 	}
 
-	private ProtocolStep createIssuanceProtocolStep2(String id, String cred, String value) {
+	private ProtocolStep createIssuanceProtocolStep2(String id, String cred, String value) throws InfoException {
 		Gson gson = new GsonBuilder()
 			.setPrettyPrinting()
 			.registerTypeAdapter(ProtocolCommand.class,
@@ -205,7 +207,7 @@ public abstract class IssueBaseResource  extends ProtocolBaseResource {
 	}
 	
 	public abstract Map<String,IssueCredentialInfo> getIssueCredentialInfos(String id, String value);
-	public abstract IssueCredentialInformation getIssueCredentialInformation(String cred);
+	public abstract IssueCredentialInformation getIssueCredentialInformation(String cred) throws InfoException;
 	
 	protected String makeIssueResponseURL(String id, String cred, int step) {
 		if (getRequestAttributes().get("id") == null) {

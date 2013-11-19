@@ -11,6 +11,7 @@ import org.irmacard.credentials.idemix.IdemixCredentials;
 import org.irmacard.credentials.idemix.IdemixNonce;
 import org.irmacard.credentials.idemix.spec.IdemixVerifySpecification;
 import org.irmacard.credentials.idemix.util.VerifyCredentialInformation;
+import org.irmacard.credentials.info.InfoException;
 import org.irmacard.web.restapi.ProtocolState;
 import org.irmacard.web.restapi.util.ProtocolCommandSerializer;
 import org.irmacard.web.restapi.util.ProtocolResponseDeserializer;
@@ -22,14 +23,8 @@ import com.google.gson.GsonBuilder;
 
 public class VerificationProtocolResource extends ProtocolBaseResource {
 	
-	// TODO: the ISSUER and CRED_NAME should be deduced from the 
-	// proofspec, but the credentials API doesn't support that yet.
-	private static final String ISSUER = "MijnOverheid";
-	private static final String CRED_NAME = "ageLower";
-	
-	
 	@Override
-	public String handleProtocolStep(String id, int step, String value) {
+	public String handleProtocolStep(String id, int step, String value) throws InfoException {
 		String verifier = (String) getRequestAttributes().get("verifier");
 		String specName = (String) getRequestAttributes().get("specname");
 
@@ -38,8 +33,7 @@ public class VerificationProtocolResource extends ProtocolBaseResource {
 			.registerTypeAdapter(ProtocolCommand.class,
 					new ProtocolCommandSerializer()).create();
 
-		VerifyCredentialInformation vci = new VerifyCredentialInformation(
-				ISSUER, CRED_NAME, verifier, specName);
+		VerifyCredentialInformation vci = new VerifyCredentialInformation(verifier, specName);
 		IdemixVerifySpecification vspec = vci.getIdemixVerifySpecification();
 		
 		ProtocolStep ps = null;

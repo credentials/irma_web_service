@@ -4,6 +4,7 @@ import java.util.HashMap;
 import java.util.Map;
 
 import org.irmacard.credentials.idemix.util.IssueCredentialInformation;
+import org.irmacard.credentials.info.InfoException;
 import org.irmacard.web.restapi.ProtocolState;
 import org.irmacard.web.restapi.resources.IssueBaseResource;
 import org.irmacard.web.restapi.resources.irmaWiki.data.IRMAWikiIssuanceData;
@@ -60,7 +61,7 @@ public class IRMAWikiRegistrationIssueResource extends IssueBaseResource {
 		return map;
 	}
 
-	public IssueCredentialInformation getIssueCredentialInformation(String cred) {
+	public IssueCredentialInformation getIssueCredentialInformation(String cred) throws InfoException {
 		return new IssueCredentialInformation(ISSUER, cred);
 	}
 }

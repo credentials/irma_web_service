@@ -4,6 +4,7 @@ import java.util.HashMap;
 import java.util.Map;
 
 import org.irmacard.credentials.idemix.util.IssueCredentialInformation;
+import org.irmacard.credentials.info.InfoException;
 import org.irmacard.web.restapi.util.IssueCredentialInfo;
 
 public class MijnOverheidIssueResource extends IssueBaseResource {
@@ -37,7 +38,7 @@ public class MijnOverheidIssueResource extends IssueBaseResource {
 		return map;
 	}
 	
-	public IssueCredentialInformation getIssueCredentialInformation(String cred) {
+	public IssueCredentialInformation getIssueCredentialInformation(String cred) throws InfoException {
 		return new IssueCredentialInformation(ISSUER, cred);
 	}
 }

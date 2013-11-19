@@ -17,6 +17,7 @@ import org.irmacard.web.restapi.resources.irmaTube.IRMATubeVerificationResource;
 import org.irmacard.web.restapi.resources.irmaWiki.IRMAWikiRegistrationIssueResource;
 import org.irmacard.web.restapi.resources.irmaWiki.IRMAWikiRegistrationVerificationResource;
 import org.irmacard.web.restapi.resources.irmaWiki.IRMAWikiVerificationResource;
+import org.irmacard.web.restapi.resources.surfnetCoupons.SurfnetVoucherVerificationResource;
 import org.restlet.Application;
 import org.restlet.Restlet;
 import org.restlet.routing.Router;
@@ -52,6 +53,9 @@ public class IRMAProtocolApplication extends Application {
 
 		router.attach("/verification/IRMATube/{age}", IRMATubeVerificationResource.class);
 		router.attach("/verification/IRMATube/{age}/{id}/{step}", IRMATubeVerificationResource.class);
+
+		router.attach("/verification/SurfnetVoucher", SurfnetVoucherVerificationResource.class);
+		router.attach("/verification/SurfnetVoucher/{id}/{step}", SurfnetVoucherVerificationResource.class);
 
 		router.attach("/verification/IRMAWiki", IRMAWikiVerificationResource.class);
 		router.attach("/verification/IRMAWiki/{id}/{step}", IRMAWikiVerificationResource.class);

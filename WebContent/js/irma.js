@@ -72,6 +72,10 @@ var IRMA = {
 			async: false,
 			success: function(res) {
 				$('body').prepend(res);
+				$("#IRMA_issuer_arrow_img").prop("src", IRMAURL.img + "/irma_arrow_white_312px.png");
+				$("#IRMA_issuer_irma_img").prop("src", IRMAURL.img + "/irma_logo_1024px.png");
+				$("#IRMA_verifier_arrow_img").prop("src", IRMAURL.img + "/irma_arrow_312px.png");
+				$("#IRMA_verifier_irma_img").prop("src", IRMAURL.img + "/irma_logo_1024px.png");
 			}
 		});
 	},

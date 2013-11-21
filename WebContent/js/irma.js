@@ -87,6 +87,12 @@ var IRMA = {
 		});
 	},
 
+	// Return system to workable initial state
+	// TODO: work on state engine to make this robust.
+	verification_reset: function() {
+		IRMA.retrieve_verifications();
+	},
+
 	start_verify: function() {
 		IRMA.disableVerify(); // Reset state
 		console.log("Starting IRMA verification");
@@ -262,6 +268,7 @@ var IRMA = {
 		} else {
 			IRMA.show_failure("Unknown error verifying " + cred_name, "FAILED");
 		}
+		IRMA.verification_reset();
 	},
 
 	is_communication_error: function(response) {

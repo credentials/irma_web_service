@@ -2,7 +2,7 @@ var IRMAURL = new Object();
 IRMAURL.base = "/irma_web_service";
 IRMAURL.action = IRMAURL.base + "/protocols/verification/SpuitenEnSlikken";
 IRMAURL.html = IRMAURL.base + "/irma";
-IRMAURL.icon = IRMAURL.base + "/img";
+IRMAURL.img = IRMAURL.base + "/img";
 IRMAURL.issuerLogo = IRMAURL.base + "/img/RU_logo_issuer.png";
 IRMAURL.verifierLogo = IRMAURL.base + "/img/RU_logo_verifier.png";
 
@@ -72,10 +72,6 @@ var IRMA = {
 			async: false,
 			success: function(res) {
 				$('body').prepend(res);
-				$("#IRMA_issuer_arrow_img").prop("src", IRMAURL.img + "/irma_arrow_white_312px.png");
-				$("#IRMA_issuer_irma_img").prop("src", IRMAURL.img + "/irma_logo_1024px.png");
-				$("#IRMA_verifier_arrow_img").prop("src", IRMAURL.img + "/irma_arrow_312px.png");
-				$("#IRMA_verifier_irma_img").prop("src", IRMAURL.img + "/irma_logo_1024px.png");
 			}
 		});
 	},
@@ -275,6 +271,8 @@ var IRMA = {
 
 	start_batch_issue: function(selection, issue_url) {
 		$("#IRMA_issuer_logo_img").prop("src", IRMAURL.issuerLogo);
+		$("#IRMA_issuer_arrow_img").prop("src", IRMAURL.img + "/irma_arrow_white_312px.png");
+		$("#IRMA_issuer_irma_img").prop("src", IRMAURL.img + "/irma_logo_1024px.png");
 		IRMA.show_issue();
 		IRMA.selection = selection;
 		IRMA.issue_url = issue_url;
@@ -294,7 +292,7 @@ var IRMA = {
 		IRMA.bindCallback("cardInserted", IRMA.createCardInsertedCallback(function() {
 			IRMA.Handler.selectApplet(IRMA.irma_aid, IRMA.enable_issue, function() {
 				IRMA.Handler.selectApplet(IRMA.irma_aid_0_7, IRMA.enable_issue, function() {
-					$("#IRMA_status_icon").prop("src", IRMAURL.icon + "/irma_icon_warning_520px.png");
+					$("#IRMA_status_icon").prop("src", IRMAURL.img + "/irma_icon_warning_520px.png");
 					$("#IRMA_status_text").html("Inserted card is not an IRMA card");
 				});
 			});
@@ -485,7 +483,9 @@ var IRMA = {
 	},
 
 	disableVerify: function () {
-		$("#IRMA_status_icon").prop("src", IRMAURL.icon + "/irma_icon_waiting_520px.png");
+		$("#IRMA_status_icon").prop("src", IRMAURL.img + "/irma_icon_waiting_520px.png");
+		$("#IRMA_verifier_arrow_img").prop("src", IRMAURL.img + "/irma_arrow_312px.png");
+		$("#IRMA_verifier_irma_img").prop("src", IRMAURL.img + "/irma_logo_1024px.png");
 		$("#IRMA_status_text").html("Insert your IRMA card or use your phone");
 		$("#IRMA_button_verify").off("click");
 		$("#IRMA_button_verify").removeClass("enabled");
@@ -493,7 +493,7 @@ var IRMA = {
 	},
 
 	enableVerify: function() {
-		$("#IRMA_status_icon").prop("src", IRMAURL.icon + "/irma_icon_ready_520px.png");
+		$("#IRMA_status_icon").prop("src", IRMAURL.img + "/irma_icon_ready_520px.png");
 		$("#IRMA_status_text").html("Hit 'VERIFY' to check your credential");
 		$("#IRMA_button_verify").html("VERIFY");
 		$("#IRMA_button_verify").addClass("enabled");
@@ -526,7 +526,7 @@ var IRMA = {
 
 	onVerifySuccess: function(data) {
 		console.log("Internal on verify succes function called");
-		$("#IRMA_status_icon").prop("src", IRMAURL.icon + "/irma_icon_ok_520px.png");
+		$("#IRMA_status_icon").prop("src", IRMAURL.img + "/irma_icon_ok_520px.png");
 		$("#IRMA_status_text").html("Hit 'CONTINUE' to proceed to the website");
 		$("#IRMA_button_verify").html("CONTINUE");
 		$("#IRMA_button_verify").addClass("enabled");
@@ -537,7 +537,7 @@ var IRMA = {
 	},
 
 	show_warning: function(text) {
-        $("#IRMA_status_icon").prop("src", IRMAURL.icon + "/irma_icon_warning_520px.png");
+        $("#IRMA_status_icon").prop("src", IRMAURL.img + "/irma_icon_warning_520px.png");
         $("#IRMA_status_text").html(text);
         IRMA.Handler.sendFeedback(text, "warning");
 	},
@@ -551,14 +551,14 @@ var IRMA = {
 	},
 
 	show_error: function(text, status) {
-		$("#IRMA_status_icon").prop("src", IRMAURL.icon + "/irma_icon_warning_520px.png");
+		$("#IRMA_status_icon").prop("src", IRMAURL.img + "/irma_icon_warning_520px.png");
 		$("#IRMA_status_text").html(text);
 		$("#IRMA_button_verify").html(status);
 		IRMA.Handler.sendFeedback(text, "failure");
 	},
 
 	show_failure: function(text, status) {
-		$("#IRMA_status_icon").prop("src", IRMAURL.icon + "/irma_icon_missing_520px.png");
+		$("#IRMA_status_icon").prop("src", IRMAURL.img + "/irma_icon_missing_520px.png");
 		$("#IRMA_status_text").html(text);
 		IRMA.Handler.sendFeedback(text, "failure");
 		$("#IRMA_button_verify").html(status);

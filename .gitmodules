@@ -1,0 +1,3 @@
+[submodule "data/irma_configuration"]
+	path = data/irma_configuration
+	url = git@github.com:credentials/irma_configuration

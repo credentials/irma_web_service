@@ -5,8 +5,6 @@ import java.net.URISyntaxException;
 
 import org.irmacard.credentials.idemix.util.CredentialInformation;
 import org.irmacard.credentials.info.DescriptionStore;
-import org.irmacard.web.restapi.resources.MijnOverheidIssueResource;
-import org.irmacard.web.restapi.resources.MijnOverheidVerificationResource;
 import org.irmacard.web.restapi.resources.NYTimesVerificationResource;
 import org.irmacard.web.restapi.resources.SpuitenEnSlikkenVerificationResource;
 import org.irmacard.web.restapi.resources.StudentCardIssueResource;
@@ -20,7 +18,6 @@ import org.irmacard.web.restapi.resources.irmaWiki.IRMAWikiVerificationResource;
 import org.restlet.Application;
 import org.restlet.Restlet;
 import org.restlet.routing.Router;
-
 
 public class IRMAProtocolApplication extends Application {
 	/**
@@ -59,11 +56,6 @@ public class IRMAProtocolApplication extends Application {
 		router.attach("/verification/IRMAWikiRegistration/{id}/{step}", IRMAWikiRegistrationVerificationResource.class);
 		router.attach("/issue/IRMAWikiRegistration/{id}", IRMAWikiRegistrationIssueResource.class);
 		router.attach("/issue/IRMAWikiRegistration/{id}/{cred}/{step}", IRMAWikiRegistrationIssueResource.class);
-
-		router.attach("/verification/MijnOverheid", MijnOverheidVerificationResource.class);
-		router.attach("/verification/MijnOverheid/{id}/{step}", MijnOverheidVerificationResource.class);
-		router.attach("/issue/MijnOverheid/{id}", MijnOverheidIssueResource.class);
-		router.attach("/issue/MijnOverheid/{id}/{cred}/{step}", MijnOverheidIssueResource.class);
 
 		router.attach("/verification/StudentCard", StudentCardVerificationResource.class);
 		router.attach("/verification/StudentCard/{id}/{step}", StudentCardVerificationResource.class);

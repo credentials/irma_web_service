@@ -6,8 +6,21 @@
 			  this.waitTime = 100;
 			  this.applet = applet;
 			  this.callbacks = {};
-			  this.waitForApplet();	
+			  this.waitForApplet();
 		  },
+
+		  poll: function() {
+			  console.log("Testing if card was already present");
+			  try {
+				  this.connectFirstCard();
+				  test = this.transmit("802B0100");
+				  if(!(typeof test === "undefined")) {
+					  console.log("Simulating card inserted event later");
+					  setTimeout(function () {SmartCardHandler.handleCallback("cardInserted");}, 500);
+				  }
+			  } catch (e) {};
+		  },
+
 		  waitForApplet: function() {
 			  this.waitTime = Math.min(this.waitTime * 2,2000);
 			  if (typeof document.embeds[0].run != 'undefined') {

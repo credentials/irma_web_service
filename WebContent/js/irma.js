@@ -121,6 +121,8 @@ var IRMA = {
 			// TODO not clear how to handle this in the UI
 			console.log("Connection timed out");
 		});
+
+		SmartCardHandler.poll();
 	},
 
 	retrieve_verifications: function() {

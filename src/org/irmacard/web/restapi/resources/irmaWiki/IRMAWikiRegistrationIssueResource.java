@@ -20,6 +20,7 @@ public class IRMAWikiRegistrationIssueResource extends IssueBaseResource {
 	public class Names {
 		public String nickname;
 		public String realname;
+		public String email;
 		public Names() {}
 	}
 
@@ -37,6 +38,7 @@ public class IRMAWikiRegistrationIssueResource extends IssueBaseResource {
 			if (names != null && names.nickname != null) {
 				data.nickname = names.nickname;
 				data.realname = names.realname;
+				data.email = names.email;
 			}
 		}
 		
@@ -51,6 +53,8 @@ public class IRMAWikiRegistrationIssueResource extends IssueBaseResource {
 		ici.name = "Member Credential";
 		attributes.put("type", "user");
 		attributes.put("nickname", data.nickname);
+		attributes.put("realname", data.realname);
+		attributes.put("email", data.email);
 		ici.attributes = attributes;
 		
 		System.out.println("IRMAWiki: registered new user with nickname " + data.nickname + "(" + data.realname + ")");

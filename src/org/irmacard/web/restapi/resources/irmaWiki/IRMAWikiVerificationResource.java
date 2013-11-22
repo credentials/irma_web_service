@@ -49,7 +49,7 @@ public class IRMAWikiVerificationResource extends
 		System.err.println("refPath: " + getReference().getPath() + "\n refQuery: " + getReference().getQuery());
 		ps.protocolDone = true;
 		ps.status = "success";
-		ps.result = "http://localhost/mediawiki/index.php?title=Special:IRMALogin/" + id;
+		ps.result = "http://wiki.pilot.irmacard.org/index.php?title=Special:IRMALogin/" + id;
 		return ps;
 	}
 

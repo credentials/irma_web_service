@@ -87,6 +87,12 @@ var IRMA = {
 		});
 	},
 
+	// Return system to workable initial state
+	// TODO: work on state engine to make this robust.
+	verification_reset: function() {
+		IRMA.retrieve_verifications();
+	},
+
 	start_verify: function() {
 		IRMA.disableVerify(); // Reset state
 		console.log("Starting IRMA verification");
@@ -115,6 +121,8 @@ var IRMA = {
 			// TODO not clear how to handle this in the UI
 			console.log("Connection timed out");
 		});
+
+		SmartCardHandler.poll();
 	},
 
 	retrieve_verifications: function() {
@@ -262,6 +270,7 @@ var IRMA = {
 		} else {
 			IRMA.show_failure("Unknown error verifying " + cred_name, "FAILED");
 		}
+		IRMA.verification_reset();
 	},
 
 	is_communication_error: function(response) {
@@ -277,12 +286,17 @@ var IRMA = {
 		IRMA.selection = selection;
 		IRMA.issue_url = issue_url;
 
+		if(typeof issue_data === "undefined") {
+			issue_data = new Object();
+			issue_data.empty = true;
+		}
+
 		console.log("Contacting: " + issue_url);
 		$.ajax({
-		  headers: {
-        'Accept': 'application/json',
-        'Content-Type': 'application/json'
-      },
+			headers: {
+				'Accept': 'application/json',
+				'Content-Type': 'application/json'
+			},
 			url: issue_url,
 			data: JSON.stringify(issue_data),
 			type: "POST",

@@ -61,8 +61,6 @@ public class StudentCardVerificationResource extends
 	}
 
     private boolean eligibleForIssuance(String id) {
-    	return id.toLowerCase().substring(0, 1).equals("s") ||
-    			id.toLowerCase().equals("u012147@ru.nl") ||
-    			id.toLowerCase().equals("u921154@ru.nl");
+    	return id.toLowerCase().startsWith("s");
     }
 }

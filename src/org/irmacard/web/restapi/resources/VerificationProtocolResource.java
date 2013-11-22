@@ -20,9 +20,7 @@ import org.irmacard.web.restapi.util.ProtocolStep;
 import com.google.gson.Gson;
 import com.google.gson.GsonBuilder;
 
-
-public class VerificationProtocolResource extends ProtocolBaseResource {
-	
+public class VerificationProtocolResource extends ProtocolBaseResource {	
 	@Override
 	public String handleProtocolStep(String id, int step, String value) throws InfoException {
 		String verifier = (String) getRequestAttributes().get("verifier");
@@ -33,7 +31,15 @@ public class VerificationProtocolResource extends ProtocolBaseResource {
 			.registerTypeAdapter(ProtocolCommand.class,
 					new ProtocolCommandSerializer()).create();
 
-		VerifyCredentialInformation vci = new VerifyCredentialInformation(verifier, specName);
+		VerifyCredentialInformation vci = null;
+		try {
+			vci = new VerifyCredentialInformation(verifier, specName);
+		} catch (InfoException e1) {
+			// TODO Auto-generated catch block
+			// TODO Is this still used in practice?
+			e1.printStackTrace();
+			return "Error";
+		}
 		IdemixVerifySpecification vspec = vci.getIdemixVerifySpecification();
 		
 		ProtocolStep ps = null;

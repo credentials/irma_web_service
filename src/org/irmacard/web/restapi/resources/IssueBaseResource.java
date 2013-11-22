@@ -89,7 +89,13 @@ public abstract class IssueBaseResource  extends ProtocolBaseResource {
 		ProtocolState.putStatus(id, "issueready");
 		
 		IdemixCredentials ic = new IdemixCredentials(null);
-		IssueCredentialInformation ici = getIssueCredentialInformation(cred);
+		IssueCredentialInformation ici;
+		try {
+			ici = getIssueCredentialInformation(cred);
+		} catch (InfoException e) {
+			e.printStackTrace();
+			return ProtocolStep.newError("Cannot read issuance information");
+		}
 		IdemixIssueSpecification spec = ici.getIdemixIssueSpecification();
 		spec.setCardVersion(cv);
 
@@ -143,7 +149,13 @@ public abstract class IssueBaseResource  extends ProtocolBaseResource {
 		// FIXME: setup the actual idemix issue specification
 		System.out.println("==== Setting up credential infromation ===");
 		IdemixCredentials ic = new IdemixCredentials(null);
-		IssueCredentialInformation ici = getIssueCredentialInformation(cred);
+		IssueCredentialInformation ici;
+		try {
+			ici = getIssueCredentialInformation(cred);
+		} catch (InfoException e) {
+			e.printStackTrace();
+			return ProtocolStep.newError("Cannot read issuance information");
+		}
 
 		System.out.println("=== Getting issuance information ===");
 		IdemixIssueSpecification spec = ici.getIdemixIssueSpecification();

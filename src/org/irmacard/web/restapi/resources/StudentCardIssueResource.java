@@ -28,36 +28,31 @@ public class StudentCardIssueResource extends IssueBaseResource {
     private Map<String, String> getIssuanceAttributes(String id) {
         // Return the attributes that have been revealed during the proof
         Map<String,String> attributes = new HashMap<String,String>();
-        
-        if(id.equals("s112233@ru.nl")) {
-    		attributes.put("university", "Radboud University");
-    		attributes.put("studentCardNumber", "081122337");
-    		attributes.put("studentID", "s112233");
-    		attributes.put("level", "PhD");
-    		attributes.put("expiry", "halfyear");
-        } else if(id.toLowerCase().equals("u012147@ru.nl")) {
-        	attributes.put("university", "Radboud University");
-    		attributes.put("studentCardNumber", "081122336");
-    		attributes.put("studentID", "u012147");
-    		attributes.put("level", "PhD");
-    		attributes.put("expiry", "halfyear");
-        } else if(id.toLowerCase().equals("u921154@ru.nl")) {
-        	attributes.put("university", "Radboud University");
-    		attributes.put("studentCardNumber", "2300921154");
-    		attributes.put("studentID", "u921154");
-    		attributes.put("level", "PhD");
-    		attributes.put("expiry", "halfyear");
+
+        int sep_idx = id.indexOf("@");
+        String student_id = id.substring(1, sep_idx);
+        String host = id.substring(sep_idx + 1);
+
+        String university;
+
+        System.out.println("Student: " + student_id + " hosted by " + host);
+        if(host.equals("ru.nl")) {
+        	university = "Radboud University";
+        } else if (host.equals("student.tue.nl")) {
+        	university = "TU Eindhoven";
+        } else if (host.equals("utwente.nl")) {
+        	university = "University of Twente";
         } else {
-			attributes.put("university", "Radboud University");
-			attributes.put("studentCardNumber", "0813371337");
-			attributes.put("studentID", "s1234567");
-			attributes.put("level", "PhD");
-    		attributes.put("expiry", "halfyear");
+        	university = "Unknown";
         }
-		
+
+    	attributes.put("university", university);
+		attributes.put("studentCardNumber", "Unknown");
+		attributes.put("studentID", student_id);
+		attributes.put("level", "master");
 		return attributes;
 	}
-	
+
 	public IssueCredentialInformation getIssueCredentialInformation(String cred) throws InfoException {
 		return new IssueCredentialInformation(ISSUER, cred);
 	}

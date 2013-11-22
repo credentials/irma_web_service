@@ -46,6 +46,13 @@
         $("#RU_welcome").show();
       }
 
+      IRMA.onIssuanceFinished = function(event) {
+    	  IRMA.hide_issue();
+    	  $("#welcome_text").hide();
+    	  $("#thanks_text").show();
+    	  $("#RU_welcome").show();
+      }
+
       $("#load_credentials").on('click', function(event) {
         $("#RU_welcome").hide();
         IRMA.start_verify();
@@ -55,30 +62,57 @@
 </head>
 <body>
   <div id="RU_welcome">
-    <div class="container">
-      <div class="page-header">
-        <div class="row">
-          <div class="span6">
-            <img alt="Radboud University Nijmegen" src="../../img/ru_toplogo.jpg" />
-          </div>
-          <div class="span6">
-            <h1>Issuing of student credential</h1>
-          </div>
-        </div>
-      </div>
-        
-      <div class="row">
-        <p>On this page you can obtain a digital student card on your IRMA card. Obviously, you will need your IRMA card and a card reader for this.</p>
-        <p>The process has two steps. First, in order to receive this credential, you have to prove that you already have a SURFnet credential. Second, your university will issue the new credential on your IRMA card.</p>
-        <p>Don't worry! It's self-explanatory.</p>
-        <ol>
-          <li>Click on the 'Load your credentials' button.</li>
-          <li>Follow the instructions. You do need to enter your PIN code during the process.</li>
-        </ol>
-        <p style="text-align: center"><img src="../../img/irma_load_credentials.png" id="load_credentials" /></p>
-      </div>
-    </div>
-  </div>
+		<div class="container">
+			<div class="page-header">
+				<div class="row">
+					<div class="span6">
+						<img alt="Radboud University Nijmegen"
+							src="../../img/ru_toplogo.jpg" />
+					</div>
+					<div class="span6">
+						<h1>Student credential</h1>
+					</div>
+				</div>
+			</div>
+
+			<div class="row">
+				<div class="span8" id="welcome_text">
+					<p>On this page you can obtain a digital student card on your
+						IRMA card. Obviously, you will need your IRMA card and a card
+						reader for this.</p>
+					<p>The process has two steps. First, in order to receive this
+						credential, you have to prove that you already have a SURFnet
+						credential. Second, the Radboud University will issue the new
+						credential on your IRMA card.</p>
+					<p>Don't worry! It's self-explanatory.</p>
+					<ol>
+						<li>Click on the 'Load your credentials' button.</li>
+						<li>Follow the instructions. You do need to enter your PIN
+							code during the process.</li>
+					</ol>
+					<p style="text-align: center">
+						<img src="../../img/irma_load_credentials.png"
+							id="load_credentials" />
+					</p>
+				</div>
+
+				<div class="span8" id="thanks_text"  hidden=true>
+					<p>Congratulations! You have loaded your digital student card onto your 
+						IRMA card. You can now use this credential to make use of some
+						of our other IRMA Pilot services! Amongst others, you can:</p>
+					<ul>
+						<li>Print free of charge using the IRMA Print Kiosk;</li>
+						<li>Get a discount to buy deluxe coffee at selected canteens in
+							Nijmegen and Twente. See the <a href="">IRMA website</a> for
+							details; and
+						</li>
+						<li>Get extra cheap software by <a href="">using a
+								SURFspot voucher.</a>.
+					</ul>
+				</div>
+			</div>
+		</div>
+	</div>
 
   <object classid="clsid:8AD9C840-044E-11D1-B3E9-00805F499D93" height="10" width="10">
     <param name="code" value="org.ovchip.SmartCardJS.class" />

@@ -53,6 +53,7 @@
         <exclude name="WEB-INF/" />
         <exclude name="META-INF/" />
       </fileset>
+      <metainf file="${web.dir}/META-INF/context.xml" />
     </war>
   </target>
 

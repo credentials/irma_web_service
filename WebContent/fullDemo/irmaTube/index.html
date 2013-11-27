@@ -97,8 +97,10 @@
     }
 
     $(function() {
-      IRMAURL.base = "/irma_web_service";
-      IRMAURL.verifierLogo = IRMAURL.base + "/img/irmatube_verifier.png";
+      IRMAURL.base = "https://demo.irmacard.org/tomcat/irma_demo";
+      IRMAURL.html = IRMAURL.base + "/irma";
+      IRMAURL.img = IRMAURL.base + "/img";
+      IRMAURL.verifierLogo = IRMAURL.base + "/fullDemo/irmaTube/img/irmatube_verifier.png";
       IRMA.init();
 
       var template = $("#movieTpl").html();

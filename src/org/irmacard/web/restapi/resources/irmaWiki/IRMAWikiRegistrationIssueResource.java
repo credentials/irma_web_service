@@ -45,6 +45,12 @@ public class IRMAWikiRegistrationIssueResource extends IssueBaseResource {
 		if (data.nickname == null) {
 			return null;
 		}
+		if (data.realname == null || data.realname.isEmpty()) {
+			data.realname = " ";
+		}
+		if (data.email == null || data.email.isEmpty()) {
+			data.email = " ";
+		}
 		Map<String, IssueCredentialInfo> map = new HashMap<String, IssueCredentialInfo>();
 		
 		IssueCredentialInfo ici = new IssueCredentialInfo();

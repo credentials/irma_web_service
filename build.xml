@@ -36,7 +36,7 @@
 
   <target name="compile">
     <mkdir dir="${bin.dir}" />
-    <javac srcdir="${src.dir}" destdir="${bin.dir}" includeantruntime="false">
+    <javac srcdir="${src.dir}" destdir="${bin.dir}" includeantruntime="false" target="1.6" source="1.6">
        <classpath refid="classpath" />
     </javac>
   </target>

@@ -5,6 +5,8 @@ import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.sql.Statement;
+import java.util.logging.Level;
+import java.util.logging.Logger;
 
 import javax.naming.Context;
 import javax.naming.InitialContext;
@@ -14,6 +16,7 @@ import javax.sql.DataSource;
 public class VoucherStore {
 	private static VoucherStore vs;
 	DataSource ds = null;
+	private static Logger log = Logger.getLogger(VoucherStore.class.getName());
 	
 	private VoucherStore () throws VoucherException {
 		try {
@@ -22,7 +25,7 @@ public class VoucherStore {
 			ds = (DataSource) envCtx.lookup("jdbc/irma_voucher");
 		} catch (NamingException e) {
 			e.printStackTrace();
-			System.out.println("Cannot access database!");
+			log.log(Level.SEVERE, "Cannot access database!");
 			throw new VoucherException("Cannot access database!");
 		}
 	}
@@ -40,6 +43,7 @@ public class VoucherStore {
 		Connection conn = null;
 		ResultSet result;
 
+		log.log(Level.INFO, "Trying to get voucher for user " + user_id);
 		try {
 			conn = ds.getConnection();
 			
@@ -51,8 +55,10 @@ public class VoucherStore {
 			result = test_exists.executeQuery();
 			if(result.next()) {
 				voucher = result.getString("voucher_code");
-				System.out.println("User already has voucher: " + voucher);
+				log.log(Level.INFO, "User already has voucher: " + voucher);
 				return voucher;
+			} else {
+				log.log(Level.INFO, "No vouchers found for this user!");
 			}
 			result.close();
 			
@@ -63,8 +69,7 @@ public class VoucherStore {
 			if(result.next()) {
 				// Option for voucher code
 				String possible_voucher = result.getString("voucher_code");
-				System.out.println("Option for voucher: " + possible_voucher);
-				
+
 				// Store user id in database
 				result.updateString("user_id", user_id);
 				result.updateRow();
@@ -75,7 +80,7 @@ public class VoucherStore {
 			}
 		} catch (SQLException e) {
 			e.printStackTrace();
-			System.out.println("SQL error");
+			log.log(Level.SEVERE, "SQL error: " + e.getMessage());
 		} finally {
 			try { conn.close(); } catch (Exception e) {} 
 		}

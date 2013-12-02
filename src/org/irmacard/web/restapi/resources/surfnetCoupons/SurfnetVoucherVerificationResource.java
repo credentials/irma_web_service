@@ -39,11 +39,11 @@ public class SurfnetVoucherVerificationResource extends
 					+ " credential is invalid/expired");
 		}
 
-		// TODO: test here for eligible users
 		String studentID = new String(studentCard.get("studentID"));
 		String university = new String(studentCard.get("university"));
+		String level = new String(studentCard.get("level"));
 		String userID = studentID + "@" + university;
-		if (!studentID.startsWith("s")) {
+		if (!level.equals("master")) {
 			return ProtocolStep.newError("Only students are eligible for a voucher");
 		}
 		

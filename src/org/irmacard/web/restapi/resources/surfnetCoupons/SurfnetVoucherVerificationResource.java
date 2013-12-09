@@ -63,7 +63,7 @@ public class SurfnetVoucherVerificationResource extends
 		if(voucher == null) {
 			ps.protocolDone = true;
 			ps.status = "error";
-			ps.feedbackMessage = "We seem to have run out of vouchers for now. Please contact us to request more.";
+			ps.feedbackMessage = "We seem to have run out of vouchers for now. More should become available soon.";
 			return ps;
 		} else {
 			ps.protocolDone = true;

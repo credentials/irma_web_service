@@ -77,6 +77,8 @@ public class VoucherStore {
 				
 				// When no exceptions, return the voucher
 				voucher = possible_voucher;
+			} else {
+				log.log(Level.INFO, "Ran out of vouchers!!");
 			}
 		} catch (SQLException e) {
 			e.printStackTrace();

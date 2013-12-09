@@ -37,6 +37,7 @@
 				if(data.status === "success") {
 					$("#voucher-code").html(data.result);
 					$("#voucher-success").show();
+					$("#voucher-intro-text").hide();
 				}
 
 				$("#surfnet_welcome").show();
@@ -74,7 +75,7 @@
 				</p>
 			</div>
 			<div class="span4">
-				<p>Simply press the <em>Request Voucher</em> button below to get your voucher!</p>
+				<p id="voucher-intro-text">Simply press the <em>Request Voucher</em> button below to get your voucher!</p>
 				<button class="btn btn-primary" id="request_btn">Request Voucher</button>
 				<div id="voucher-success" class="alert alert-success" hidden=true>
 					<h4>Success!</h4>

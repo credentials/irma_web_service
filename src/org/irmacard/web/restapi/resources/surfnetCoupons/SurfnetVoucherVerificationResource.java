@@ -55,15 +55,22 @@ public class SurfnetVoucherVerificationResource extends
 		} catch (VoucherException e) {
 			e.printStackTrace();
 			ps.protocolDone = true;
-			ps.status = "failure";
-			ps.result = e.getMessage();
+			ps.status = "error";
+			ps.feedbackMessage = e.getMessage();
 			return ps;
 		}
-
-		ps.protocolDone = true;
-		ps.status = "success";
-		ps.result = voucher;
-		return ps;
+		
+		if(voucher == null) {
+			ps.protocolDone = true;
+			ps.status = "error";
+			ps.feedbackMessage = "We seem to have run out of vouchers for now. Please contact us to request more.";
+			return ps;
+		} else {
+			ps.protocolDone = true;
+			ps.status = "success";
+			ps.result = voucher;
+			return ps;
+		}
 	}
 
 	@Override

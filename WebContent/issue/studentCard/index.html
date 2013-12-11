@@ -37,8 +37,12 @@
         console.log(data);
         issue_url = data.result;
         $.ajax({
+          headers: {
+				'Accept': 'application/json',
+				'Content-Type': 'application/json'},
           url: data.result,
           type: 'POST',
+          data: JSON.stringify({empty: true}),
           success: start_issuance,
         });
       }

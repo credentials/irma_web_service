@@ -3,27 +3,41 @@ apply plugin: 'war'
 //sourceSets.main.resources.srcDir 'data/'
 
 repositories {
+    mavenLocal()
+    maven {
+        url "https://credentials.github.io/repos/maven2/"
+    }
+    maven {
+        url "http://maven.restlet.org"
+    }
     mavenCentral()
 }
 
 dependencies {
     providedCompile 'org.apache.tomcat:tomcat-catalina:7.0.41'
     providedCompile 'org.apache.tomcat:tomcat-util:7.0.41'
+
+    compile "com.ibm.zurich.idmx:idemix_library:2.3.4"
+    compile "net.sourceforge.scuba:scuba_smartcards:0.0.3"
+
+    compile "org.irmacard.credentials:credentials_api:0.8"
+    compile "org.irmacard.idemix:idemix_terminal:0.8"
+    compile "org.irmacard.credentials:credentials_idemix:0.8"
+
     compile files('WebContent/WEB-INF/lib/cert-cvc-1.3.0.jar')
-    compile files('WebContent/WEB-INF/lib/credentials_api.lib.jar')
-    compile files('WebContent/WEB-INF/lib/credentials_idemix.lib.jar')
-    compile files('WebContent/WEB-INF/lib/gson-2.2.2.jar')
-    compile files('WebContent/WEB-INF/lib/idemix_library.lib.jar')
-    compile files('WebContent/WEB-INF/lib/idemix_terminal.lib.jar')
-    compile files('WebContent/WEB-INF/lib/mysql-connector-java-5.1.27-bin.jar')
-    compile files('WebContent/WEB-INF/lib/org.restlet.ext.json.jar')
-    compile files('WebContent/WEB-INF/lib/org.restlet.ext.servlet.jar')
-    compile files('WebContent/WEB-INF/lib/org.restlet.ext.xml.jar')
-    compile files('WebContent/WEB-INF/lib/org.restlet.jar')
-    compile files('WebContent/WEB-INF/lib/qrgen-1.1.jar')
-    compile files('WebContent/WEB-INF/lib/scuba.lib.jar')
-    compile files('WebContent/WEB-INF/lib/zxing-core-2.1.jar')
-    compile files('WebContent/WEB-INF/lib/zxing-javase-2.1.jar')
+
+    compile "org.restlet.jee:org.restlet:2.1.1"
+    compile "org.restlet.jee:org.restlet.ext.json:2.1.7"
+    compile "org.restlet.jee:org.restlet.ext.servlet:2.1.7"
+    compile "org.restlet.jee:org.restlet.ext.xml:2.1.7"
+
+    compile 'com.google.code.gson:gson:2.2.2'
+    compile 'com.google.zxing:core:2.1.0'
+    compile 'com.google.zxing:javase:2.1.0'
+
+    compile 'net.glxn:qrgen:1.4'
+
+    compile 'mysql:mysql-connector-java:5.1.27'
 }
 
 war {

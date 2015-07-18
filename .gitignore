@@ -10,3 +10,6 @@ src/main/webapp/WEB-INF/lib/idemix_library.lib.jar
 src/main/webapp/WEB-INF/lib/idemix_terminal.lib.jar
 src/main/webapp/WEB-INF/lib/scuba.lib.jar
 src/main/webapp/META-INF/context.xml
+.classpath
+.project
+.settings

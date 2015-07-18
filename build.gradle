@@ -1,6 +1,19 @@
 apply plugin: 'war'
+apply plugin: 'jetty'
+apply plugin: 'eclipse-wtp'
+
 //webAppDirName = 'WebContent'
 //sourceSets.main.resources.srcDir 'data/'
+
+// Add H2 to build dependencies so we can access it
+buildscript {
+    repositories {
+        mavenCentral()
+    }
+    dependencies {
+        classpath "com.h2database:h2:1.3.176"
+    }
+}
 
 repositories {
     mavenLocal()
@@ -38,8 +51,15 @@ dependencies {
     compile 'net.glxn:qrgen:1.4'
 
     compile 'mysql:mysql-connector-java:5.1.27'
+
+    providedRuntime "com.h2database:h2:1.3.176"
+    providedRuntime 'commons-dbcp:commons-dbcp:1.4'
 }
 
-war {
-    //from 'WebContent'
+jettyRun {
+    jettyEnvXml = file('src/test/resources/jetty-env.xml')
+}
+
+[jettyRun, jettyRunWar]*.doFirst {
+    org.h2.tools.Server.main()
 }

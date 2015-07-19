@@ -1,0 +1,19 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<Configure class="org.eclipse.jetty.webapp.WebAppContext">
+    <New id="jdbc/irma_voucher" class="org.eclipse.jetty.plus.jndi.Resource">
+        <Arg></Arg>
+        <Arg>jdbc/irma_voucher</Arg>
+        <Arg>
+            <New class="org.apache.commons.dbcp.BasicDataSource">
+                <Set name="url">jdbc:h2:tcp://localhost/voucherdb;USER=sa;INIT=RUNSCRIPT FROM 'src/main/resources/resources/vouchers/vouchers.sql'</Set>
+            </New>
+        </Arg>
+    </New>
+    <!-- Disable scanning of jars, this can mess stuff up bigtime, but
+         it makes booting a whole lot faster, see:
+         https://wiki.eclipse.org/Jetty/Howto/Avoid_slow_deployment -->
+    <Call name="setAttribute">
+        <Arg>org.eclipse.jetty.server.webapp.WebInfIncludeJarPattern</Arg>
+        <Arg>.*/spring-security[^/]*\.jar$|.*/spring-web[^/]*\.jar$|.*/classes/.*</Arg>
+    </Call>
+</Configure>

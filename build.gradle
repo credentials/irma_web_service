@@ -1,5 +1,5 @@
 apply plugin: 'war'
-apply plugin: 'jetty'
+apply plugin: 'org.akhikhl.gretty'
 apply plugin: 'eclipse-wtp'
 
 //webAppDirName = 'WebContent'
@@ -8,15 +8,18 @@ apply plugin: 'eclipse-wtp'
 // Add H2 to build dependencies so we can access it
 buildscript {
     repositories {
+        jcenter()
         mavenCentral()
     }
     dependencies {
         classpath "com.h2database:h2:1.3.176"
+        classpath 'org.akhikhl.gretty:gretty:+'
     }
 }
 
 repositories {
     mavenLocal()
+    jcenter()
     maven {
         url "https://credentials.github.io/repos/maven2/"
     }
@@ -37,29 +40,46 @@ dependencies {
     compile "org.irmacard.idemix:idemix_terminal:0.8"
     compile "org.irmacard.credentials:credentials_idemix:0.8"
 
-    compile files('WebContent/WEB-INF/lib/cert-cvc-1.3.0.jar')
+    //compile files('WebContent/WEB-INF/lib/cert-cvc-1.3.0.jar')
 
-    compile "org.restlet.jee:org.restlet:2.1.1"
-    compile "org.restlet.jee:org.restlet.ext.json:2.1.7"
-    compile "org.restlet.jee:org.restlet.ext.servlet:2.1.7"
-    compile "org.restlet.jee:org.restlet.ext.xml:2.1.7"
+    compile "org.restlet.jee:org.restlet:2.3.2"
+    compile "org.restlet.jee:org.restlet.ext.json:2.3.2"
+    compile "org.restlet.jee:org.restlet.ext.servlet:2.3.2"
+    compile "org.restlet.jee:org.restlet.ext.xml:2.3.2"
 
     compile 'com.google.code.gson:gson:2.2.2'
     compile 'com.google.zxing:core:2.1.0'
     compile 'com.google.zxing:javase:2.1.0'
+
+    compile 'ch.qos.logback:logback-classic:1.1.2'
+    //compile 'org.slf4j:slf4j-api:1.7.12'
+    //compile 'org.slf4j:slf4j-simple:1.7.12'
+
+    //compile 'org.apache.logging.log4j:log4j-core:2.3'
+    //compile 'org.apache.logging.log4j:log4j-api:2.3'
+
+    gretty 'commons-dbcp:commons-dbcp:1.4'
 
     compile 'net.glxn:qrgen:1.4'
 
     compile 'mysql:mysql-connector-java:5.1.27'
 
     providedRuntime "com.h2database:h2:1.3.176"
-    providedRuntime 'commons-dbcp:commons-dbcp:1.4'
 }
 
-jettyRun {
-    jettyEnvXml = file('src/test/resources/jetty-env.xml')
+gretty {
+    contextConfigFile = file('src/test/resources/jetty-env.xml')
+    scanInterval = 10
+    onStart {
+        //org.h2.tools.Server.main()
+        org.h2.tools.Server.createTcpServer(null).start()
+        org.h2.tools.Server.createWebServer(null).start()
+    }
 }
 
-[jettyRun, jettyRunWar]*.doFirst {
+/*
+startH2 {
     org.h2.tools.Server.main()
 }
+startH2.onlyIf { project.gradle.startParameter.taskNames.contains("appRun") }
+*/

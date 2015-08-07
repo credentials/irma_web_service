@@ -5,7 +5,10 @@
         <Arg>jdbc/irma_voucher</Arg>
         <Arg>
             <New class="org.apache.commons.dbcp.BasicDataSource">
-                <Set name="url">jdbc:h2:tcp://localhost/voucherdb;USER=sa;INIT=RUNSCRIPT FROM 'src/main/resources/resources/vouchers/vouchers.sql'</Set>
+                <Set name="url">jdbc:h2:mem:voucherdb;USER=sa;INIT=RUNSCRIPT FROM 'src/main/resources/resources/vouchers/vouchers.sql'</Set>
+                <Set name="driverClassName">org.h2.Driver</Set>
+                <Set name="username">sa</Set>
+                <Set name="password"></Set>
             </New>
         </Arg>
     </New>

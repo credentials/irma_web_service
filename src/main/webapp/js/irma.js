@@ -1,5 +1,5 @@
 var IRMAURL = new Object();
-IRMAURL.base = "/irma_web_service";
+IRMAURL.base = "https://demo.irmacard.org/tomcat/irma_web_service";
 IRMAURL.action = IRMAURL.base + "/protocols/verification/SpuitenEnSlikken";
 IRMAURL.html = IRMAURL.base + "/irma";
 IRMAURL.img = IRMAURL.base + "/img";

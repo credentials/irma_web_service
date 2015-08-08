@@ -25,10 +25,7 @@
 
   <script type="text/javascript">
     $(function() {
-       ProxyReader.channelBaseURL = "https://demo.irmacard.org/tomcat/irma_web_relay/create";
-      IRMAURL.base = "https://demo.irmacard.org/tomcat/irma_web_service";
-      IRMAURL.html = IRMAURL.base + "/irma";
-      IRMAURL.img = IRMAURL.base + "/img";      IRMAURL.action = IRMAURL.base + "/protocols/verification/IRMATubeRegistration";
+      IRMAURL.action = IRMAURL.base + "/protocols/verification/IRMATubeRegistration";
       IRMAURL.verifierLogo = "img/irmatube_verifier.png";
       IRMAURL.issuerLogo = "img/irmatube_issuer.png";
       IRMA.after_issue_target = IRMAURL.base + "/fullDemo/irmaTube/";

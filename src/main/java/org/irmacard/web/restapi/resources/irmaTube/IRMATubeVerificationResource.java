@@ -122,30 +122,29 @@ public class IRMATubeVerificationResource extends
 	private Map<String, Integer> getAgeStore() {
 		Map<String, Integer> store = null;
 		ServletContext ctxt = null;
-		ServletContext other_ctxt = null;
 
 		try {
-			ctxt = (ServletContext) getContext().getServerDispatcher().getContext().getAttributes().get("org.restlet.ext.servlet.ServletContext");
+			ctxt = (ServletContext) getContext().getServerDispatcher().getContext().getAttributes()
+					.get("org.restlet.ext.servlet.ServletContext");
 		} catch (ClassCastException e) {
-			e.printStackTrace();
-		}
-		try {
-			other_ctxt = (ServletContext) getContext().getAttributes().get("org.restlet.ext.servlet.ServletContext");
-		} catch (ClassCastException e) {
-			e.printStackTrace();
+		} catch (NullPointerException e) {
 		}
 
-		// Try first context
+		// If first context method doesn't work, try another way
+		if (ctxt == null) {
+			try {
+				ctxt = (ServletContext) getContext().getAttributes()
+						.get("org.restlet.ext.servlet.ServletContext");
+			} catch (ClassCastException e) {
+			} catch (NullPointerException e) {
+			}
+		}
+
 		if(ctxt != null) {
 			store = (Map<String, Integer>) ctxt.getAttribute(AGE_STORE_NAME);
 		}
 
-		// Try second context
-		if(store == null && other_ctxt != null) {
-			store = (Map<String, Integer>) other_ctxt.getAttribute(AGE_STORE_NAME);
-		}
-
-		// Still no store found, create it and put it in first context.
+		// Still no store found, create it and put it in working context
 		if( store == null) {
 			System.out.println("Store not found, generating new store");
 			store = new HashMap<String, Integer>();

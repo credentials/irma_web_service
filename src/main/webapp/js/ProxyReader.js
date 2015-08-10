@@ -1,6 +1,6 @@
 var ProxyReader = {
 	// Some local variables
-	channelBaseURL: "https://demo.irmacard.org/tomcat/irma_web_relay/create",
+	channelBaseURL: "@IRMAWebRelay@/create",
 	cardVersion: "",
 
 	// Channels

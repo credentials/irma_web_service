@@ -2,8 +2,33 @@ apply plugin: 'war'
 apply plugin: 'org.akhikhl.gretty'
 apply plugin: 'eclipse-wtp'
 
-//webAppDirName = 'WebContent'
-//sourceSets.main.resources.srcDir 'data/'
+// Property localIP implies localServer (port 8080) and localRelay (port 8081)
+if (project.hasProperty("localIP")) {
+    ext.localServer = "http://" + localIP + ":8080"
+    ext.localRelay =  "http://" + localIP + ":8081"
+}
+
+// Set ext.irma_web_service_url if not set. If localServer is set
+// then set to localhost, otherwise default remote.
+if ( !project.hasProperty("irma_web_service_url") ) {
+    if(project.hasProperty("localServer")) {
+        ext.irma_web_service_url = localServer + "/irma_web_service"
+    } else {
+        ext.irma_web_service_url = "https://demo.irmacard.org/tomcat/irma_web_service"
+    }
+}
+System.out.println("Setting localServer to: " + irma_web_service_url);
+
+// Set ext.irma_webr_relay_url if not set. If localServer is set
+// then set to localhost, otherwise default remote.
+if ( !project.hasProperty("irma_web_relay_url") ){
+    if(project.hasProperty("localRelay")) {
+        ext.irma_web_relay_url = localRelay + "/irma_web_relay"
+    } else {
+        ext.irma_web_relay_url = "https://demo.irmacard.org/tomcat/irma_web_relay"
+    }
+}
+System.out.println("Setting localRelay to: " + irma_web_relay_url);
 
 // Add H2 to build dependencies so we can access it
 buildscript {
@@ -62,7 +87,19 @@ dependencies {
     compile "com.h2database:h2:1.3.176"
 }
 
+import org.apache.tools.ant.filters.*
+
 gretty {
     contextConfigFile = file('src/test/resources/jetty-env.xml')
     scanInterval = 10
+
+    webappCopy {
+        filesMatching "js/*.js", { FileCopyDetails fileDetails ->
+            logger.warn "Filtering: {}", fileDetails.path
+            filter ReplaceTokens, tokens: [
+                'IRMAWebService': irma_web_service_url,
+                'IRMAWebRelay': irma_web_relay_url
+            ]
+        }
+    }
 }

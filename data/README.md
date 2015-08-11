@@ -19,10 +19,10 @@ This directory contains the movie trailer source files. Please ensure that
    the first line. Supported values are 12, 16, 18 and 0. The latter is used
    when no age restriction is required. The value you enter here is authorative.
 
- * Edit WebContent/fullDemo/irmaTube/content/movies.js to include the movie, see
+ * Edit src/main/webapp/fullDemo/irmaTube/content/movies.js to include the movie, see
    movies.js.example for an example. The age you enter here is only indicative,
    but should correspond to an appropriate age class for this movie.
 
- * Finally, add a cover image movie.jpg in WebContent/fullDemo/irmaTube/content/.
+ * Finally, add a cover image movie.jpg in src/main/webapp/fullDemo/irmaTube/content/.
 
 Only the files in data/irmaTube are protected against unauthorized access.

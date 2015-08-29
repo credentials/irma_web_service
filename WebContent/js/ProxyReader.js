@@ -36,6 +36,9 @@ var ProxyReader = {
 			// The Proxy app needs to listen to
 			console.log("HELLO HELLO: ", ProxyReader.toProxy.qr_url);
 			$("#qr_image").attr("src", ProxyReader.toProxy.qr_url);
+			IRMA_button_webclient.onclick = function () {
+				window.location = encodeURI(ProxyReader.toProxy.read_url).replace(/^https?/, 'cardproxy');
+			};
 
 			// Tell the proxy where to send its responses
 			ProxyReader.toProxy.send({write_url: ProxyReader.fromProxy.write_url});

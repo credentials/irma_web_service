@@ -1,12 +1,11 @@
 package org.irmacard.web.restapi.resources;
 
+import java.math.BigInteger;
+
 import org.irmacard.credentials.Attributes;
 import org.irmacard.credentials.CredentialsException;
-import org.irmacard.credentials.Nonce;
 import org.irmacard.credentials.idemix.IdemixCredentials;
-import org.irmacard.credentials.idemix.IdemixNonce;
-import org.irmacard.credentials.idemix.spec.IdemixVerifySpecification;
-import org.irmacard.credentials.idemix.util.VerifyCredentialInformation;
+import org.irmacard.credentials.idemix.descriptions.IdemixVerificationDescription;
 import org.irmacard.credentials.info.InfoException;
 import org.irmacard.web.restapi.ProtocolState;
 import org.irmacard.web.restapi.util.ProtocolCommandSerializer;
@@ -31,21 +30,19 @@ public class VerificationProtocolResource extends ProtocolBaseResource {
 			.registerTypeAdapter(ProtocolCommand.class,
 					new ProtocolCommandSerializer()).create();
 
-		VerifyCredentialInformation vci = null;
+		IdemixVerificationDescription vd = null;
 		try {
-			vci = new VerifyCredentialInformation(verifier, specName);
+			vd = new IdemixVerificationDescription(verifier, specName);
 		} catch (InfoException e1) {
-			// TODO Auto-generated catch block
 			// TODO Is this still used in practice?
 			e1.printStackTrace();
 			return "Error";
 		}
-		IdemixVerifySpecification vspec = vci.getIdemixVerifySpecification();
-		
+
 		ProtocolStep ps = null;
 		switch (step) {
 		case 0:
-			ps = createVerificationProtocolStep(id, vspec);
+			ps = createVerificationProtocolStep(id, vd);
 			ps.responseurl = makeResponseURL(id, step+1);
 			ProtocolState.putStatus(id, "step1");
 			break;
@@ -54,7 +51,7 @@ public class VerificationProtocolResource extends ProtocolBaseResource {
 			ps.protocolDone = true;
 			ps.status = "failure";
 			try {
-				Attributes attr = processVerificationResponse(id, vspec, value);
+				Attributes attr = processVerificationResponse(id, vd, value);
 				if (attr != null) {
 					ps.status = "success";
 					if (verifier.equalsIgnoreCase("NYTimes")) {
@@ -86,34 +83,35 @@ public class VerificationProtocolResource extends ProtocolBaseResource {
 		return gson.toJson(ps);
 	}
 
-	public static ProtocolStep createVerificationProtocolStep(String id, IdemixVerifySpecification vspec) {
+	public static ProtocolStep createVerificationProtocolStep(String id, IdemixVerificationDescription vd) {
 		ProtocolStep ps = new ProtocolStep();
 
 		IdemixCredentials ic = new IdemixCredentials(null);
 
 		try {
-			Nonce nonce = ic.generateNonce(vspec);
-			ps.commands = ic.requestProofCommands(vspec, nonce);
+			BigInteger nonce = vd.generateNonce();
+			ps.commands = ic.requestProofCommands(vd, nonce);
 			ps.feedbackMessage = "Verifying";
 
-			ProtocolState.putNonce(id, ((IdemixNonce) nonce).getNonce());			
-		} catch (CredentialsException e) {
+			ProtocolState.putNonce(id, nonce);
+		} catch (InfoException e) {
 			e.printStackTrace();
 		}
 		return ps;
 	}
 
-	public static Attributes processVerificationResponse(String id, IdemixVerifySpecification vspec, String value) throws CredentialsException {
+	public static Attributes processVerificationResponse(String id, IdemixVerificationDescription vd, String value)
+			throws CredentialsException {
 		Gson gson = new GsonBuilder()
 			.setPrettyPrinting()
 			.registerTypeAdapter(ProtocolResponse.class,
 				new ProtocolResponseDeserializer()).create();
 
-		IdemixNonce nonce = new IdemixNonce(ProtocolState.getNonce(id));
+		BigInteger nonce = ProtocolState.getNonce(id);
 
 		ProtocolResponses responses = gson.fromJson(value, ProtocolResponses.class);
 		IdemixCredentials ic = new IdemixCredentials(null);
 
-		return ic.verifyProofResponses(vspec, nonce, responses);
+		return ic.verifyProofResponses(vd, nonce, responses);
 	}
 }

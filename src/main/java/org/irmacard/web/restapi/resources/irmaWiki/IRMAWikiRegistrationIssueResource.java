@@ -3,7 +3,7 @@ package org.irmacard.web.restapi.resources.irmaWiki;
 import java.util.HashMap;
 import java.util.Map;
 
-import org.irmacard.credentials.idemix.util.IssueCredentialInformation;
+import org.irmacard.credentials.idemix.descriptions.IdemixCredentialDescription;
 import org.irmacard.credentials.info.InfoException;
 import org.irmacard.web.restapi.ProtocolState;
 import org.irmacard.web.restapi.resources.IssueBaseResource;
@@ -71,7 +71,8 @@ public class IRMAWikiRegistrationIssueResource extends IssueBaseResource {
 		return map;
 	}
 
-	public IssueCredentialInformation getIssueCredentialInformation(String cred) throws InfoException {
-		return new IssueCredentialInformation(ISSUER, cred);
+	public IdemixCredentialDescription getIdemixCredentialDescription(String cred)
+			throws InfoException {
+		return new IdemixCredentialDescription(ISSUER, cred);
 	}
 }

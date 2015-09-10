@@ -3,7 +3,7 @@ package org.irmacard.web.restapi;
 import java.net.URI;
 import java.net.URISyntaxException;
 
-import org.irmacard.credentials.idemix.util.CredentialInformation;
+import org.irmacard.credentials.idemix.info.IdemixKeyStore;
 import org.irmacard.credentials.info.DescriptionStore;
 import org.irmacard.web.restapi.resources.NYTimesVerificationResource;
 import org.irmacard.web.restapi.resources.SpuitenEnSlikkenVerificationResource;
@@ -39,7 +39,7 @@ public class IRMAProtocolApplication extends Application {
 			e.printStackTrace();
 			throw new RuntimeException(e.toString());
 		}
-		CredentialInformation.setCoreLocation(CORE_LOCATION);
+		IdemixKeyStore.setCoreLocation(CORE_LOCATION);
 		DescriptionStore.setCoreLocation(CORE_LOCATION);
 
 		router.attach("/verification/SpuitenEnSlikken", SpuitenEnSlikkenVerificationResource.class);

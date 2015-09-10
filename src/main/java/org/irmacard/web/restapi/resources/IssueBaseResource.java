@@ -1,6 +1,5 @@
 package org.irmacard.web.restapi.resources;
 
-import java.lang.reflect.Field;
 import java.math.BigInteger;
 import java.util.Map;
 
@@ -11,10 +10,14 @@ import net.sf.scuba.smartcards.ProtocolResponses;
 
 import org.irmacard.credentials.Attributes;
 import org.irmacard.credentials.CredentialsException;
-import org.irmacard.credentials.idemix.IdemixCredentials;
-import org.irmacard.credentials.idemix.spec.IdemixIssueSpecification;
-import org.irmacard.credentials.idemix.util.IssueCredentialInformation;
+import org.irmacard.credentials.idemix.descriptions.IdemixCredentialDescription;
+import org.irmacard.credentials.idemix.info.IdemixKeyStore;
+import org.irmacard.credentials.idemix.irma.IRMAIdemixIssuer;
+import org.irmacard.credentials.idemix.messages.IssueCommitmentMessage;
+import org.irmacard.credentials.idemix.messages.IssueSignatureMessage;
+import org.irmacard.credentials.info.CredentialDescription;
 import org.irmacard.credentials.info.InfoException;
+import org.irmacard.idemix.IdemixSmartcard;
 import org.irmacard.idemix.util.CardVersion;
 import org.irmacard.web.restapi.ProtocolState;
 import org.irmacard.web.restapi.util.CardVersionDeserializer;
@@ -27,9 +30,8 @@ import org.irmacard.web.restapi.util.ProtocolStep;
 import com.google.gson.Gson;
 import com.google.gson.GsonBuilder;
 import com.google.gson.JsonSyntaxException;
-import com.ibm.zurich.idmx.issuance.Issuer;
 
-public abstract class IssueBaseResource  extends ProtocolBaseResource {	
+public abstract class IssueBaseResource  extends ProtocolBaseResource {
 	@Override
 	public String handleProtocolStep(String id, int step, String value) throws InfoException {
 		System.out.println("Handle post called!!!");
@@ -80,52 +82,24 @@ public abstract class IssueBaseResource  extends ProtocolBaseResource {
 		}
 
 		CardVersion cv = gson.fromJson(value, CardVersion.class);
+		ProtocolState.putCardVersion(id, cv);
+
+		IdemixCredentialDescription icd = getIdemixCredentialDescription(cred);
+		CredentialDescription cd = icd.getCredentialDescription();
+
+		BigInteger nonce1 = icd.generateNonce();
+		ProtocolState.putNonce(id, nonce1);
 
 		Attributes attributes = makeAttributes(issuer_info.get(cred).attributes);
+		attributes.setCredentialID(cd.getId());
+		ProtocolState.putAttributes(id, attributes);
 
-		// FIXME: should not really do this here.
-		attributes.setExpireDate(null);
-		
 		ProtocolState.putStatus(id, "issueready");
-		
-		IdemixCredentials ic = new IdemixCredentials(null);
-		IssueCredentialInformation ici;
-		try {
-			ici = getIssueCredentialInformation(cred);
-		} catch (InfoException e) {
-			e.printStackTrace();
-			return ProtocolStep.newError("Cannot read issuance information");
-		}
-		IdemixIssueSpecification spec = ici.getIdemixIssueSpecification();
-		spec.setCardVersion(cv);
-
-		// Initialize the issuer
-		Issuer issuer = ici.getIssuer(attributes);
 
 		// Run part one of protocol
-		ProtocolCommands commands;
-		try {
-			commands = ic.requestIssueRound1Commands(spec, attributes, issuer);
-		} catch (CredentialsException e) {
-			e.printStackTrace();
-			return ProtocolStep.newError("Error while issuing.");
-		}
-		
-		// Save state, this is the nasty part
-		BigInteger nonce1 = null;
-		try {
-			Field nonce1Field = Issuer.class.getDeclaredField("nonce1");
-			nonce1Field.setAccessible(true);
-			nonce1 = (BigInteger) nonce1Field.get(issuer);
-		} catch (Exception e) {
-			e.printStackTrace();
-		}
-		
-		ProtocolState.putIssuer(id, issuer);
-		ProtocolState.putNonce(id, nonce1);
-		ProtocolState.putAttributes(id, attributes);
-		ProtocolState.putCardVersion(id, cv);
-		
+		ProtocolCommands commands = IdemixSmartcard.requestIssueCommitmentCommands(cv,
+				icd, attributes, nonce1);
+
 		ProtocolStep ps = new ProtocolStep();
 		ps.commands = commands;
 		ps.confirmationMessage = "Are you sure you want this credential to be issued to your IRMA card?";
@@ -146,56 +120,33 @@ public abstract class IssueBaseResource  extends ProtocolBaseResource {
 			.registerTypeAdapter(ProtocolResponse.class,
 					new ProtocolResponseDeserializer()).create();
 
-		// FIXME: setup the actual idemix issue specification
-		System.out.println("==== Setting up credential infromation ===");
-		IdemixCredentials ic = new IdemixCredentials(null);
-		IssueCredentialInformation ici;
-		try {
-			ici = getIssueCredentialInformation(cred);
-		} catch (InfoException e) {
-			e.printStackTrace();
-			return ProtocolStep.newError("Cannot read issuance information");
-		}
+		IdemixCredentialDescription icd = getIdemixCredentialDescription(cred);
+		CredentialDescription cd = icd.getCredentialDescription();
 
-		System.out.println("=== Getting issuance information ===");
-		IdemixIssueSpecification spec = ici.getIdemixIssueSpecification();
-		spec.setCardVersion(ProtocolState.getCardVersion(id));
-
+		CardVersion cv = ProtocolState.getCardVersion(id);
 		BigInteger nonce1 = ProtocolState.getNonce(id);
 		Attributes attributes = ProtocolState.getAttributes(id);
 
 		// Initialize the issuer
-		System.out.println("=== Getting issuer ===");
-		Issuer issuer = ici.getIssuer(attributes);
-
-		// Restore the state, this is the nasty part
-		try {
-			Field nonce1Field = Issuer.class.getDeclaredField("nonce1");
-			nonce1Field.setAccessible(true);
-			nonce1Field.set(issuer, nonce1);
-		} catch (Exception e) {
-			e.printStackTrace();
-		}
-
-		// FIXME: superfluous?
-		issuer = ProtocolState.getIssuer(id);
+		IRMAIdemixIssuer issuer = new IRMAIdemixIssuer(icd.getPublicKey(),
+				IdemixKeyStore.getInstance().getSecretKey(cd), icd.getContext());
 
 		ProtocolResponses responses = gson.fromJson(value,
 				ProtocolResponses.class);
+		IssueCommitmentMessage commit_msg = IdemixSmartcard
+				.processIssueCommitmentCommands(cv, responses);
 
-		// Run part one of protocol
-		ProtocolCommands commands;
+		// Create signature
+		IssueSignatureMessage signature_msg;
 		try {
-			// Run next part of protocol
-			commands = ic.requestIssueRound3Commands(spec, attributes, issuer, responses);
+			signature_msg = issuer.issueSignature(commit_msg, icd, attributes, nonce1);
 		} catch (CredentialsException e) {
 			e.printStackTrace();
 			return ProtocolStep.newError("Error while issuing.");
-		} catch (NullPointerException e) {
-			// This appears to be thrown here if some verification fails
-			e.printStackTrace();
-			return ProtocolStep.newError("Error while issuing (null-pointer).");
 		}
+
+		ProtocolCommands commands = IdemixSmartcard.requestIssueSignatureCommands(cv, icd,
+				signature_msg);
 
 		ProtocolState.putStatus(id, "issuing");
 
@@ -219,8 +170,10 @@ public abstract class IssueBaseResource  extends ProtocolBaseResource {
 	}
 	
 	public abstract Map<String,IssueCredentialInfo> getIssueCredentialInfos(String id, String value);
-	public abstract IssueCredentialInformation getIssueCredentialInformation(String cred) throws InfoException;
-	
+
+	public abstract IdemixCredentialDescription getIdemixCredentialDescription(
+			String cred) throws InfoException;
+
 	protected String makeIssueResponseURL(String id, String cred, int step) {
 		if (getRequestAttributes().get("id") == null) {
 			return getBaseURL() + getBasePath() + '/' + id + '/' + cred + '/' + Integer.toString(step);

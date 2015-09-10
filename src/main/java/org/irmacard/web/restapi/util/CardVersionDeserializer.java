@@ -4,7 +4,7 @@ import java.lang.reflect.Type;
 
 import org.irmacard.idemix.util.CardVersion;
 
-import net.sourceforge.scuba.util.Hex;
+import net.sf.scuba.util.Hex;
 
 import com.google.gson.JsonDeserializationContext;
 import com.google.gson.JsonDeserializer;

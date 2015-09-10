@@ -2,9 +2,9 @@ package org.irmacard.web.restapi.util;
 
 import java.lang.reflect.Type;
 
-import net.sourceforge.scuba.smartcards.ProtocolResponse;
-import net.sourceforge.scuba.smartcards.ResponseAPDU;
-import net.sourceforge.scuba.util.Hex;
+import net.sf.scuba.smartcards.ProtocolResponse;
+import net.sf.scuba.smartcards.ResponseAPDU;
+import net.sf.scuba.util.Hex;
 
 import com.google.gson.JsonDeserializationContext;
 import com.google.gson.JsonDeserializer;

@@ -3,8 +3,8 @@ package org.irmacard.web.restapi.util;
 import java.util.List;
 import java.util.Map;
 
-import net.sourceforge.scuba.smartcards.ProtocolCommand;
-import net.sourceforge.scuba.smartcards.ProtocolCommands;
+import net.sf.scuba.smartcards.ProtocolCommand;
+import net.sf.scuba.smartcards.ProtocolCommands;
 
 /**
  * Data structure for communicating protocol steps.

@@ -1,9 +1,5 @@
 package org.irmacard.web.restapi.resources;
 
-import net.sourceforge.scuba.smartcards.ProtocolCommand;
-import net.sourceforge.scuba.smartcards.ProtocolResponse;
-import net.sourceforge.scuba.smartcards.ProtocolResponses;
-
 import org.irmacard.credentials.Attributes;
 import org.irmacard.credentials.CredentialsException;
 import org.irmacard.credentials.Nonce;
@@ -20,7 +16,11 @@ import org.irmacard.web.restapi.util.ProtocolStep;
 import com.google.gson.Gson;
 import com.google.gson.GsonBuilder;
 
-public class VerificationProtocolResource extends ProtocolBaseResource {	
+import net.sf.scuba.smartcards.ProtocolCommand;
+import net.sf.scuba.smartcards.ProtocolResponse;
+import net.sf.scuba.smartcards.ProtocolResponses;
+
+public class VerificationProtocolResource extends ProtocolBaseResource {
 	@Override
 	public String handleProtocolStep(String id, int step, String value) throws InfoException {
 		String verifier = (String) getRequestAttributes().get("verifier");

@@ -39,7 +39,7 @@ public abstract class IssueBaseResource  extends ProtocolBaseResource {
 			.setPrettyPrinting()
 			.registerTypeAdapter(ProtocolCommand.class,
 					new ProtocolCommandSerializer()).create();
-		
+
 		ProtocolStep ps = null;
 		String cred = (String) getRequestAttributes().get("cred");
 
@@ -65,10 +65,10 @@ public abstract class IssueBaseResource  extends ProtocolBaseResource {
 			ps = createIssuanceProtocolStepEnd(id, value);
 			break;
 		}
-		
+
 		return gson.toJson(ps);
 	}
-	
+
 	private ProtocolStep createIssuanceProtocolStep1(String id, String cred, String value) throws InfoException, JsonSyntaxException {
 		Gson gson = new GsonBuilder()
 		.setPrettyPrinting()
@@ -107,9 +107,8 @@ public abstract class IssueBaseResource  extends ProtocolBaseResource {
 		ps.usePIN = true;
 		ps.protocolDone = false;
 		ps.feedbackMessage = "Issuing credential (1)";
-		
+
 		return ps;
-		
 	}
 
 	private ProtocolStep createIssuanceProtocolStep2(String id, String cred, String value) throws InfoException {
@@ -158,7 +157,7 @@ public abstract class IssueBaseResource  extends ProtocolBaseResource {
 
 		return ps;
 	}
-	
+
 	private ProtocolStep createIssuanceProtocolStepEnd(String id, String value) {
 		// TODO: actually check what is sent
 		ProtocolState.putStatus(id, "success");
@@ -168,7 +167,7 @@ public abstract class IssueBaseResource  extends ProtocolBaseResource {
 		ps.status = "success";
 		return ps;
 	}
-	
+
 	public abstract Map<String,IssueCredentialInfo> getIssueCredentialInfos(String id, String value);
 
 	public abstract IdemixCredentialDescription getIdemixCredentialDescription(
@@ -180,7 +179,7 @@ public abstract class IssueBaseResource  extends ProtocolBaseResource {
 		}
 		return getBaseURL() + getBasePath().substring(0, getBasePath().lastIndexOf('/')+1) + Integer.toString(step);
 	}
-	
+
 	protected Attributes makeAttributes(Map<String,String> map) {
 		Attributes attributes = new Attributes();
 		for(String key : map.keySet()) {

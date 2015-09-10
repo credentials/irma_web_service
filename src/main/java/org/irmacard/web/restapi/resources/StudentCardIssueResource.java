@@ -24,7 +24,7 @@ public class StudentCardIssueResource extends IssueBaseResource {
 
 		return map;
 	}
-	
+
     private Map<String, String> getIssuanceAttributes(String id) {
         // Return the attributes that have been revealed during the proof
         Map<String,String> attributes = new HashMap<String,String>();

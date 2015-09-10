@@ -12,7 +12,7 @@ import org.irmacard.web.restapi.util.IssueCredentialInfo;
 public class IRMATubeRegistrationIssueResource extends IssueBaseResource {
 	final String ISSUER = "IRMATube";
 	final String CREDENTIAL = "member";
-	
+
 	private static final long ID_SIZE = 10000000000l;
 
 	@Override
@@ -23,13 +23,13 @@ public class IRMATubeRegistrationIssueResource extends IssueBaseResource {
 		System.out.println("Some randomness: " + Math.random() * ID_SIZE + " " + Math.random());
 		System.out.println("Some more randomness testing: " + 0.1 * ID_SIZE);
 		System.out.println("New userId generated: " + userID);
-		
+
 		if(age == null) {
 			return null;
 		}
 
 		Map<String, IssueCredentialInfo> map = new HashMap<String, IssueCredentialInfo>();
-		
+
 		IssueCredentialInfo ici = new IssueCredentialInfo();
 		Map<String,String> attributes = new HashMap<String,String>();
 
@@ -37,7 +37,7 @@ public class IRMATubeRegistrationIssueResource extends IssueBaseResource {
 		attributes.put("type", "regular");
 		attributes.put("id", userID);
 		ici.attributes = attributes;
-		
+
 		System.out.println("IRMATube: registered new user with id " + userID);
 
 		map.put(CREDENTIAL, ici);

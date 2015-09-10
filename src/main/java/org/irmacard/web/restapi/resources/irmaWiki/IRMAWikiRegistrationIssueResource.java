@@ -16,7 +16,7 @@ import com.google.gson.GsonBuilder;
 public class IRMAWikiRegistrationIssueResource extends IssueBaseResource {
 	final String ISSUER = "IRMAWiki";
 	final String CREDENTIAL = "member";
-	
+
 	public class Names {
 		public String nickname;
 		public String realname;
@@ -41,7 +41,7 @@ public class IRMAWikiRegistrationIssueResource extends IssueBaseResource {
 				data.email = names.email;
 			}
 		}
-		
+
 		if (data.nickname == null) {
 			return null;
 		}
@@ -52,7 +52,7 @@ public class IRMAWikiRegistrationIssueResource extends IssueBaseResource {
 			data.email = " ";
 		}
 		Map<String, IssueCredentialInfo> map = new HashMap<String, IssueCredentialInfo>();
-		
+
 		IssueCredentialInfo ici = new IssueCredentialInfo();
 		Map<String,String> attributes = new HashMap<String,String>();
 
@@ -62,7 +62,7 @@ public class IRMAWikiRegistrationIssueResource extends IssueBaseResource {
 		attributes.put("realname", data.realname);
 		attributes.put("email", data.email);
 		ici.attributes = attributes;
-		
+
 		System.out.println("IRMAWiki: registered new user with nickname " + data.nickname + "(" + data.realname + ")");
 
 		map.put(CREDENTIAL, ici);

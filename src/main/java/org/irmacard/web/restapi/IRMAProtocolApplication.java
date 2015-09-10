@@ -24,7 +24,7 @@ public class IRMAProtocolApplication extends Application {
 	/**
 	 * Starting point for the IRMA REST interface for smartcard protocols. Contains
 	 * the URL router.
-	 * 
+	 *
 	 * @author Maarten Everts
 	 */
 	@Override
@@ -72,5 +72,5 @@ public class IRMAProtocolApplication extends Application {
 		router.attach("/issue/IRMATubeRegistration/{id}/{cred}/{step}", IRMATubeRegistrationIssueResource.class);
 
 		return router;
-	}   
+	}
 }

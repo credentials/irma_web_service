@@ -33,9 +33,9 @@ import com.google.gson.reflect.TypeToken;
 
 
 public abstract class VerificationBaseResource extends ProtocolBaseResource {
-	
+
 	static final Type protocolResponsesType = new TypeToken<Map<String, ProtocolResponses>>() {}.getType();
-	
+
 	@Override
 	public String handleProtocolStep(String id, int step, String value) {
 

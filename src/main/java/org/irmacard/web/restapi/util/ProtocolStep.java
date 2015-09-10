@@ -16,7 +16,7 @@ public class ProtocolStep {
 	public String status;
 	public ProtocolCommands commands; // soon to be deprecated
     public Map<Short,List<ProtocolCommand>> commandsSets;
-    
+
     public String responseurl;
 
     public boolean protocolDone = false;
@@ -25,11 +25,11 @@ public class ProtocolStep {
 
     public boolean askConfirmation = false;
     public String confirmationMessage;
-    
+
     public String feedbackMessage;
-    
+
     public String result = null;
-	
+
     public static ProtocolStep newError(String errorMessage) {
     	ProtocolStep ps = new ProtocolStep();
 		ps.feedbackMessage = errorMessage;

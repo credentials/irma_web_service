@@ -43,18 +43,23 @@ var IRMA = {
 
 		// Initialize readers
 		ProxyReader.init();
-		SmartCardHandler.init();
+		if(typeof SmartCardHandler !== 'undefined') {
+			SmartCardHandler.init();
+		}
 	},
 
 	bindCallback: function(event, fct) {
 		ProxyReader.bind(event, function(data) {fct(data, ProxyReader);});
-		SmartCardHandler.bind(event, function(data) {fct(data, SmartCardHandler);});
+		if(typeof SmartCardHandler !== 'undefined'){
+			SmartCardHandler.bind(event, function(data) {fct(data, SmartCardHandler);});
+		}
 	},
 
 	createCardInsertedCallback: function(callback) {
 		return function(data, handler) {
 			IRMA.Handler = handler;
-			if(handler === SmartCardHandler) {
+			if(typeof SmartCardHanlder !== 'undefined' &&
+					handler === SmartCardHandler) {
 				// Card inserted into SmartCardHandler, connect to it
 				// FIXME: this would be the place to final fix this
 				console.log("Connecting to card for applet");
@@ -122,7 +127,9 @@ var IRMA = {
 			console.log("Connection timed out");
 		});
 
-		SmartCardHandler.poll();
+		if(typeof SmartCardHandler !== 'undefined') {
+			SmartCardHandler.poll();
+		}
 	},
 
 	retrieve_verifications: function() {

@@ -7,3 +7,11 @@ user_id varchar(40)
 );
 INSERT INTO vouchers VALUES (1, 'AABBCC', NULL);
 INSERT INTO vouchers VALUES (2, 'ZYXZYX', NULL);
+
+CREATE TABLE registrations
+(
+    id int unsigned not null auto_increment primary key,
+    name varchar(256),
+    lunch boolean,
+    registrationToken varchar(36),
+)

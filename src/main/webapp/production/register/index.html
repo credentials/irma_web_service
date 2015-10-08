@@ -1,0 +1,161 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+	<meta charset="utf-8">
+	<title>IRMA meeting registration</title>
+	<link href="../../css/irma.css" rel="stylesheet" type="text/css" />
+	<!-- 
+	<link
+		href="http://fonts.googleapis.com/css?family=Ubuntu:regular,bold&subset=Latin"
+		rel="stylesheet" type="text/css" />  -->
+	<link href="../../css/bootstrap.css" rel="stylesheet" type="text/css" />
+	
+	<script src="../../js/channel.js" type="text/javascript"></script>
+	<script src="../../js/ProxyReader.js" type="text/javascript"></script>
+	<script src="../../js/jquery.js" type="text/javascript"></script>
+	<script src="../../js/irma.js" type="text/javascript"></script>
+	<script src="../../js/mustache.js" type="text/javascript"></script>
+	<script src="../../js/bootstrap.min.js" type="text/javascript"></script>
+	
+	
+
+	<script>
+		$(function() {
+			IRMAURL.verifierLogo = IRMAURL.base + "/img/surfnet_verifier_logo.png";
+			IRMAURL.issuerLogo = IRMAURL.base + "/img/surfnet_issuer_logo.png";
+
+			IRMA.init();
+			IRMA.onBackButtonPressed = function(data) {
+				IRMA.hide_verify();
+				$("#irma_registration_welcome").show();
+			}
+			
+			IRMA.onVerifySuccess = function(data) {
+				IRMA.hide_verify();
+
+				$("#request_btn").hide()
+				if(data.status === "success") {
+					$("#voucher-code").html(data.result);
+					$("#voucher-success").show();
+					$("#voucher-intro-text").hide();
+				}
+				
+				result = JSON.parse(data.result);
+				$("#nameField").html(result.name);
+				$("#lunchField").html(result.lunch);
+				
+				IRMAURL.action = IRMAURL.base + "/protocols/issue/SurfnetRegistration/" + result.registrationToken;
+
+				$("#registration_start").hide();
+				$("#registered").show();
+				$("#irma_registration_welcome").show();
+				
+				var start_issuance = function(data) {
+					console.log(data);
+				    var credentials = data.info.issue_information;
+				    console.log(credentials);
+					$("#irma_registration_welcome").hide();
+					
+				    IRMA.start_batch_issue(Object.keys(credentials), IRMAURL.action);
+				}
+				
+				$("#proof_registration_btn").on("click", function(event) {
+					console.log("Issue registration btn clicked");
+					
+					$.ajax({
+				        headers: {
+				          'Accept': 'application/json',
+				          'Content-Type': 'application/json'
+				        },
+				        url: IRMAURL.action,
+				        type: 'POST',
+				        success: start_issuance,
+				    });
+				});
+			};
+			
+			$("#register_irma_btn").on("click", function(event) {
+				console.log("Request IRMA button clicked");
+				suffix = $("#lunchCheckbox").prop("checked") ? "yes" : "no";
+				IRMAURL.action = IRMAURL.base + "/protocols/verification/SurfnetRegistration/" + suffix;
+				$("#irma_registration_welcome").hide();
+				IRMA.start_verify();
+			});
+		
+			IRMA.onIssuanceFinished = function(event) {
+				$("#proof_registration_btn").hide();
+				$("#irma_registration_welcome").show();
+				$("#thx_hdr").html("You have registered and loaded the registration attribute!")
+				$("#proof_registration_txt").hide();
+				IRMA.hide_issue();
+			};
+		});
+	</script>
+</head>
+<body>
+	<div id="irma_registration_welcome" class="container">
+		<div class="page-header">    
+			<h1>IRMA bijeenkomst</h1>
+			<h1><small>6 november 2015</small></h1>
+		</div>
+		<div class="row" id="registration_start"> 
+			<div class="span8">
+				<p>
+					You can use this website IRMA meeting
+					via the the <a>IRMA phone application</a>.
+					Click on the registration button to 
+					reveal your name attribute. Your name is 
+					then automatically added to the list of
+					attendants. 
+				</p>
+				<p>
+					Subsequently you can choose to obtain a "proof of
+					registration" attribute on your device. Those who can
+					show such an attribute during the coffee break on
+					November 6 will receive a delicious treat.
+				</p>
+				<p>
+					If you have any questions, or would rather register via
+					email, <a href="https://www.irmacard.org/contact/">contact us</a>.
+					
+				</p>
+			</div>
+			<div class="span4">
+				<p>
+					Please check the lunch box if you'd like us to arrange lunch for you.
+				<p>
+				<form>
+					<div class="checkbox">
+					    <label>
+					      <input type="checkbox" id="lunchCheckbox"> I'd like lunch
+					    </label>
+	  				</div>
+  				</form>
+				<button class="btn btn-primary btn-block" id="register_irma_btn">Registrer using IRMA</button>				
+			</div>
+		</div>
+		<div class ="row" id="registered" hidden="true">
+			<div class="span8">
+				<h3 id="thx_hdr">You have been registered!</h3>
+				
+				<table class="table">
+					<tr>
+						<th>Name</th><td id="nameField"></td>
+					</tr>
+					<tr>
+						<th>Lunch</th><td id="lunchField"></td>
+					</tr>
+				</table>
+				
+				<p id="proof_registration_txt">
+					If you wish to receive the delicous treat on
+					November 6, don't forget to obtain the proof
+					of registration attribute by pressing the button
+					below.
+				</p>
+				<button class="btn btn-primary" id="proof_registration_btn">Get proof of registration</button>
+			</div>
+		</div>
+	</div>
+</body>
+</html>

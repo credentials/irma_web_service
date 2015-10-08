@@ -16,6 +16,8 @@ import org.irmacard.web.restapi.resources.irmaWiki.IRMAWikiRegistrationIssueReso
 import org.irmacard.web.restapi.resources.irmaWiki.IRMAWikiRegistrationVerificationResource;
 import org.irmacard.web.restapi.resources.irmaWiki.IRMAWikiVerificationResource;
 import org.irmacard.web.restapi.resources.surfnetCoupons.SurfnetVoucherVerificationResource;
+import org.irmacard.web.restapi.resources.surfnetRegister.SurfnetRegistrationIssueResource;
+import org.irmacard.web.restapi.resources.surfnetRegister.SurfnetRegistrationVerificationResource;
 import org.restlet.Application;
 import org.restlet.Restlet;
 import org.restlet.routing.Router;
@@ -48,11 +50,21 @@ public class IRMAProtocolApplication extends Application {
 		router.attach("/verification/NYTimes", NYTimesVerificationResource.class);
 		router.attach("/verification/NYTimes/{id}/{step}", NYTimesVerificationResource.class);
 
+        router.attach("/verification/SurfnetRegistration/{lunch}",
+                SurfnetRegistrationVerificationResource.class);
+        router.attach("/verification/SurfnetRegistration/{lunch}/{id}/{step}",
+                SurfnetRegistrationVerificationResource.class);
+        router.attach("/issue/SurfnetRegistration/{id}",
+                SurfnetRegistrationIssueResource.class);
+        router.attach("/issue/SurfnetRegistration/{id}/{cred}/{step}",
+                SurfnetRegistrationIssueResource.class);
+
 		router.attach("/verification/IRMATube/{age}", IRMATubeVerificationResource.class);
 		router.attach("/verification/IRMATube/{age}/{id}/{step}", IRMATubeVerificationResource.class);
 
 		router.attach("/verification/SurfnetVoucher", SurfnetVoucherVerificationResource.class);
-		router.attach("/verification/SurfnetVoucher/{id}/{step}", SurfnetVoucherVerificationResource.class);
+        router.attach("/verification/SurfnetVoucher/{id}/{step}",
+                SurfnetVoucherVerificationResource.class);
 
 		router.attach("/verification/IRMAWiki", IRMAWikiVerificationResource.class);
 		router.attach("/verification/IRMAWiki/{id}/{step}", IRMAWikiVerificationResource.class);

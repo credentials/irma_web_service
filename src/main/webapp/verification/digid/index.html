@@ -1,0 +1,104 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+	<meta charset="utf-8">
+	<title>IRMA-DigiD Login</title>
+	<link href="../../css/irma.css" rel="stylesheet" type="text/css" />
+	<link
+		href="http://fonts.googleapis.com/css?family=Ubuntu:regular,bold&subset=Latin"
+		rel="stylesheet" type="text/css" />
+	<link href="../../css/bootstrap.css" rel="stylesheet" type="text/css" />
+	<link href="digid.css" rel="stylesheet" type="text/css" />
+	
+	<script src="../../js/channel.js" type="text/javascript"></script>
+	<script src="../../js/ProxyReader.js" type="text/javascript"></script>
+	<script src="../../js/jquery.js" type="text/javascript"></script>
+	<script src="../../js/irma.js" type="text/javascript"></script>
+
+	<script>
+		$(function() {
+			IRMAURL.action = IRMAURL.base + "/protocols/verification/IDDocumentNumber";
+			IRMAURL.verifierLogo = IRMAURL.base + "/img/digid-irma.png";
+			IRMA.init();
+			IRMA.onBackButtonPressed = function(data) {
+				IRMA.hide_verify();
+				$("#login-with-IRMA").show();
+			}
+			IRMA.onVerifySuccess = function(data) {
+				IRMA.hide_verify();
+				IRMA.done();
+				console.log(data);
+
+				
+				if(data.status === "success") {
+					$("#document_nr").html(data.result);
+					$("#document_nr_inline").html(data.result);
+					$("#login-success").show();
+				} else {
+					$("#login-with-IRMA").show();
+				}
+			}
+			$("#login_btn").on("click", function(event) {
+				$("#login-with-IRMA").hide();
+				IRMA.start_verify();
+			});
+		});
+	</script>
+</head>
+<body>
+	<div id="surfnet_welcome" class="container">
+		<div class="page-header">
+			<div class="page-header-title">
+			DigiD
+			</div>
+			<div class="page-header-block"></div>
+		</div>
+		<div class="row">
+			<div class="span3">
+				<img src="../../img/digid-irma.png" alt="DigiD logo"></img>
+			</div>  
+			<div class="span6" id="login-with-IRMA">
+				<h1>Inloggen bij IRMA-DigiD</h1>
+				<p class="alert alert-error">
+					<strong>Let op!</strong> Deze pagina is <em>niet</em> van de Rijksoverheid, maar
+					van het IRMA team van de Radboud Universiteit Nijmegen.
+					Deze pagina laat slechts zien wat mogelijk is en biedt geen echte login
+					bij <a href="https://www.digid.nl">DigiD</a>.
+				</p>
+				<p>
+					Door op de onderstaande knop te drukken start u een login
+					bij IRMA-DigiD. Hierbij controleren wij
+					uw document nummer.
+				</p>
+				<button class="btn btn-primary" id="login_btn">Log in met IRMA</button>
+			</div>
+			<div class="span6" id="login-success" hidden>
+				<h1>U bent ingelogd bij IRMA-DigiD</h1>
+				<h1><small>Document nummer: <span id="document_nr">UNKNOWN</span></small></h1>
+				<p>
+					U heeft zich bij deze geauthenticeerd met het nummer <span
+						id="document_nr_inline">UNKNOWN</span> van uw
+					identiteitsdocument. Hiermee kan de overheid opzoeken wie u bent,
+					en wat uw BSN is. Met een geverifieerd BSN kunt u betrouwbaar
+					toegang krijgen tot online diensten bij de overheid en in de zorg.
+				</p>
+				<p>
+					Het ministerie van binnenlandse zaken (BZK) vindt de hier gebruikte
+					IRMA techniek te innovatief. BZK wil er zelfs geen proef mee doen,
+					ook al is de technologie open, gratis beschikbaar,
+					privacy-vriendelijk en flexibel.
+				</p>
+				<p>	
+					Mocht u over deze weigering een
+					mening willen laten horen kan dat bijv. bij het Twitter account
+					@Rijksoverheid, of via het 
+					  <a href="https://www.rijksoverheid.nl/contact/contactformulier">webformulier van de Rijksoverheid</a>.
+				</p>
+				<p>
+					Uw documentnummer is inmiddels uit onze database verwijderd.
+				</p>
+			</div>
+		</div>
+	</div>
+</body>
+</html>

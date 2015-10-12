@@ -1,0 +1,22 @@
+.page-header {
+	padding-bottom: 0px;
+	border-bottom: 10px solid #F6D4B2;
+}
+
+.page-header-title {
+	background-color: #FBEAD9;
+	line-height: 2em;
+	margin: 0px;
+	border: 0px none;
+	font-size: 1.5em;
+	font-weight: bold;
+	padding-left: 10px;
+}
+
+.page-header-block {
+	background-color: #E17000;
+	height: 30px;
+	padding-top: 20px;
+	margin: 0px;
+	border: 10px #ff88dd;
+}

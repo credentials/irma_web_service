@@ -5,6 +5,7 @@ import java.net.URISyntaxException;
 
 import org.irmacard.credentials.idemix.info.IdemixKeyStore;
 import org.irmacard.credentials.info.DescriptionStore;
+import org.irmacard.web.restapi.resources.IDDocumentNumberVerificationResource;
 import org.irmacard.web.restapi.resources.NYTimesVerificationResource;
 import org.irmacard.web.restapi.resources.SpuitenEnSlikkenVerificationResource;
 import org.irmacard.web.restapi.resources.StudentCardIssueResource;
@@ -65,6 +66,11 @@ public class IRMAProtocolApplication extends Application {
 		router.attach("/verification/SurfnetVoucher", SurfnetVoucherVerificationResource.class);
         router.attach("/verification/SurfnetVoucher/{id}/{step}",
                 SurfnetVoucherVerificationResource.class);
+
+        router.attach("/verification/IDDocumentNumber",
+                IDDocumentNumberVerificationResource.class);
+        router.attach("/verification/IDDocumentNumber/{id}/{step}",
+                IDDocumentNumberVerificationResource.class);
 
 		router.attach("/verification/IRMAWiki", IRMAWikiVerificationResource.class);
 		router.attach("/verification/IRMAWiki/{id}/{step}", IRMAWikiVerificationResource.class);

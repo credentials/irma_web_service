@@ -13,5 +13,5 @@ CREATE TABLE registrations
     id int unsigned not null auto_increment primary key,
     name varchar(256),
     lunch boolean,
-    registrationToken varchar(36),
+    registrationToken varchar(36)
 )

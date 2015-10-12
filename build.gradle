@@ -55,7 +55,9 @@ repositories {
 }
 
 dependencies {
-    compile 'org.apache.tomcat:tomcat-catalina:7.0.41'
+    providedCompile 'org.apache.tomcat:tomcat-catalina:7.0.41'
+    gretty 'org.apache.tomcat:tomcat-catalina:7.0.41'
+
     compile 'org.apache.tomcat:tomcat-util:7.0.41'
 
     compile "org.irmacard.idemix:idemix_terminal:0.10.0"

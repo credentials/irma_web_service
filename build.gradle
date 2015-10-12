@@ -14,7 +14,7 @@ if ( !project.hasProperty("irma_web_service_url") ) {
     if(project.hasProperty("localServer")) {
         ext.irma_web_service_url = localServer + "/irma_web_service"
     } else {
-        ext.irma_web_service_url = "https://demo.irmacard.org/tomcat/irma_web_service"
+        ext.irma_web_service_url = "https://demo.irmacard.org/tomcat/irma_web_service2"
     }
 }
 System.out.println("Setting localServer to: " + irma_web_service_url);
@@ -83,6 +83,10 @@ dependencies {
 }
 
 import org.apache.tools.ant.filters.*
+
+war {
+    baseName = "irma_web_service2"
+}
 
 gretty {
     contextConfigFile = file('src/test/resources/jetty-env.xml')

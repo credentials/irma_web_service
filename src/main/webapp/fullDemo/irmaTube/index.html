@@ -65,6 +65,10 @@
     function openMovie(videoNumber, ageLimit) {
       IRMAURL.action = IRMAURL.base + "/protocols/verification/IRMATube/" + ageLimit;
       $("#irmaTube").hide();
+      
+      IRMA.missingCredentialMessage = {
+        902: "You do not have the IRMATube membership credential. Get one by <a href=\"register.html\">registering</a> for IRMATube."
+      }
 
       IRMA.onVerifySuccess = function(data) {
         IRMA.hide_verify();

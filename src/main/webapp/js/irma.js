@@ -273,7 +273,13 @@ var IRMA = {
 			// Lost contact with the card
 			IRMA.show_failure("Card Lost", "FAILED");
 		} else if (response['failed-key'] === "startprove" && response.startprove.apdu === "6A88") {
-			IRMA.show_failure("Credential for " + cred_name + " does not exists.", "FAILED");
+			// Cannot find the credential
+			console.log("Verification with ID: " + key + " failed");
+			var error_msg = IRMA.missingCredentialMessage[key];
+			if(typeof error_msg == 'undefined') {
+				error_msg = "Credential for <strong>" + cred_name + "</strong> does not exist.";
+			}
+			IRMA.show_failure(error_msg, "FAILED");
 		} else {
 			IRMA.show_failure("Unknown error verifying " + cred_name, "FAILED");
 		}

@@ -40,8 +40,9 @@ var IRMA = {
 		IRMA.load_extra_html(IRMAURL.html + "/issue.html");
 		IRMA.load_extra_html(IRMAURL.html + "/verify.html");
 		IRMA.load_extra_html(IRMAURL.html + "/qr.html");
+	},
 
-		// Initialize readers
+	initReaders: function() {
 		ProxyReader.init();
 		if(typeof SmartCardHandler !== 'undefined') {
 			SmartCardHandler.init();
@@ -99,7 +100,9 @@ var IRMA = {
 	},
 
 	start_verify: function() {
-		IRMA.disableVerify(); // Reset state
+		// Reset state
+		IRMA.disableVerify();
+		IRMA.initReaders();
 		console.log("Starting IRMA verification");
 
 		IRMA.setup_qr();
@@ -279,7 +282,9 @@ var IRMA = {
 			if(typeof error_msg == 'undefined') {
 				error_msg = "Credential for <strong>" + cred_name + "</strong> does not exist.";
 			}
+			console.log("VERIFICATION FAILED!");
 			IRMA.show_failure(error_msg, "FAILED");
+			IRMA.Handler.close();
 		} else {
 			IRMA.show_failure("Unknown error verifying " + cred_name, "FAILED");
 		}

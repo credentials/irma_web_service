@@ -4,6 +4,8 @@ import java.util.HashMap;
 import java.util.Map;
 
 import org.irmacard.credentials.idemix.descriptions.IdemixCredentialDescription;
+import org.irmacard.credentials.info.CredentialDescription;
+import org.irmacard.credentials.info.DescriptionStore;
 import org.irmacard.credentials.info.InfoException;
 import org.irmacard.web.restapi.ProtocolState;
 import org.irmacard.web.restapi.resources.IssueBaseResource;
@@ -47,6 +49,8 @@ public class IRMATubeRegistrationIssueResource extends IssueBaseResource {
 
 	public IdemixCredentialDescription getIdemixCredentialDescription(String cred)
 			throws InfoException {
-		return new IdemixCredentialDescription(ISSUER, cred);
+		DescriptionStore ds = DescriptionStore.getInstance();
+		CredentialDescription cd = ds.getCredentialDescriptionByName(ISSUER, cred);
+		return new IdemixCredentialDescription(cd);
 	}
 }

@@ -13,6 +13,7 @@ import net.glxn.qrgen.QRCode;
 import net.glxn.qrgen.image.ImageType;
 
 import org.irmacard.credentials.Attributes;
+import org.irmacard.credentials.CredentialsException;
 import org.irmacard.credentials.info.InfoException;
 import org.irmacard.web.restapi.ProtocolState;
 import org.irmacard.web.restapi.util.QRResponse;
@@ -36,7 +37,7 @@ import com.google.gson.GsonBuilder;
 public abstract class ProtocolBaseResource extends ServerResource  {
 
     @Post("json")
-    public String handlePost (String value) throws InfoException {
+    public String handlePost(String value) throws InfoException, CredentialsException {
         String id = (String) getRequestAttributes().get("id");
         String step = (String) getRequestAttributes().get("step");
 
@@ -147,9 +148,11 @@ public abstract class ProtocolBaseResource extends ServerResource  {
      * @param step
      * @param value
      * @return
-     * @throws InfoException 
+     * @throws InfoException
+     * @throws CredentialsException
      */
-    public abstract String handleProtocolStep(String id, int step, String value) throws InfoException;
+    public abstract String handleProtocolStep(String id, int step, String value)
+            throws InfoException, CredentialsException;
 
     /**
      * Check whether a boolean query parameter was set to true.

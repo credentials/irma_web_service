@@ -33,7 +33,8 @@ import com.google.gson.JsonSyntaxException;
 
 public abstract class IssueBaseResource  extends ProtocolBaseResource {
 	@Override
-	public String handleProtocolStep(String id, int step, String value) throws InfoException {
+    public String handleProtocolStep(String id, int step, String value)
+            throws InfoException, CredentialsException {
 		System.out.println("Handle post called!!!");
 		Gson gson = new GsonBuilder()
 			.setPrettyPrinting()
@@ -69,7 +70,8 @@ public abstract class IssueBaseResource  extends ProtocolBaseResource {
 		return gson.toJson(ps);
 	}
 
-	private ProtocolStep createIssuanceProtocolStep1(String id, String cred, String value) throws InfoException, JsonSyntaxException {
+    private ProtocolStep createIssuanceProtocolStep1(String id, String cred, String value)
+            throws InfoException, JsonSyntaxException, CredentialsException {
 		Gson gson = new GsonBuilder()
 		.setPrettyPrinting()
 		.registerTypeAdapter(CardVersion.class,

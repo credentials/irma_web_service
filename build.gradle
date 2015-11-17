@@ -60,7 +60,7 @@ dependencies {
 
     compile 'org.apache.tomcat:tomcat-util:7.0.41'
 
-    compile "org.irmacard.idemix:idemix_terminal:0.10.0"
+    compile "org.irmacard.idemix:idemix_terminal:0.10.2"
 
     compile "org.restlet.jee:org.restlet:2.3.2"
     compile "org.restlet.jee:org.restlet.ext.json:2.3.2"
